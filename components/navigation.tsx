@@ -41,7 +41,7 @@ export function Navigation() {
           <span className="absolute -bottom-1 left-0 w-0 h-[3px] bg-pikavault-yellow group-hover:w-full transition-all duration-300"></span>
         </Link>
 
-        <nav className="hidden md:flex items-center space-x-8">
+        <nav className="hidden lg:flex items-center space-x-8">
           {navItems.map((item) => (
             <Link
               key={item.name}
@@ -57,9 +57,7 @@ export function Navigation() {
           <WalletConnection />
         </nav>
 
-        <div className="flex items-center space-x-4 md:hidden">
-          <WalletConnection />
-
+        <div className="flex items-center space-x-4 lg:hidden">
           <button
             className="text-white hover:text-pikavault-yellow transition-colors"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -84,6 +82,7 @@ export function Navigation() {
                 {item.name}
               </Link>
             ))}
+            <WalletConnection />
           </nav>
         </div>
       )}
