@@ -84,7 +84,7 @@ export function CustomToast({
           if (!isSuccess) {
             handleClose()
           }
-        }, 6000)
+        }, 4000)
 
         return () => {
           clearInterval(pulseInterval)
@@ -122,31 +122,42 @@ export function CustomToast({
 
   const handleConnect = () => {
     setIsConnecting(true)
-
-    // Simulate connection process
-    setTimeout(() => {
+    
+    onConnect()
+    
+    const connectionCheck = setTimeout(() => {
       setIsConnecting(false)
-      if (connected) {
-        setIsSuccess(true)
-
-        // Transform to success state
-        if (toastRef.current) {
-          gsap.to(toastRef.current, {
-            backgroundColor: "#00F5FF",
-            borderColor: "#F6FF00",
-            duration: 0.3,
-          })
-        }
-
-        // Auto-close after showing success
-        setTimeout(() => {
-          localStorage.setItem("wallet_connected", "true")
-          onConnect()
-          handleClose()
-        }, 2000)
+      if (!connected) {
+        console.log("Connection attempt timed out")
       }
-    }, 1500)
+    }, 10000) // 10 second timeout for connection attempt
+    
+    return () => clearTimeout(connectionCheck)
   }
+
+  // Monitor connection state changes
+  useEffect(() => {
+    if (connected && isConnecting) {
+      setIsConnecting(false)
+      setIsSuccess(true)
+
+      // Transform to success state
+      if (toastRef.current) {
+        gsap.to(toastRef.current, {
+          backgroundColor: "#00F5FF",
+          borderColor: "#F6FF00",
+          duration: 0.3,
+        })
+      }
+
+      const successTimer = setTimeout(() => {
+        localStorage.setItem("wallet_connected", "true")
+        handleClose()
+      }, 2000)
+      
+      return () => clearTimeout(successTimer)
+    }
+  }, [connected, isConnecting])
 
   const handleToastClick = () => {
     if (!isConnecting && !isSuccess) {
