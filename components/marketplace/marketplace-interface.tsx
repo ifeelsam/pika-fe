@@ -30,6 +30,7 @@ import {
   getAllListings,
   getUserAccount,
   findMarketplacePDA,
+  delistNFT,
 } from "@/lib/anchor/transactions";
 import { MARKETPLACE_ADMIN } from "@/lib/anchor/config";
 
@@ -222,6 +223,37 @@ export function MarketplaceInterface() {
     } catch (err) {
       console.error("Purchase failed:", err);
       setError(err instanceof Error ? err.message : "Failed to purchase NFT");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelist = async (listing: ListingData) => {
+    if (!program || !wallet.publicKey || !userRegistered) {
+      setError("Please register first and connect wallet");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const [marketplacePDA] = findMarketplacePDA(MARKETPLACE_ADMIN, program.programId);
+
+      const result = await delistNFT(
+        program,
+        wallet.publicKey,
+        marketplacePDA,
+        new PublicKey(listing.account.nftAddress),
+        new PublicKey(listing.publicKey)
+      );
+
+      setSuccess(`NFT delisted successfully! TX: ${result.tx}`);
+      await loadListings();
+      await checkUserRegistration();
+    } catch (err) {
+      console.error("Delist failed:", err);
+      setError(err instanceof Error ? err.message : "Failed to delist NFT");
     } finally {
       setIsLoading(false);
     }
@@ -456,9 +488,22 @@ export function MarketplaceInterface() {
                     )}
                     
                     {listing.account.owner === wallet.publicKey?.toString() && (
-                      <Badge variant="outline" className="w-full mt-3 justify-center">
-                        Your NFT
-                      </Badge>
+                      <div className="mt-3 space-y-2">
+                        <Badge variant="outline" className="w-full justify-center">
+                          Your NFT
+                        </Badge>
+                        {listing.account.status.active && (
+                          <Button 
+                            onClick={() => handleDelist(listing)}
+                            disabled={isLoading}
+                            variant="destructive"
+                            className="w-full"
+                            size="sm"
+                          >
+                            {isLoading ? "Delisting..." : "Delist NFT"}
+                          </Button>
+                        )}
+                      </div>
                     )}
                   </CardContent>
                 </Card>
