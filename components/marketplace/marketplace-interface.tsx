@@ -11,17 +11,6 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Keypair, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import { 
-  createMint,
-  getAssociatedTokenAddress,
-  createAssociatedTokenAccount,
-  mintTo,
-  TOKEN_PROGRAM_ID,
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  createInitializeMintInstruction,
-  createAssociatedTokenAccountInstruction,
-  createMintToInstruction
-} from "@solana/spl-token";
-import { 
   registerUser, 
   listNFT,
   createUmiInstance,
@@ -497,7 +486,7 @@ export function MarketplaceInterface() {
                             onClick={() => handleDelist(listing)}
                             disabled={isLoading}
                             variant="destructive"
-                            className="w-full"
+                            className="w-full rounded-xl"
                             size="sm"
                           >
                             {isLoading ? "Delisting..." : "Delist NFT"}
