@@ -14,13 +14,16 @@ import { gsap } from "gsap"
 import { useAnchorProgram } from "@/lib/anchor/client"
 import { 
   registerUser, 
-  mintAndListNFT,
+  createUmiInstance,
+  mintNFTWithUmi,
+  listNFT,
   getUserAccount,
   findMarketplacePDA
 } from "@/lib/anchor/transactions"
-import { MARKETPLACE_ADMIN } from "@/lib/anchor/config"
-import { Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js"
+import { Keypair } from "@solana/web3.js"
 import { createMint } from "@solana/spl-token"
+import { MARKETPLACE_ADMIN } from "@/lib/anchor/config"
+import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js"
 
 export default function ListingPage() {
   const [activeStep, setActiveStep] = useState(0)
@@ -165,81 +168,96 @@ export default function ListingPage() {
 
     try {
       setPublishingError(null)
+      setIsProcessing(true)
+      
+      // Validate required data
+      if (!uploadedImages.length) {
+        throw new Error("Please upload at least one image of your card")
+      }
+      
+      console.log("Starting listing process with data:", {
+        name: cardData.name,
+        set: cardData.set,
+        price: cardData.price || cardData.suggestedPrice,
+        condition: cardData.condition,
+        imageCount: uploadedImages.length
+      })
       
       // Ensure user is registered
       await ensureUserRegistered()
-
-      // Generate NFT mint keypair
-      const nftMint = Keypair.generate()
-      
-      // Create collection mint (in a real app, you might have a pre-existing collection)
-      console.log("Creating collection mint...")
-      const collectionMint = await createMint(
-        connection,
-        wallet as any,
-        wallet.publicKey,
-        wallet.publicKey,
-        0
-      )
+      console.log("User registration confirmed")
 
       // Get marketplace PDA
       const [marketplacePDA] = findMarketplacePDA(MARKETPLACE_ADMIN, program.programId)
+      console.log("Using marketplace PDA:", marketplacePDA.toString())
       
       // Convert price to lamports (assuming price is in USD, convert to SOL for demo)
       // In a real app, you'd have proper price conversion
-      const priceInSOL = (cardData.price || cardData.suggestedPrice) / 100 // Simplified conversion
-      const priceInLamports = priceInSOL * LAMPORTS_PER_SOL
-
-      // Create metadata string from card data
-      const metadata = JSON.stringify({
-        name: cardData.name,
-        set: cardData.set,
-        number: cardData.number,
-        rarity: cardData.rarity,
-        condition: cardData.condition,
-        language: cardData.language,
-        isGraded: cardData.isGraded,
-        gradingCompany: cardData.gradingCompany,
-        gradingScore: cardData.gradingScore,
-        conditionNotes: cardData.conditionNotes,
-        listingType: cardData.listingType,
-        duration: cardData.duration,
-        images: uploadedImages // Include all IPFS image URLs
-      })
+      const priceInSOL = (cardData.price || cardData.suggestedPrice) / 100; // Simplified conversion
+      const priceInLamports = priceInSOL * LAMPORTS_PER_SOL;
+      console.log(`Price: $${cardData.price || cardData.suggestedPrice} → ${priceInSOL} SOL → ${priceInLamports} lamports`)
 
       // Use first uploaded image as main image
       const imageUrl = uploadedImages[0] || ""
+      console.log("Primary image URL:", imageUrl)
+
+      // Create a safe symbol (limit to 10 chars)
+      const symbol = cardData.set && typeof cardData.set === 'string' 
+        ? cardData.set.slice(0, 10) 
+        : "PIKAVAULT";
+      console.log("Using symbol:", symbol)
 
       console.log("Minting and listing NFT...")
-      console.log("Using IPFS image URL:", imageUrl)
       
-      const result = await mintAndListNFT(
+      // Step 1: Create UMI instance and mint NFT with metadata
+      const umi = createUmiInstance(connection.rpcEndpoint, wallet)
+      
+      const nftResult = await mintNFTWithUmi(umi, {
+        name: cardData.name || "Unnamed Card",
+        symbol: symbol,
+        description: `${cardData.set} - ${cardData.number} | ${cardData.condition} | ${cardData.rarity}`,
+        image: imageUrl,
+        attributes: [
+          { trait_type: "Set", value: cardData.set || "Unknown Set" },
+          { trait_type: "Number", value: cardData.number || "" },
+          { trait_type: "Rarity", value: cardData.rarity || "common" },
+          { trait_type: "Condition", value: cardData.condition || "Near Mint" },
+          { trait_type: "Language", value: cardData.language || "English" },
+          { trait_type: "Graded", value: cardData.isGraded ? "Yes" : "No" },
+          ...(cardData.isGraded && cardData.gradingCompany ? [{ trait_type: "Grading Company", value: cardData.gradingCompany }] : []),
+          ...(cardData.isGraded && cardData.gradingScore ? [{ trait_type: "Grade", value: cardData.gradingScore }] : []),
+        ]
+      }, wallet)
+
+      // Convert UMI public key to Solana public key
+      const nftMintPublicKey = new PublicKey(nftResult.nftMint.publicKey)
+      
+      console.log("NFT minted with metadata! Mint:", nftMintPublicKey.toString())
+      console.log("Metadata URI:", nftResult.metadataUri)
+
+      // Step 2: List the NFT on the marketplace
+      const listResult = await listNFT(
         program,
         wallet.publicKey,
         marketplacePDA,
-        nftMint,
-        collectionMint,
-        cardData.name,
-        cardData.set.slice(0, 10), // Symbol has character limit
-        priceInLamports,
-        metadata,
-        imageUrl
+        nftMintPublicKey,
+        priceInLamports
       )
 
-      setTransactionSignature(result.tx)
-      setNftMintAddress(nftMint.publicKey.toString())
+      setTransactionSignature(listResult.tx)
+      setNftMintAddress(nftMintPublicKey.toString())
       
       console.log("NFT minted and listed successfully!")
-      console.log("Transaction:", result.tx)
-      console.log("NFT Mint:", nftMint.publicKey.toString())
+      console.log("Transaction:", listResult.tx)
+      console.log("NFT Mint:", nftMintPublicKey.toString())
       
-      return result
-
-    } catch (error) {
-      console.error("Error publishing listing:", error)
-      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
-      setPublishingError(errorMessage)
-      throw error
+      setIsProcessing(false)
+      setIsPublished(true)
+      
+      return listResult
+    } catch (mintError) {
+      console.error("Error in minting process:", mintError)
+      throw new Error(`Minting failed: ${mintError instanceof Error ? mintError.message : "Unknown error"}`)
     }
   }
 
@@ -255,16 +273,9 @@ export default function ListingPage() {
       window.scrollTo({ top: 0, behavior: "smooth" })
     } else {
       // Publish listing to blockchain
-      setIsProcessing(true)
-      publishListing()
-        .then(() => {
-          setIsProcessing(false)
-          setIsPublished(true)
-        })
-        .catch((error) => {
-          setIsProcessing(false)
-          console.error("Failed to publish listing:", error)
-        })
+      publishListing().catch((error) => {
+        console.error("Failed to publish listing:", error)
+      })
     }
   }
 

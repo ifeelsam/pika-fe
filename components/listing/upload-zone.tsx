@@ -5,7 +5,8 @@ import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { gsap } from "gsap"
 import { Upload, Camera, X, Check, AlertTriangle } from "lucide-react"
-import { uploadMultipleToIPFS, blobURLtoFile } from "@/lib/ipfs/pinata"
+import { uploadMultipleToIrys, blobURLtoFile } from "@/lib/ipfs/pinata"
+import { useWallet } from "@solana/wallet-adapter-react"
 
 interface UploadZoneProps {
   onImageUpload: (images: string[]) => void
@@ -25,6 +26,8 @@ export function UploadZone({ onImageUpload, uploadedImages, isProcessing, onSoun
   const fileInputRef = useRef<HTMLInputElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  
+  const { wallet } = useWallet()
 
   // Animation for drop zone
   useEffect(() => {
@@ -95,12 +98,18 @@ export function UploadZone({ onImageUpload, uploadedImages, isProcessing, onSoun
       return
     }
 
+    if (!wallet) {
+      setUploadError("Please connect your wallet to upload files")
+      onSound("error")
+      return
+    }
+
     setIsUploading(true)
     setUploadProgress(10)
 
     try {
-      // Upload files to IPFS
-      const ipfsUrls = await uploadMultipleToIPFS(validFiles)
+      // Upload files to Irys
+      const ipfsUrls = await uploadMultipleToIrys(validFiles, wallet)
       
       // Update progress as uploads complete
       setUploadProgress(100)
@@ -116,8 +125,8 @@ export function UploadZone({ onImageUpload, uploadedImages, isProcessing, onSoun
         setIsUploading(false)
       }, 500)
     } catch (error) {
-      console.error("Error uploading to IPFS:", error)
-      setUploadError("Failed to upload to IPFS. Please try again.")
+      console.error("Error uploading to Irys:", error)
+      setUploadError("Failed to upload to Irys. Please try again.")
       setIsUploading(false)
       setUploadProgress(0)
       onSound("error")
@@ -161,11 +170,17 @@ export function UploadZone({ onImageUpload, uploadedImages, isProcessing, onSoun
           // Create file from blob
           const file = new File([blob], `pikavault-${captureType}-${Date.now()}.jpg`, { type: "image/jpeg" })
           
+          if (!wallet) {
+            setUploadError("Please connect your wallet to upload captures")
+            onSound("error")
+            return
+          }
+          
           setIsUploading(true)
           setUploadProgress(10)
           
-          // Upload to IPFS
-          const ipfsUrl = await uploadMultipleToIPFS([file])
+          // Upload to Irys
+          const ipfsUrl = await uploadMultipleToIrys([file], wallet)
           
           setUploadProgress(100)
           onImageUpload([...uploadedImages, ...ipfsUrl])

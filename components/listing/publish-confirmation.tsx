@@ -33,11 +33,14 @@ export function PublishConfirmation({
     }
   }, [])
 
-  // Use real transaction hash or fallback to mock
-  const txHash = transactionSignature || "0x7d865e959b2466918c9863afca942d0fb89d7c9ac0c99bafc3749504ded97730"
-  const explorerUrl = transactionSignature 
+  // Create explorer URLs
+  const txExplorerUrl = transactionSignature 
     ? `https://explorer.solana.com/tx/${transactionSignature}?cluster=devnet`
-    : `https://etherscan.io/tx/${txHash}`
+    : null
+    
+  const nftExplorerUrl = nftMintAddress
+    ? `https://explorer.solana.com/address/${nftMintAddress}?cluster=devnet`
+    : null
 
   return (
     <div ref={confirmationRef} className="max-w-3xl mx-auto text-center space-y-12">
@@ -83,6 +86,14 @@ export function PublishConfirmation({
                 ${cardData.price || cardData.suggestedPrice}
               </span>
             </div>
+            {uploadedImages.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-white/20">
+                <p className="mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Preview</p>
+                <div className="aspect-square w-full max-w-[120px] overflow-hidden">
+                  <img src={uploadedImages[0]} alt="Card" className="w-full h-full object-cover" />
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -91,38 +102,55 @@ export function PublishConfirmation({
             BLOCKCHAIN DETAILS
           </h3>
 
-          <div className="space-y-2 text-left">
+          <div className="space-y-4 text-left">
             <div className="flex justify-between items-center">
               <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Status</span>
               <span className="text-pikavault-cyan font-bold" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                 {transactionSignature ? "Confirmed" : "Pending"}
               </span>
             </div>
-            <div className="flex justify-between items-center">
+            
+            <div>
               <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Transaction</span>
-              <a
-                href={explorerUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-1 text-white/70 hover:text-pikavault-yellow transition-colors"
-              >
-                <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                  {`${txHash.slice(0, 6)}...${txHash.slice(-4)}`}
-                </span>
-                <ExternalLink className="w-4 h-4" />
-              </a>
+              {txExplorerUrl ? (
+                <a
+                  href={txExplorerUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center space-x-1 text-white/70 hover:text-pikavault-yellow transition-colors mt-1 break-all"
+                >
+                  <span className="font-mono text-xs" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                    {transactionSignature}
+                  </span>
+                  <ExternalLink className="w-4 h-4 flex-shrink-0 ml-1" />
+                </a>
+              ) : (
+                <div className="text-white/50 font-mono text-xs mt-1">Transaction pending...</div>
+              )}
             </div>
-            <div className="flex justify-between items-center">
+            
+            <div>
               <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>NFT Mint</span>
-              <span className="font-mono text-xs" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                {nftMintAddress ? `${nftMintAddress.slice(0, 6)}...${nftMintAddress.slice(-4)}` : "#12345"}
-              </span>
+              {nftExplorerUrl ? (
+                <a
+                  href={nftExplorerUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center space-x-1 text-white/70 hover:text-pikavault-yellow transition-colors mt-1 break-all"
+                >
+                  <span className="font-mono text-xs" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                    {nftMintAddress}
+                  </span>
+                  <ExternalLink className="w-4 h-4 flex-shrink-0 ml-1" />
+                </a>
+              ) : (
+                <div className="text-white/50 font-mono text-xs mt-1">Mint address pending...</div>
+              )}
             </div>
+            
             <div className="flex justify-between items-center">
               <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Network</span>
-              <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                {transactionSignature ? "Solana Devnet" : "Ethereum"}
-              </span>
+              <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Solana Devnet</span>
             </div>
             <div className="flex justify-between items-center">
               <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Timestamp</span>
