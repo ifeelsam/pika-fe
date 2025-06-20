@@ -11,13 +11,30 @@ interface CardGridProps {
 }
 
 export function CardGrid({ selectedCards, setSelectedCards }: CardGridProps) {
-  const { filteredCards } = useMarketplace()
+  const { filteredCards, isLoading, error } = useMarketplace()
   const gridRef = useRef<HTMLDivElement>(null)
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
   const [isAnimated, setIsAnimated] = useState(false)
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set())
+
+  // Handle image load errors
+  const handleImageError = (cardId: string) => {
+    setFailedImages(prev => new Set(prev).add(cardId))
+  }
+
+  // Get image URL with fallback
+  const getImageUrl = (card: any) => {
+    if (failedImages.has(card.id)) {
+      return `/placeholder-${(parseInt(card.id.slice(-1), 16) % 5) + 1}.png`
+    }
+    return card.imageUrl
+  }
 
   useEffect(() => {
-    if (gridRef.current) {
+    if (gridRef.current && !isLoading && filteredCards.length > 0) {
+      // Reset animation state
+      setIsAnimated(false)
+      
       // Set initial state - hidden
       gsap.set(gridRef.current.children, {
         y: 100,
@@ -37,7 +54,7 @@ export function CardGrid({ selectedCards, setSelectedCards }: CardGridProps) {
         },
       })
     }
-  }, [])
+  }, [isLoading, filteredCards])
 
   // Toggle card selection
   const toggleCardSelection = (cardId: string) => {
@@ -74,6 +91,39 @@ export function CardGrid({ selectedCards, setSelectedCards }: CardGridProps) {
       default:
         return "circle(50% at 50% 50%)" // Circle
     }
+  }
+
+  // Show loading state - return null to let page-level loading handle it
+  if (isLoading) {
+    return null
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="text-center py-16">
+        <div className="text-red-400 text-lg mb-4" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+          Error loading marketplace
+        </div>
+        <div className="text-white/70 text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+          {error}
+        </div>
+      </div>
+    )
+  }
+
+  // Show empty state
+  if (filteredCards.length === 0) {
+    return (
+      <div className="text-center py-16">
+        <div className="text-white/70 text-lg mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+          No NFTs found
+        </div>
+        <div className="text-white/50 text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+          Try adjusting your filters or check back later
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -133,8 +183,16 @@ export function CardGrid({ selectedCards, setSelectedCards }: CardGridProps) {
                 {/* Card image */}
                 <div
                   className="w-full aspect-[3/4] bg-cover bg-center"
-                  style={{ backgroundImage: `url(${card.imageUrl})` }}
+                  style={{ backgroundImage: `url(${getImageUrl(card)})` }}
                 >
+                  {/* Hidden img element for error handling */}
+                  <img
+                    src={card.imageUrl}
+                    alt={card.name}
+                    style={{ display: 'none' }}
+                    onError={() => handleImageError(card.id)}
+                  />
+
                   {/* Overlay gradient */}
                   <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-pikavault-dark/90"></div>
 
@@ -163,6 +221,13 @@ export function CardGrid({ selectedCards, setSelectedCards }: CardGridProps) {
                       clipPath: rarityShape,
                     }}
                   ></div>
+
+                  {/* Status badge */}
+                  {card.status !== "active" && (
+                    <div className="absolute top-3 left-12 px-2 py-1 bg-black/70 text-white text-xs rounded">
+                      {card.status.toUpperCase()}
+                    </div>
+                  )}
 
                   {/* Card content */}
                   <div className="absolute bottom-0 left-0 w-full p-4">
@@ -193,7 +258,7 @@ export function CardGrid({ selectedCards, setSelectedCards }: CardGridProps) {
                     className="text-white text-lg font-black tracking-tight"
                     style={{ fontFamily: "'Monument Extended', sans-serif" }}
                   >
-                    ${card.price}
+                    {card.price.toFixed(2)} SOL
                   </p>
                 </div>
               </div>
