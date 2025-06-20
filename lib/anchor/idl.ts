@@ -1,5 +1,5 @@
 export type PikaVault = {
-  "address": "6aLg7Q1yji5fNMoGWFxS5nhcq3ZojGpf3rVyUQyM7Eg8",
+  "address": "EqJfvdGXFgMr5AfRzZdByrk3bkJVBixdcgAHiuFsPHHF",
   "metadata": {
     "name": "pikaVault",
     "version": "0.1.0",
@@ -378,16 +378,16 @@ export type PikaVault = {
       ]
     },
     {
-      "name": "mintAndList",
+      "name": "listNft",
       "discriminator": [
-        200,
-        161,
-        243,
-        36,
-        250,
-        45,
-        242,
-        13
+        88,
+        221,
+        93,
+        166,
+        63,
+        220,
+        106,
+        232
       ],
       "accounts": [
         {
@@ -453,9 +453,7 @@ export type PikaVault = {
           }
         },
         {
-          "name": "nftMint",
-          "writable": true,
-          "signer": true
+          "name": "nftMint"
         },
         {
           "name": "makerAta",
@@ -654,91 +652,6 @@ export type PikaVault = {
           }
         },
         {
-          "name": "collectionMint"
-        },
-        {
-          "name": "metadata",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  101,
-                  116,
-                  97,
-                  100,
-                  97,
-                  116,
-                  97
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "metadataProgram"
-              },
-              {
-                "kind": "account",
-                "path": "nftMint"
-              }
-            ],
-            "program": {
-              "kind": "account",
-              "path": "metadataProgram"
-            }
-          }
-        },
-        {
-          "name": "masterEditionAccount",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  101,
-                  116,
-                  97,
-                  100,
-                  97,
-                  116,
-                  97
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "metadataProgram"
-              },
-              {
-                "kind": "account",
-                "path": "nftMint"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  101,
-                  100,
-                  105,
-                  116,
-                  105,
-                  111,
-                  110
-                ]
-              }
-            ],
-            "program": {
-              "kind": "account",
-              "path": "metadataProgram"
-            }
-          }
-        },
-        {
-          "name": "rent",
-          "address": "SysvarRent111111111111111111111111111111111"
-        },
-        {
           "name": "tokenProgram"
         },
         {
@@ -748,32 +661,12 @@ export type PikaVault = {
         {
           "name": "systemProgram",
           "address": "11111111111111111111111111111111"
-        },
-        {
-          "name": "metadataProgram",
-          "address": "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
         }
       ],
       "args": [
         {
-          "name": "name",
-          "type": "string"
-        },
-        {
-          "name": "symbol",
-          "type": "string"
-        },
-        {
           "name": "listingPrice",
           "type": "u64"
-        },
-        {
-          "name": "cardMetadata",
-          "type": "string"
-        },
-        {
-          "name": "imageUrl",
-          "type": "string"
         }
       ]
     },
@@ -1464,43 +1357,23 @@ export type PikaVault = {
   "errors": [
     {
       "code": 6000,
-      "name": "listingNotActive",
-      "msg": "The listing is not active."
+      "name": "nameTooLong",
+      "msg": "input name is too long!"
     },
     {
       "code": 6001,
-      "name": "insufficientFunds",
-      "msg": "Insufficient funds to complete the purchase."
+      "name": "verify",
+      "msg": "failed to verify seller"
     },
     {
       "code": 6002,
-      "name": "escrowCreationFailed",
-      "msg": "Escrow creation failed."
+      "name": "escrowEmpty",
+      "msg": "Escrow is already empty"
     },
     {
       "code": 6003,
       "name": "listingNotSold",
-      "msg": "listing is not currently marked as sold"
-    },
-    {
-      "code": 6004,
-      "name": "unauthorizedRefund",
-      "msg": "you are not authorized to request a refund for this purchase"
-    },
-    {
-      "code": 6005,
-      "name": "escrowAlreadyReleased",
-      "msg": "escrow funds have already been released"
-    },
-    {
-      "code": 6006,
-      "name": "cannotBuyOwnListing",
-      "msg": "Cannot buy your own listing"
-    },
-    {
-      "code": 6007,
-      "name": "invalidPrice",
-      "msg": "Invalid price"
+      "msg": "Listing is not sold"
     }
   ],
   "types": [
@@ -1554,10 +1427,6 @@ export type PikaVault = {
             "type": "pubkey"
           },
           {
-            "name": "cardMetadata",
-            "type": "string"
-          },
-          {
             "name": "listingPrice",
             "type": "u64"
           },
@@ -1572,10 +1441,6 @@ export type PikaVault = {
           {
             "name": "createdAt",
             "type": "i64"
-          },
-          {
-            "name": "imageUrl",
-            "type": "string"
           },
           {
             "name": "bump",

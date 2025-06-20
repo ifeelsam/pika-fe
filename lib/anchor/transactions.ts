@@ -4,6 +4,25 @@ import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddres
 import { METADATA_PROGRAM_ID } from "./config";
 import type { PikaVault } from "./idl";
 
+// Metaplex UMI imports for NFT minting
+import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
+import { 
+  createNft, 
+  mplTokenMetadata
+} from "@metaplex-foundation/mpl-token-metadata";
+import {
+  generateSigner,
+  percentAmount,
+  createGenericFile,
+  signerIdentity,
+  publicKey as umiPublicKey,
+  Umi,
+  Signer
+} from "@metaplex-foundation/umi";
+import { walletAdapterIdentity } from "@metaplex-foundation/umi-signer-wallet-adapters";
+import { base58 } from "@metaplex-foundation/umi/serializers";
+import { uploadMetadataToIrys } from "../ipfs/pinata";
+
 // Helper function to find marketplace PDA
 export const findMarketplacePDA = (authority: PublicKey, programId: PublicKey) => {
   return PublicKey.findProgramAddressSync(
@@ -119,7 +138,110 @@ export const registerUser = async (program: Program<PikaVault>, wallet: PublicKe
   }
 };
 
-// Mint and list NFT
+// Create UMI instance for NFT minting
+export const createUmiInstance = (
+  rpcEndpoint: string,
+  wallet?: any // Wallet adapter instance
+): Umi => {
+  const umi = createUmi(rpcEndpoint)
+    .use(mplTokenMetadata());
+
+  if (wallet) {
+    umi.use(walletAdapterIdentity(wallet));
+    console.log("umi:", umi)
+  }
+  console.log("umi", umi)
+
+  return umi;
+};
+
+// Mint NFT using Metaplex UMI (client-side) - simplified version without metadata upload
+export const mintNFTWithUmi = async (
+  umi: Umi,
+  metadata: {
+    name: string;
+    symbol: string;
+    description: string;
+    image: string;
+    attributes?: Array<{ trait_type: string; value: string }>;
+  },
+  wallet: any
+): Promise<{ nftMint: Signer; tx: string; metadataUri: string }> => {
+  try {
+    // Generate a new NFT mint signer
+    const nftMint = generateSigner(umi);
+
+    // Upload metadata to Irys
+    console.log("Uploading metadata to Irys devnet...");
+    const metadataUri = await uploadMetadataToIrys(metadata, wallet);
+    console.log("Metadata uploaded to Irys:", metadataUri);
+
+    // Create the NFT
+    const createNftIx = createNft(umi, {
+      mint: nftMint,
+      name: metadata.name,
+      symbol: metadata.symbol,
+      uri: metadataUri,
+      sellerFeeBasisPoints: percentAmount(0), // 0% royalty
+    });
+
+    // Send and confirm the transaction
+    const result = await createNftIx.sendAndConfirm(umi);
+    console.log("result", result)
+    // Decode the transaction signature
+    const signature = base58.deserialize(result.signature)[0];
+
+    console.log("NFT minted successfully with UMI! Transaction signature:", signature);
+    console.log("NFT Mint Address:", nftMint.publicKey);
+    console.log("Metadata URI:", metadataUri);
+
+    return { nftMint, tx: signature, metadataUri };
+  } catch (error) {
+    console.error("Error minting NFT with UMI:", error);
+    throw error;
+  }
+};
+
+// List NFT on marketplace (separate from minting)
+export const listNFT = async (
+  program: Program<PikaVault>,
+  maker: PublicKey,
+  marketplace: PublicKey,
+  nftMint: PublicKey,
+  listingPrice: number
+) => {
+  try {
+    const [userAccount] = findUserAccountPDA(maker, program.programId);
+    const [listing] = findListingPDA(marketplace, nftMint, program.programId);
+    
+    const makerAta = await getAssociatedTokenAddress(nftMint, maker);
+    const vault = await getAssociatedTokenAddress(nftMint, listing, true);
+
+    const tx = await program.methods
+      .listNft(new BN(listingPrice))
+      .accountsStrict({
+        maker: maker,
+        userAccount: userAccount,
+        marketplace: marketplace,
+        nftMint: nftMint,
+        makerAta: makerAta,
+        vault: vault,
+        listing: listing,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        systemProgram: SystemProgram.programId,
+      })
+      .rpc();
+
+    console.log("NFT listed successfully! Transaction signature:", tx);
+    return { tx, listing, vault, makerAta };
+  } catch (error) {
+    console.error("Error listing NFT:", error);
+    throw error;
+  }
+};
+
+// Combined function: Mint NFT with UMI and list on marketplace
 export const mintAndListNFT = async (
   program: Program<PikaVault>,
   maker: PublicKey,
@@ -130,25 +252,22 @@ export const mintAndListNFT = async (
   symbol: string,
   listingPrice: number,
   cardMetadata: string,
-  imageUrl: string
+  imageUrl: string,
+  connection?: any, // Connection instance for UMI
+  wallet?: any // Wallet adapter instance
 ) => {
   try {
+    // If using the old interface, fall back to listing only
+    // This maintains backward compatibility
     const [userAccount] = findUserAccountPDA(maker, program.programId);
     const [listing] = findListingPDA(marketplace, nftMint.publicKey, program.programId);
-    const [metadata] = findMetadataPDA(nftMint.publicKey);
-    const [masterEdition] = findMasterEditionPDA(nftMint.publicKey);
     
     const makerAta = await getAssociatedTokenAddress(nftMint.publicKey, maker);
     const vault = await getAssociatedTokenAddress(nftMint.publicKey, listing, true);
 
+    // Since the NFT is already minted client-side, we just list it
     const tx = await program.methods
-      .mintAndList(
-        name,
-        symbol,
-        new BN(listingPrice),
-        cardMetadata,
-        imageUrl
-      )
+      .listNft(new BN(listingPrice))
       .accountsStrict({
         maker: maker,
         userAccount: userAccount,
@@ -157,29 +276,22 @@ export const mintAndListNFT = async (
         makerAta: makerAta,
         vault: vault,
         listing: listing,
-        collectionMint: collectionMint,
-        metadata: metadata,
-        masterEditionAccount: masterEdition,
-        rent: SYSVAR_RENT_PUBKEY,
         tokenProgram: TOKEN_PROGRAM_ID,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
-        metadataProgram: METADATA_PROGRAM_ID,
       })
       .rpc();
 
-    console.log("NFT minted and listed successfully! Transaction signature:", tx);
+    console.log("NFT listed successfully! Transaction signature:", tx);
     return { 
       tx, 
       listing, 
       nftMint: nftMint.publicKey, 
-      metadata, 
-      masterEdition, 
       vault, 
       makerAta 
     };
   } catch (error) {
-    console.error("Error minting and listing NFT:", error);
+    console.error("Error listing NFT:", error);
     throw error;
   }
 };

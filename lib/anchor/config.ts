@@ -7,12 +7,12 @@ import type { PikaVault } from "./idl.ts";
 export const NETWORK = "devnet";
 export const RPC_URL = clusterApiUrl(NETWORK);
 
-export const PROGRAM_ID = new PublicKey("6aLg7Q1yji5fNMoGWFxS5nhcq3ZojGpf3rVyUQyM7Eg8");
+export const PROGRAM_ID = new PublicKey("EqJfvdGXFgMr5AfRzZdByrk3bkJVBixdcgAHiuFsPHHF");
 
 export const METADATA_PROGRAM_ID = new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
 
 export const MARKETPLACE_ADMIN = new PublicKey("3yUkodxjCmZ5DbfmydQDcYWY3CL5idMa4WcTZpT2jkUN");
-// marketplace pda -> E8bJQ9QmQevEu6Lf1XcjYojZsHvt1HAr7pPPLzGZtKp2
+// marketplace pda -> Hu5RrTKWfpE88QW5iALyXUy6C82JjRdrReYz9EdunJx
 
 export const DEFAULT_MARKETPLACE_FEE = 1000;
 
