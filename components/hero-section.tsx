@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { Button } from "@/components/ui/button"
+import { redirect } from "next/navigation"
 
 export function HeroSection() {
   const headlineRef = useRef<HTMLHeadingElement>(null)
@@ -98,6 +99,7 @@ export function HeroSection() {
 
         <div ref={buttonRef} className="relative group">
           <Button
+            onClick={() => redirect("/marketplace")}
             className="bg-pikavault-yellow hover:bg-pikavault-yellow/90 text-pikavault-dark text-lg md:text-xl font-bold py-6 px-12 rounded-none transition-all duration-300 overflow-hidden group-hover:translate-x-1 group-hover:-translate-y-1"
             style={{ fontFamily: "'Monument Extended', sans-serif" }}
           >
