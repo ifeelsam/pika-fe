@@ -91,7 +91,7 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
                 </div>
 
                 <p className="text-white font-black" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
-                  ${card.price}
+                  {card.price} SOL
                 </p>
               </div>
             ))}
@@ -105,7 +105,7 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
             </p>
 
             <p className="text-pikavault-yellow text-2xl font-black" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
-              ${totalPrice}
+              {totalPrice} SOL
             </p>
           </div>
 
