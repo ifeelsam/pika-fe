@@ -235,7 +235,7 @@ export function CardDisplay({ card, currentView, onViewChange, onInspectionOpen,
             }}
             className={`px-4 py-2 border-2 transition-all duration-300 ${
               currentView === "front"
-                ? `bg-[${rarityColor}] border-[${rarityColor}] text-pikavault-dark`
+                ? `bg-[${rarityColor}] border-pikavault-cyan text-pikavault-cyan`
                 : "bg-transparent border-white/30 text-white hover:border-white/60"
             }`}
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
@@ -250,7 +250,7 @@ export function CardDisplay({ card, currentView, onViewChange, onInspectionOpen,
             }}
             className={`px-4 py-2 border-2 transition-all duration-300 ${
               currentView === "back"
-                ? `bg-[${rarityColor}] border-[${rarityColor}] text-pikavault-dark`
+                ? `bg-[${rarityColor}] border-pikavault-yellow text-pikavault-yellow`
                 : "bg-transparent border-white/30 text-white hover:border-white/60"
             }`}
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
