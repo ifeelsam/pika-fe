@@ -7,10 +7,10 @@ import { FilterBar } from "@/components/marketplace/filter-bar"
 import { CardGrid } from "@/components/marketplace/card-grid"
 import { TransactionPanel } from "@/components/marketplace/transaction-panel"
 import { BackgroundEffects } from "@/components/marketplace/background-effects"
-import { MarketplaceProvider, useMarketplace } from "@/components/marketplace/marketplace-context"
+import { useMarketplace } from "@/components/marketplace/marketplace-context"
 import MarketplaceLoading from "./loading"
 
-function MarketplaceContent() {
+export default function MarketplacePage() {
   const { isLoading } = useMarketplace()
   const [selectedCards, setSelectedCards] = useState<string[]>([])
   const [isPanelOpen, setIsPanelOpen] = useState(false)
@@ -49,13 +49,5 @@ function MarketplaceContent() {
         }}
       />
     </div>
-  )
-}
-
-export default function MarketplacePage() {
-  return (
-    <MarketplaceProvider>
-      <MarketplaceContent />
-    </MarketplaceProvider>
   )
 }

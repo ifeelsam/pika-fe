@@ -215,7 +215,7 @@ export function MarketplaceProvider({ children }: { children: ReactNode }) {
           price: priceInSol,
           imageUrl: metadata.image,
           rotation: generateRotation(listing.publicKey.toString()),
-          owner: listing.account.owner.toString().slice(0, 6) + "..." + listing.account.owner.toString().slice(-4),
+          owner: listing.account.owner.toString(),
           collection,
           listingPubkey: listing.publicKey.toString(),
           nftMint: listing.account.nftAddress.toString(),

@@ -1,10 +1,16 @@
 "use client"
 
-import { useRef, useEffect } from "react"
+import { useRef, useEffect, useState } from "react"
 import { X } from "lucide-react"
 import { useMarketplace } from "./marketplace-context"
 import { Button } from "@/components/ui/button"
 import { gsap } from "gsap"
+import { useWallet } from "@solana/wallet-adapter-react"
+import { useAnchorProgram } from "@/lib/anchor/client"
+import { delistNFT, findMarketplacePDA } from "@/lib/anchor/transactions"
+import { PublicKey } from "@solana/web3.js"
+import { MARKETPLACE_ADMIN } from "@/lib/anchor/config"
+import { useRouter } from "next/navigation"
 
 interface TransactionPanelProps {
   isOpen: boolean
@@ -13,14 +19,25 @@ interface TransactionPanelProps {
 }
 
 export function TransactionPanel({ isOpen, selectedCards, onClose }: TransactionPanelProps) {
-  const { cards } = useMarketplace()
+  const { cards, refreshListings } = useMarketplace()
+  const { publicKey } = useWallet()
+  const { program } = useAnchorProgram()
+  const router = useRouter()
   const panelRef = useRef<HTMLDivElement>(null)
+  const [isDelisting, setIsDelisting] = useState(false)
+  const [delistError, setDelistError] = useState<string | null>(null)
 
   // Get selected card details
   const selectedCardDetails = cards.filter((card) => selectedCards.includes(card.id))
 
   // Calculate total price
   const totalPrice = selectedCardDetails.reduce((sum, card) => sum + card.price, 0)
+
+  // Check if current user owns any of the selected cards
+  const userOwnedCards = selectedCardDetails.filter(card => 
+    publicKey && card.owner === publicKey.toString()
+  )
+  const isUserOwned = userOwnedCards.length > 0
 
   // Animation for panel
   useEffect(() => {
@@ -41,6 +58,51 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
     }
   }, [isOpen])
 
+  // Handle delist functionality
+  const handleDelist = async () => {
+    if (!program || !publicKey || userOwnedCards.length === 0) {
+      setDelistError("Missing required data for delisting")
+      return
+    }
+
+    setIsDelisting(true)
+    setDelistError(null)
+    
+    try {
+      // For now, we'll handle one card at a time (could be extended for batch operations)
+      const card = userOwnedCards[0]
+      
+      // Get the marketplace PDA
+      const [marketplace] = findMarketplacePDA(MARKETPLACE_ADMIN, program.programId)
+      
+      await delistNFT(
+        program,
+        publicKey,
+        marketplace,
+        new PublicKey(card.nftMint),
+        new PublicKey(card.listingPubkey)
+      )
+
+      // Refresh listings and close panel
+      await refreshListings()
+      onClose()
+      
+    } catch (error: any) {
+      console.error("Error delisting NFT:", error)
+      setDelistError(error.message || "Failed to delist NFT")
+    } finally {
+      setIsDelisting(false)
+    }
+  }
+
+  // Handle view card functionality
+  const handleViewCard = () => {
+    if (selectedCardDetails.length > 0) {
+      const card = selectedCardDetails[0]
+      router.push(`/card/${card.nftMint}`)
+    }
+  }
+
   return (
     <div
       ref={panelRef}
@@ -49,7 +111,7 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
       <div className="h-full flex flex-col p-6">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl font-black" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
-            CHECKOUT
+            {isUserOwned ? "MANAGE" : "CHECKOUT"}
           </h2>
 
           <button onClick={onClose} className="p-2 text-white/70 hover:text-pikavault-yellow transition-colors">
@@ -88,6 +150,10 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
                   <p className="text-white/70 text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                     #{card.id}
                   </p>
+                  
+                  {publicKey && card.owner === publicKey.toString() && (
+                    <span className="text-pikavault-yellow text-xs font-bold">OWNED BY YOU</span>
+                  )}
                 </div>
 
                 <p className="text-white font-black" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
@@ -110,18 +176,40 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
           </div>
 
           <div className="space-y-4">
-            <Button
-              className="w-full bg-pikavault-yellow hover:bg-pikavault-yellow/90 text-pikavault-dark text-lg font-bold py-6 rounded-none"
-              style={{ fontFamily: "'Monument Extended', sans-serif" }}
-            >
-              BUY NOW
-            </Button>
+            {delistError && (
+              <div className="bg-pikavault-pink/20 border-2 border-pikavault-pink p-3 text-center">
+                <p className="text-pikavault-pink text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                  {delistError}
+                </p>
+              </div>
+            )}
+            
+            {isUserOwned ? (
+              // Show delist button for user-owned cards
+              <Button
+                onClick={handleDelist}
+                disabled={isDelisting}
+                className="w-full bg-pikavault-pink hover:bg-pikavault-pink/90 text-white text-lg font-bold py-6 rounded-none disabled:opacity-50"
+                style={{ fontFamily: "'Monument Extended', sans-serif" }}
+              >
+                {isDelisting ? "DELISTING..." : "DELIST"}
+              </Button>
+            ) : (
+              // Show buy button for cards not owned by user
+              <Button
+                className="w-full bg-pikavault-yellow hover:bg-pikavault-yellow/90 text-pikavault-dark text-lg font-bold py-6 rounded-none"
+                style={{ fontFamily: "'Monument Extended', sans-serif" }}
+              >
+                BUY NOW
+              </Button>
+            )}
 
             <Button
-              className="w-full bg-transparent border-4 border-pikavault-pink hover:bg-pikavault-pink/10 text-white text-lg font-bold py-6 rounded-none"
+              onClick={handleViewCard}
+              className="w-full bg-transparent border-4 border-pikavault-cyan hover:bg-pikavault-cyan/10 text-white text-lg font-bold py-6 rounded-none"
               style={{ fontFamily: "'Monument Extended', sans-serif" }}
             >
-              PLACE BID
+              VIEW CARD
             </Button>
           </div>
         </div>

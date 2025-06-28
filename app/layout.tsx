@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { WalletContextProvider } from '@/components/providers/wallet-provider'
+import { MarketplaceProvider } from '@/components/marketplace/marketplace-context'
 import { Analytics } from "@vercel/analytics/next"
 
 export const metadata: Metadata = {
@@ -18,7 +19,11 @@ export default function RootLayout({
       <meta property="og:site_name" content="PikaVault"></meta>
       <meta property="og:url" content="https://x.com/PikaVault_"></meta>
       <body>
-        <WalletContextProvider>{children}</WalletContextProvider>
+        <WalletContextProvider>
+          <MarketplaceProvider>
+            {children}
+          </MarketplaceProvider>
+        </WalletContextProvider>
         <Analytics/>
       </body>
     </html>

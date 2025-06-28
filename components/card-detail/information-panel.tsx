@@ -90,7 +90,7 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
             style={{ fontFamily: "'Monument Extended', sans-serif" }}
           >
             <span className="text-white">{card.name}</span>
-            {/* <span className="text-pikavault-yellow ml-4">#{card.setNumber.toString()}</span> */}
+            <span className="text-pikavault-yellow ml-4">#{card.setNumber.toString()}</span>
           </h1>
 
           {/* Rarity indicator */}
