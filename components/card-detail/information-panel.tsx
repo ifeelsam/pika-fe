@@ -90,7 +90,7 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
             style={{ fontFamily: "'Monument Extended', sans-serif" }}
           >
             <span className="text-white">{card.name}</span>
-            <span className="text-pikavault-yellow ml-4">#{card.setNumber}</span>
+            {/* <span className="text-pikavault-yellow ml-4">#{card.setNumber.toString()}</span> */}
           </h1>
 
           {/* Rarity indicator */}
@@ -120,23 +120,23 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
         <div ref={priceRef} className="space-y-2">
           <div className="flex items-baseline space-x-4">
             <h2
-              className="text-6xl md:text-7xl font-black text-pikavault-pink"
+              className="text-6xl md:text-5xl font-black text-pikavault-pink"
               style={{ fontFamily: "'Monument Extended', sans-serif" }}
             >
-              ${card.price}
+              {parseFloat(card.price)} SOL
             </h2>
             <div
               className={`text-xl font-bold ${card.priceChange24h >= 0 ? "text-pikavault-cyan" : "text-pikavault-pink"}`}
               style={{ fontFamily: "'Space Grotesk', sans-serif" }}
             >
               {card.priceChange24h >= 0 ? "+" : ""}
-              {card.priceChange24h}%
+              {card.priceChange24h.toFixed(2)}%
             </div>
           </div>
 
           <div className="flex items-center space-x-4 text-white/50">
-            <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Floor: ${card.floorPrice}</span>
-            <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Last: ${card.lastSalePrice}</span>
+            <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Floor: {card.floorPrice.toFixed(3)} SOL</span>
+            <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Last: {card.lastSalePrice.toFixed(3)} SOL</span>
           </div>
         </div>
       </div>
@@ -213,17 +213,17 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
         </Button>
 
         {/* Secondary CTA */}
-        <Button
+        {/* <Button
           className="w-full bg-transparent border-4 border-pikavault-pink hover:bg-pikavault-pink/10 text-white text-lg font-bold py-4 rounded-none transition-all duration-300"
           style={{ fontFamily: "'Monument Extended', sans-serif" }}
           onClick={() => onSound("click")}
           onMouseEnter={() => onSound("hover")}
         >
           MAKE OFFER
-        </Button>
+        </Button> */}
 
         {/* Utility actions */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <Button
             onClick={() => {
               onWatchlistToggle()
@@ -245,12 +245,12 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
             <Share2 className="w-5 h-5" />
           </Button>
 
-          <Button
+          {/* <Button
             onClick={() => onSound("click")}
             className="p-4 bg-transparent border-2 border-white/30 text-white hover:border-white/60 transition-all duration-300"
           >
             <MessageCircle className="w-5 h-5" />
-          </Button>
+          </Button> */}
         </div>
       </div>
 
