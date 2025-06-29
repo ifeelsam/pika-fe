@@ -29,7 +29,7 @@ export default function CardDetailPage({ params }: { params: { id: string } }) {
     return {
       ...card,
       setName: card.collection.toUpperCase(),
-      setNumber: `${card.rotation.toString().padStart(3, '0')}/150`,
+      setNumber: `${Math.abs(card.rotation).toString().padStart(3, '0')}/150`,
       condition: "NM",
       conditionGrade: "A+",
       conditionDescription: "Near Mint - Minor edge wear, excellent centering",
