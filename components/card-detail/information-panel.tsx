@@ -4,6 +4,7 @@ import { useRef, useEffect, useState } from "react"
 import { gsap } from "gsap"
 import { Copy, Heart, Share2, MessageCircle, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { NETWORK } from "@/lib/anchor/config"
 
 interface InformationPanelProps {
   card: any
@@ -174,12 +175,12 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
 
           {/* Authentication */}
           <div className="flex justify-between items-center">
-            <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Auth Hash</span>
+            <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>NFT Mint</span>
             <button
-              onClick={() => copyHash(card.authenticationHash)}
+              onClick={() => copyHash(card.nftMint)}
               className="flex items-center space-x-2 text-white/70 hover:text-pikavault-yellow transition-colors"
             >
-              <span className="font-mono text-sm">{truncateHash(card.authenticationHash)}</span>
+              <span className="font-mono text-sm">{truncateHash(card.nftMint)}</span>
               <Copy className="w-4 h-4" />
             </button>
           </div>
@@ -188,7 +189,7 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
           <div className="flex justify-between items-center">
             <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Blockchain</span>
             <a
-              href={`https://etherscan.io/tx/${card.blockchainTxHash}`}
+              href={`https://explorer.solana.com/address/${card.nftMint}?cluster=${NETWORK}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center space-x-2 text-pikavault-cyan hover:text-pikavault-cyan/80 transition-colors"
