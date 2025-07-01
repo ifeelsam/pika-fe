@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { gsap } from "gsap"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { useAnchorProgram } from "@/lib/anchor/client"
-import { delistNFT, findMarketplacePDA } from "@/lib/anchor/transactions"
+import { delistNFT, purchaseNFT, findMarketplacePDA } from "@/lib/anchor/transactions"
 import { PublicKey } from "@solana/web3.js"
 import { MARKETPLACE_ADMIN } from "@/lib/anchor/config"
 import { useRouter } from "next/navigation"
@@ -26,6 +26,8 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
   const panelRef = useRef<HTMLDivElement>(null)
   const [isDelisting, setIsDelisting] = useState(false)
   const [delistError, setDelistError] = useState<string | null>(null)
+  const [isPurchasing, setIsPurchasing] = useState(false)
+  const [purchaseError, setPurchaseError] = useState<string | null>(null)
 
   // Get selected card details
   const selectedCardDetails = cards.filter((card) => selectedCards.includes(card.id))
@@ -41,6 +43,10 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
 
   // Animation for panel
   useEffect(() => {
+    if (isOpen) {
+      setDelistError(null)
+      setPurchaseError(null)
+    }
     if (panelRef.current) {
       if (isOpen) {
         gsap.to(panelRef.current, {
@@ -56,7 +62,7 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
         })
       }
     }
-  }, [isOpen])
+  }, [isOpen, selectedCards])
 
   // Handle delist functionality
   const handleDelist = async () => {
@@ -83,6 +89,9 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
         new PublicKey(card.listingPubkey)
       )
 
+      // Success feedback
+      console.log("✅ NFT delisted successfully!")
+      
       // Refresh listings and close panel
       await refreshListings()
       onClose()
@@ -92,6 +101,53 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
       setDelistError(error.message || "Failed to delist NFT")
     } finally {
       setIsDelisting(false)
+    }
+  }
+
+  const handlePurchase = async () => {
+    if (!program || !publicKey || selectedCardDetails.length === 0) {
+      setPurchaseError("Missing required data for purchase")
+      return
+    }
+
+    // Check if user is trying to buy their own card
+    const userOwnedCard = selectedCardDetails.find(card => card.owner === publicKey.toString())
+    if (userOwnedCard) {
+      setPurchaseError("You cannot purchase your own card")
+      return
+    }
+
+    setIsPurchasing(true)
+    setPurchaseError(null)
+    
+    try {
+      // handles one card at a time (could be extended for batch operations)
+      const card = selectedCardDetails[0]
+      
+      // the marketplace PDA
+      const [marketplace] = findMarketplacePDA(MARKETPLACE_ADMIN, program.programId)
+      console.log("marketplace", marketplace)
+      await purchaseNFT(
+        program,
+        publicKey, // buyer
+        marketplace,
+        new PublicKey(card.listingPubkey),
+        new PublicKey(card.nftMint),
+        new PublicKey(card.owner) // seller
+      )
+
+      // Success feedback
+      console.log("✅ NFT purchased successfully!")
+      
+      // Refresh listings and close panel
+      await refreshListings()
+      onClose()
+      
+    } catch (error: any) {
+      console.error("Error purchasing NFT:", error)
+      setPurchaseError(error.message || "Failed to purchase NFT")
+    } finally {
+      setIsPurchasing(false)
     }
   }
 
@@ -176,10 +232,10 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
           </div>
 
           <div className="space-y-4">
-            {delistError && (
+            {(delistError || purchaseError) && (
               <div className="bg-pikavault-pink/20 border-2 border-pikavault-pink p-3 text-center">
                 <p className="text-pikavault-pink text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                  {delistError}
+                  {delistError || purchaseError}
                 </p>
               </div>
             )}
@@ -197,16 +253,19 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
             ) : (
               // Show buy button for cards not owned by user
               <Button
-                className="w-full bg-pikavault-yellow hover:bg-pikavault-yellow/90 text-pikavault-dark text-lg font-bold py-6 rounded-none"
+                onClick={handlePurchase}
+                disabled={isPurchasing || !publicKey}
+                className="w-full bg-pikavault-yellow hover:bg-pikavault-yellow/90 text-pikavault-dark text-lg font-bold py-6 rounded-none disabled:opacity-50"
                 style={{ fontFamily: "'Monument Extended', sans-serif" }}
               >
-                BUY NOW
+                {isPurchasing ? "PURCHASING..." : !publicKey ? "CONNECT WALLET" : "BUY NOW"}
               </Button>
             )}
 
             <Button
               onClick={handleViewCard}
-              className="w-full bg-transparent border-4 border-pikavault-cyan hover:bg-pikavault-cyan/10 text-white text-lg font-bold py-6 rounded-none"
+              disabled={isDelisting || isPurchasing}
+              className="w-full bg-transparent border-4 border-pikavault-cyan hover:bg-pikavault-cyan/10 text-white text-lg font-bold py-6 rounded-none disabled:opacity-50"
               style={{ fontFamily: "'Monument Extended', sans-serif" }}
             >
               VIEW CARD

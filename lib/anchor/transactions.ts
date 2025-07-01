@@ -1,10 +1,8 @@
-import { PublicKey, SystemProgram, Keypair, LAMPORTS_PER_SOL, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
+import { PublicKey, SystemProgram, Keypair} from "@solana/web3.js";
 import { Program, BN } from "@coral-xyz/anchor";
 import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddress } from "@solana/spl-token";
 import { METADATA_PROGRAM_ID } from "./config";
 import type { PikaVault } from "./idl";
-
-// Metaplex UMI imports for NFT minting
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { 
   createNft, 
@@ -13,9 +11,6 @@ import {
 import {
   generateSigner,
   percentAmount,
-  createGenericFile,
-  signerIdentity,
-  publicKey as umiPublicKey,
   Umi,
   Signer
 } from "@metaplex-foundation/umi";
