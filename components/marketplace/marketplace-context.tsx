@@ -60,11 +60,23 @@ export function MarketplaceProvider({ children }: { children: ReactNode }) {
   const [searchQuery, setSearchQuery] = useState("")
   const [cards, setCards] = useState<BaseCardData[]>([])
 
-  // Helper function to determine rarity based on price
-  const determineRarity = (price: number): CardRarity => {
-    if (price >= 10) return "legendary"
-    if (price >= 5) return "epic"
-    if (price >= 1) return "rare"
+  // Enhanced rarity determination using NFT metadata attributes (from use-nft-metadata.ts)
+  const getAttributeValue = (attributes: NFTAttribute[] | undefined, traitType: string): string => {
+    if (!attributes) return ""
+    const attribute = attributes.find(attr => 
+      attr.trait_type.toLowerCase() === traitType.toLowerCase()
+    )
+    return attribute ? String(attribute.value) : ""
+  }
+
+  const determineRarity = (attributes: NFTAttribute[] | undefined, price: number): CardRarity => {
+    const rarityFromAttributes = getAttributeValue(attributes, "rarity")
+    if (rarityFromAttributes) {
+      const rarity = rarityFromAttributes.toLowerCase()
+      if (["legendary", "epic", "rare", "common"].includes(rarity)) {
+        return rarity as CardRarity
+      }
+    }
     return "common"
   }
 
@@ -87,8 +99,8 @@ export function MarketplaceProvider({ children }: { children: ReactNode }) {
     return (hash % 7) - 3 // Random rotation between -3 and 3
   }
 
-  // Helper function to fetch NFT metadata using UMI
-  const fetchNFTMetadata = async (nftMint: string): Promise<{ name: string; image: string; description?: string }> => {
+  // Enhanced function to fetch NFT metadata with attributes for rarity determination
+  const fetchNFTMetadata = async (nftMint: string): Promise<{ name: string; image: string; description?: string; attributes?: NFTAttribute[] }> => {
     try {
       if (!program?.provider.connection) {
         throw new Error("No connection available")
@@ -108,13 +120,15 @@ export function MarketplaceProvider({ children }: { children: ReactNode }) {
       const name = metadata.name || `NFT #${nftMint.slice(0, 6).toUpperCase()}`
       
       let imageUrl = `/placeholder-1.png`
+      let attributes: NFTAttribute[] | undefined = undefined
       
       // Fetch off-chain metadata if URI exists
       if (metadata.uri) {
         try {
           const response = await fetch(metadata.uri)
-          const offChainMetadata = await response.json()
+          const offChainMetadata: NFTMetadata = await response.json()
           imageUrl = offChainMetadata.image || imageUrl
+          attributes = offChainMetadata.attributes
         } catch (error) {
           console.warn("Failed to fetch off-chain metadata:", error)
         }
@@ -123,7 +137,8 @@ export function MarketplaceProvider({ children }: { children: ReactNode }) {
       return {
         name,
         image: imageUrl,
-        description: metadata.uri ? undefined : undefined // Will be fetched from off-chain if needed
+        description: metadata.uri ? undefined : undefined,
+        attributes
       }
     } catch (error) {
       console.error("Error fetching NFT metadata for", nftMint, ":", error)
@@ -153,14 +168,7 @@ export function MarketplaceProvider({ children }: { children: ReactNode }) {
       
       const formattedCards: BaseCardData[] = listings.map((listing, index) => {
         const priceInSol = parseInt(listing.account.listingPrice.toString()) / LAMPORTS_PER_SOL
-        const rarity = determineRarity(priceInSol)
-        const collection = determineCollection(listing.account.nftAddress.toString())
         
-        // Determine status
-        let status: MarketplaceStatus = "unlisted"
-        if (listing.account.status.active) status = "active"
-        else if (listing.account.status.sold) status = "sold"
-
         // Get metadata or fallback
         const metadataResult = metadataResults[index]
         const metadata = metadataResult.status === 'fulfilled' 
@@ -169,6 +177,15 @@ export function MarketplaceProvider({ children }: { children: ReactNode }) {
               name: `NFT #${listing.account.nftAddress.toString().slice(0, 6).toUpperCase()}`, 
               image: `/placeholder-${(index % 5) + 1}.png` 
             }
+
+        // Determine rarity using metadata attributes
+        const rarity = determineRarity(metadata.attributes, priceInSol)
+        const collection = determineCollection(listing.account.nftAddress.toString())
+        
+        // Determine status
+        let status: MarketplaceStatus = "unlisted"
+        if (listing.account.status.active) status = "active"
+        else if (listing.account.status.sold) status = "sold"
 
         return {
           id: listing.account.nftAddress.toString().slice(0, 8),
