@@ -85,7 +85,7 @@ export function OwnershipHistory({ history }: OwnershipHistoryProps) {
                         className="text-2xl font-black text-pikavault-cyan mb-2"
                         style={{ fontFamily: "'Monument Extended', sans-serif" }}
                       >
-                        ${entry.price}
+                        {entry.price} SOL
                       </p>
                       <a
                         href={`https://explorer.solana.com/tx/${entry.txHash}?cluster=${NETWORK}`}

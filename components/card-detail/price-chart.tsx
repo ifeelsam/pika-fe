@@ -153,8 +153,8 @@ export function PriceChart({ data, currentPrice }: PriceChartProps) {
               <p className="text-white/50 text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                 Current Price
               </p>
-              <p className="text-2xl font-black text-white" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
-                ${currentPrice}
+              <p className="text-xl md:text-3xl font-black text-pikavault-yellow" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
+                {currentPrice} SOL
               </p>
             </div>
           </div>
@@ -168,7 +168,7 @@ export function PriceChart({ data, currentPrice }: PriceChartProps) {
                 {new Date(point.date).toLocaleDateString()}
               </p>
               <p className="text-lg font-bold" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
-                ${point.price}
+                {parseFloat(point.price.toFixed(4))} SOL
               </p>
             </div>
           ))}
