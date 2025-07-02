@@ -162,7 +162,7 @@ export function PublishConfirmation({
 
       <div className="space-y-4">
         <Link
-          href="/collection"
+          href={`/card/${nftMintAddress}`}
           className="inline-block px-8 py-4 bg-pikavault-yellow text-pikavault-dark font-bold text-lg"
           style={{ fontFamily: "'Monument Extended', sans-serif" }}
         >
