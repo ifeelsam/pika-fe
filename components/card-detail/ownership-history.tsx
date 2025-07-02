@@ -4,6 +4,7 @@ import { useRef, useEffect } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { ExternalLink, User } from "lucide-react"
+import { NETWORK } from "@/lib/anchor/config"
 
 interface OwnershipHistoryProps {
   history: Array<{
@@ -87,7 +88,7 @@ export function OwnershipHistory({ history }: OwnershipHistoryProps) {
                         ${entry.price}
                       </p>
                       <a
-                        href={`https://etherscan.io/tx/${entry.txHash}`}
+                        href={`https://explorer.solana.com/tx/${entry.txHash}?cluster=${NETWORK}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center space-x-1 text-white/70 hover:text-pikavault-yellow transition-colors"
