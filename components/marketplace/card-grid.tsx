@@ -240,7 +240,7 @@ export function CardGrid({ selectedCards, setSelectedCards }: CardGridProps) {
 
                     <div className="flex justify-between items-center">
                       <p className="text-white/70 text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                        #{card.id} • {card.owner}
+                        #{card.id} • {card.ownerAddress}
                       </p>
                     </div>
                   </div>

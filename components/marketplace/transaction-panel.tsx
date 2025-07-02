@@ -37,7 +37,7 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
 
   // Check if current user owns any of the selected cards
   const userOwnedCards = selectedCardDetails.filter(card => 
-    publicKey && card.owner === publicKey.toString()
+    publicKey && card.ownerAddress === publicKey.toString()
   )
   const isUserOwned = userOwnedCards.length > 0
 
@@ -111,7 +111,7 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
     }
 
     // Check if user is trying to buy their own card
-    const userOwnedCard = selectedCardDetails.find(card => card.owner === publicKey.toString())
+    const userOwnedCard = selectedCardDetails.find(card => card.ownerAddress === publicKey.toString())
     if (userOwnedCard) {
       setPurchaseError("You cannot purchase your own card")
       return
@@ -133,7 +133,7 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
         marketplace,
         new PublicKey(card.listingPubkey),
         new PublicKey(card.nftMint),
-        new PublicKey(card.owner) // seller
+        new PublicKey(card.ownerAddress) // seller
       )
 
       // Success feedback
@@ -207,7 +207,7 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
                     #{card.id}
                   </p>
                   
-                  {publicKey && card.owner === publicKey.toString() && (
+                  {publicKey && card.ownerAddress === publicKey.toString() && (
                     <span className="text-pikavault-yellow text-xs font-bold">OWNED BY YOU</span>
                   )}
                 </div>

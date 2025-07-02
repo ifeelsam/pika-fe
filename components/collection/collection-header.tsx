@@ -9,14 +9,12 @@ import { motion } from "framer-motion"
 import { useWallet } from "@solana/wallet-adapter-react"
 
 export function CollectionHeader() {
-  const {publicKey} = useWallet();
+  const { publicKey } = useWallet();
   const { totalValue, viewMode, setViewMode } = useCollection()
   const headerRef = useRef<HTMLDivElement>(null)
   const [displayValue, setDisplayValue] = useState(0)
   const [isCopied, setIsCopied] = useState(false)
 
-  // Wallet address
-  const walletAddress = "0xD8a6F7992c37d5A89f8d5DB1579F16fF42a7b809"
   const truncateAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`
   }

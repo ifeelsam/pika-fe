@@ -6,44 +6,6 @@ import { getAllListings, createUmiInstance } from "@/lib/anchor/transactions"
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js"
 import { fetchDigitalAsset } from "@metaplex-foundation/mpl-token-metadata"
 import { publicKey as umiPublicKey } from "@metaplex-foundation/umi"
-import { METADATA_PROGRAM_ID } from "@/lib/anchor/config"
-
-type FilterType = {
-  id: string
-  label: string
-  options: {
-    id: string
-    label: string
-    active: boolean
-  }[]
-}
-
-type CardType = {
-  id: string
-  name: string
-  rarity: "common" | "rare" | "epic" | "legendary"
-  price: number
-  imageUrl: string
-  rotation: number
-  owner: string
-  collection: string
-  listingPubkey: string
-  nftMint: string
-  status: "active" | "sold" | "unlisted"
-}
-
-type MarketplaceContextType = {
-  filters: FilterType[]
-  toggleFilter: (filterId: string, optionId: string) => void
-  resetFilters: () => void
-  cards: CardType[]
-  filteredCards: CardType[]
-  searchQuery: string
-  setSearchQuery: (query: string) => void
-  isLoading: boolean
-  error: string | null
-  refreshListings: () => Promise<void>
-}
 
 const MarketplaceContext = createContext<MarketplaceContextType | undefined>(undefined)
 
@@ -96,10 +58,10 @@ export function MarketplaceProvider({ children }: { children: ReactNode }) {
   ])
 
   const [searchQuery, setSearchQuery] = useState("")
-  const [cards, setCards] = useState<CardType[]>([])
+  const [cards, setCards] = useState<BaseCardData[]>([])
 
   // Helper function to determine rarity based on price
-  const determineRarity = (price: number): "common" | "rare" | "epic" | "legendary" => {
+  const determineRarity = (price: number): CardRarity => {
     if (price >= 10) return "legendary"
     if (price >= 5) return "epic"
     if (price >= 1) return "rare"
@@ -189,13 +151,13 @@ export function MarketplaceProvider({ children }: { children: ReactNode }) {
       
       const metadataResults = await Promise.allSettled(metadataPromises)
       
-      const formattedCards: CardType[] = listings.map((listing, index) => {
+      const formattedCards: BaseCardData[] = listings.map((listing, index) => {
         const priceInSol = parseInt(listing.account.listingPrice.toString()) / LAMPORTS_PER_SOL
         const rarity = determineRarity(priceInSol)
         const collection = determineCollection(listing.account.nftAddress.toString())
         
         // Determine status
-        let status: "active" | "sold" | "unlisted" = "unlisted"
+        let status: MarketplaceStatus = "unlisted"
         if (listing.account.status.active) status = "active"
         else if (listing.account.status.sold) status = "sold"
 
@@ -215,7 +177,7 @@ export function MarketplaceProvider({ children }: { children: ReactNode }) {
           price: priceInSol,
           imageUrl: metadata.image,
           rotation: generateRotation(listing.publicKey.toString()),
-          owner: listing.account.owner.toString(),
+          ownerAddress: listing.account.owner.toString(),
           collection,
           listingPubkey: listing.publicKey.toString(),
           nftMint: listing.account.nftAddress.toString(),
