@@ -5,7 +5,7 @@ import type { PikaVault } from "./idl.ts";
 
 
 export const NETWORK = "devnet";
-export const RPC_URL = clusterApiUrl(NETWORK);
+export const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || clusterApiUrl(NETWORK);
 
 export const PROGRAM_ID = new PublicKey("EqJfvdGXFgMr5AfRzZdByrk3bkJVBixdcgAHiuFsPHHF");
 

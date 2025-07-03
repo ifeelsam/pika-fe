@@ -17,7 +17,7 @@ export const WalletContextProvider: FC<Props> = ({ children }) => {
   const network = WalletAdapterNetwork.Devnet
 
   // RPC endpoint
-  const endpoint = useMemo(() => clusterApiUrl(network), [network])
+  const endpoint = useMemo(() => process.env.NEXT_PUBLIC_RPC_URL || clusterApiUrl(network), [network])
 
   const wallets = useMemo(
     () => [
