@@ -101,7 +101,7 @@ export function MissionStatement() {
         </div>
 
         {/* Trust statistics */}
-        <div ref={statsRef} className="grid grid-cols-1 md:grid-cols-3 gap-12 mt-24">
+        {/* <div ref={statsRef} className="grid grid-cols-1 md:grid-cols-3 gap-12 mt-24">
           <div className="stat-item">
             <p className="text-white/50 text-xl mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               TOTAL TRADES
@@ -137,7 +137,7 @@ export function MissionStatement() {
               99.8%
             </h3>
           </div>
-        </div>
+        </div> */}
       </div>
     </section>
   )
