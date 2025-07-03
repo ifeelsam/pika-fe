@@ -1,6 +1,6 @@
 import { PublicKey, SystemProgram, Keypair} from "@solana/web3.js";
 import { Program, BN } from "@coral-xyz/anchor";
-import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddress } from "@solana/spl-token";
+import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddress, createAssociatedTokenAccountInstruction, getAccount } from "@solana/spl-token";
 import { METADATA_PROGRAM_ID } from "./config";
 import type { PikaVault } from "./idl";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
@@ -378,6 +378,22 @@ export const releaseEscrow = async (
     const vault = await getAssociatedTokenAddress(nftMint, listing, true);
     const buyerTokenAccount = await getAssociatedTokenAddress(nftMint, buyer);
 
+      // if buyer's if ata doesn't exist, create it
+    const preInstructions = [];
+    try {
+      await getAccount(program.provider.connection, buyerTokenAccount);
+      console.log("Buyer token account already exists");
+    } catch (error) {
+      console.log("Creating buyer token account...");
+      const createAtaIx = createAssociatedTokenAccountInstruction(
+        seller, // payer (seller pays for the creation)
+        buyerTokenAccount, // ata
+        buyer, // owner
+        nftMint 
+      );
+      preInstructions.push(createAtaIx);
+    }
+
     const tx = await program.methods
       .releaseEscrow()
       .accountsStrict({
@@ -393,6 +409,7 @@ export const releaseEscrow = async (
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
       })
+      .preInstructions(preInstructions)
       .rpc();
 
     console.log("Escrow released and NFT transferred successfully! Transaction signature:", tx);

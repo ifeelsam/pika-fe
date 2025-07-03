@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { gsap } from "gsap"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { useAnchorProgram } from "@/lib/anchor/client"
-import { delistNFT, purchaseNFT, findMarketplacePDA } from "@/lib/anchor/transactions"
+import { delistNFT, purchaseNFT, releaseEscrow, findMarketplacePDA, findEscrowPDA } from "@/lib/anchor/transactions"
 import { PublicKey } from "@solana/web3.js"
 import { MARKETPLACE_ADMIN } from "@/lib/anchor/config"
 import { useRouter } from "next/navigation"
@@ -28,6 +28,8 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
   const [delistError, setDelistError] = useState<string | null>(null)
   const [isPurchasing, setIsPurchasing] = useState(false)
   const [purchaseError, setPurchaseError] = useState<string | null>(null)
+  const [isReleasingEscrow, setIsReleasingEscrow] = useState(false)
+  const [escrowError, setEscrowError] = useState<string | null>(null)
 
   // Get selected card details
   const selectedCardDetails = cards.filter((card) => selectedCards.includes(card.id))
@@ -41,11 +43,27 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
   )
   const isUserOwned = userOwnedCards.length > 0
 
+  // Check if any of the user's cards are in "sold" status (awaiting escrow release)
+  const soldUserCards = selectedCardDetails.filter(card =>
+    publicKey && 
+    card.ownerAddress === publicKey.toString() && 
+    card.status === "sold"
+  )
+  const hasSoldCards = soldUserCards.length > 0
+
+  // Check if any of the selected cards are active and not owned by user (can be purchased)
+  const purchasableCards = selectedCardDetails.filter(card =>
+    card.status === "active" && 
+    (!publicKey || card.ownerAddress !== publicKey.toString())
+  )
+  const canPurchase = purchasableCards.length > 0
+
   // Animation for panel
   useEffect(() => {
     if (isOpen) {
       setDelistError(null)
       setPurchaseError(null)
+      setEscrowError(null)
     }
     if (panelRef.current) {
       if (isOpen) {
@@ -76,7 +94,12 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
     
     try {
       // For now, we'll handle one card at a time (could be extended for batch operations)
-      const card = userOwnedCards[0]
+      const card = userOwnedCards.find(c => c.status === "active") // Only delist active cards
+      
+      if (!card) {
+        setDelistError("No active cards to delist")
+        return
+      }
       
       // Get the marketplace PDA
       const [marketplace] = findMarketplacePDA(MARKETPLACE_ADMIN, program.programId)
@@ -122,7 +145,12 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
     
     try {
       // handles one card at a time (could be extended for batch operations)
-      const card = selectedCardDetails[0]
+      const card = purchasableCards[0]
+      
+      if (!card) {
+        setPurchaseError("No active cards available for purchase")
+        return
+      }
       
       // the marketplace PDA
       const [marketplace] = findMarketplacePDA(MARKETPLACE_ADMIN, program.programId)
@@ -151,12 +179,71 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
     }
   }
 
+  // Handle release escrow functionality
+  const handleReleaseEscrow = async () => {
+    if (!program || !publicKey || soldUserCards.length === 0) {
+      setEscrowError("Missing required data for escrow release")
+      return
+    }
+
+    setIsReleasingEscrow(true)
+    setEscrowError(null)
+    
+    try {
+      // Handle one card at a time (could be extended for batch operations)
+      const card = soldUserCards[0]
+      
+      // Get the marketplace PDA
+      const [marketplace] = findMarketplacePDA(MARKETPLACE_ADMIN, program.programId)
+      
+      // Get the escrow PDA
+      const [escrow] = findEscrowPDA(new PublicKey(card.listingPubkey), program.programId)
+      
+      // Fetch escrow data to get buyer information
+      let escrowData
+      try {
+        escrowData = await program.account.escrow.fetch(escrow)
+      } catch (error) {
+        throw new Error("Escrow not found or already released")
+      }
+      
+      await releaseEscrow(
+        program,
+        publicKey, // seller
+        escrowData.buyer, // buyer from escrow data
+        marketplace,
+        new PublicKey(card.listingPubkey),
+        new PublicKey(card.nftMint),
+        escrow
+      )
+
+      // Success feedback
+      console.log("✅ Escrow released successfully!")
+      
+      // Refresh listings and close panel
+      await refreshListings()
+      onClose()
+      
+    } catch (error: any) {
+      console.error("Error releasing escrow:", error)
+      setEscrowError(error.message || "Failed to release escrow")
+    } finally {
+      setIsReleasingEscrow(false)
+    }
+  }
+
   // Handle view card functionality
   const handleViewCard = () => {
     if (selectedCardDetails.length > 0) {
       const card = selectedCardDetails[0]
       router.push(`/card/${card.nftMint}`)
     }
+  }
+
+  const getPanelTitle = () => {
+    if (hasSoldCards) return "RELEASE ESCROW"
+    if (isUserOwned) return "MANAGE"
+    return "CHECKOUT"
   }
 
   return (
@@ -167,7 +254,7 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
       <div className="h-full flex flex-col p-6">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl font-black" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
-            {isUserOwned ? "MANAGE" : "CHECKOUT"}
+            {getPanelTitle()}
           </h2>
 
           <button onClick={onClose} className="p-2 text-white/70 hover:text-pikavault-yellow transition-colors">
@@ -208,7 +295,12 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
                   </p>
                   
                   {publicKey && card.ownerAddress === publicKey.toString() && (
-                    <span className="text-pikavault-yellow text-xs font-bold">OWNED BY YOU</span>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-pikavault-yellow text-xs font-bold">OWNED BY YOU</span>
+                      {card.status === "sold" && (
+                        <span className="text-pikavault-cyan text-xs font-bold">AWAITING ESCROW RELEASE</span>
+                      )}
+                    </div>
                   )}
                 </div>
 
@@ -232,16 +324,26 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
           </div>
 
           <div className="space-y-4">
-            {(delistError || purchaseError) && (
+            {(delistError || purchaseError || escrowError) && (
               <div className="bg-pikavault-pink/20 border-2 border-pikavault-pink p-3 text-center">
                 <p className="text-pikavault-pink text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                  {delistError || purchaseError}
+                  {delistError || purchaseError || escrowError}
                 </p>
               </div>
             )}
             
-            {isUserOwned ? (
-              // Show delist button for user-owned cards
+            {hasSoldCards ? (
+              // Show release escrow button for sold cards
+              <Button
+                onClick={handleReleaseEscrow}
+                disabled={isReleasingEscrow || !publicKey}
+                className="w-full bg-pikavault-cyan hover:bg-pikavault-cyan/90 text-pikavault-dark text-lg font-bold py-6 rounded-none disabled:opacity-50"
+                style={{ fontFamily: "'Monument Extended', sans-serif" }}
+              >
+                {isReleasingEscrow ? "RELEASING..." : !publicKey ? "CONNECT WALLET" : "RELEASE ESCROW"}
+              </Button>
+            ) : isUserOwned ? (
+              // Show delist button for user-owned active cards
               <Button
                 onClick={handleDelist}
                 disabled={isDelisting}
@@ -250,7 +352,7 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
               >
                 {isDelisting ? "DELISTING..." : "DELIST"}
               </Button>
-            ) : (
+            ) : canPurchase ? (
               // Show buy button for cards not owned by user
               <Button
                 onClick={handlePurchase}
@@ -260,11 +362,16 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
               >
                 {isPurchasing ? "PURCHASING..." : !publicKey ? "CONNECT WALLET" : "BUY NOW"}
               </Button>
+            ) : (
+              // No available actions
+              <div className="text-center text-white/50 py-4" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                No actions available for selected cards
+              </div>
             )}
 
             <Button
               onClick={handleViewCard}
-              disabled={isDelisting || isPurchasing}
+              disabled={isDelisting || isPurchasing || isReleasingEscrow}
               className="w-full bg-transparent border-4 border-pikavault-cyan hover:bg-pikavault-cyan/10 text-white text-lg font-bold py-6 rounded-none disabled:opacity-50"
               style={{ fontFamily: "'Monument Extended', sans-serif" }}
             >
