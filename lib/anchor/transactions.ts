@@ -530,3 +530,216 @@ export const getUserListings = async (program: Program<PikaVault>, user: PublicK
     throw error;
   }
 }; 
+
+// Get all NFTs owned by a specific wallet address
+export const getUserOwnedNFTs = async (
+  program: Program<PikaVault>,
+  ownerAddress: PublicKey
+): Promise<{
+  nftMint: string;
+  metadata: {
+    name: string;
+    image: string;
+    description?: string;
+    attributes?: NFTAttribute[];
+  };
+  isListed: boolean;
+  listingInfo?: {
+    listingPubkey: string;
+    price: number;
+    status: "active" | "sold" | "unlisted";
+  };
+}[]> => {
+  const maxRetries = 3;
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      if (!program?.provider.connection) {
+        throw new Error("No connection available");
+      }
+
+      console.log(`Fetching NFTs for wallet (attempt ${attempt + 1}):`, ownerAddress.toString());
+
+      // Get all token accounts owned by the user with retry logic
+      let tokenAccounts;
+      try {
+        tokenAccounts = await program.provider.connection.getParsedTokenAccountsByOwner(
+          ownerAddress,
+          { programId: TOKEN_PROGRAM_ID }
+        );
+      } catch (rpcError: any) {
+        console.warn(`RPC call failed on attempt ${attempt + 1}:`, rpcError);
+        
+        if (attempt === maxRetries - 1) {
+          throw new Error(`Failed to fetch token accounts after ${maxRetries} attempts: ${rpcError.message}`);
+        }
+        
+        // Wait before retry
+        await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+        continue;
+      }
+
+      console.log("Found token accounts:", tokenAccounts.value.length);
+
+      // Filter for NFTs (accounts with amount = 1 and decimals = 0)
+      const nftAccounts = tokenAccounts.value.filter(account => {
+        const tokenInfo = account.account.data.parsed.info;
+        return tokenInfo.tokenAmount.amount === "1" && tokenInfo.tokenAmount.decimals === 0;
+      });
+
+      console.log("Found NFT accounts:", nftAccounts.length);
+
+      if (nftAccounts.length === 0) {
+        return [];
+      }
+
+      // Create UMI instance for metadata fetching
+      const umi = createUmiInstance(program.provider.connection.rpcEndpoint);
+
+      // Fetch all current marketplace listings to check if NFTs are listed with retry
+      let allListings: Awaited<ReturnType<typeof getAllListings>>;
+      try {
+        allListings = await getAllListingsWithRetry(program, 3);
+      } catch (listingError: any) {
+        console.warn("Failed to fetch marketplace listings, assuming no listings:", listingError);
+        allListings = [];
+      }
+      
+      const listingMap = new Map(
+        allListings.map(listing => [
+          listing.account.nftAddress.toString(),
+          {
+            listingPubkey: listing.publicKey.toString(),
+            price: parseInt(listing.account.listingPrice.toString()) / 1000000000, // Convert lamports to SOL
+            status: listing.account.status.active ? "active" as const 
+                   : listing.account.status.sold ? "sold" as const 
+                   : "unlisted" as const
+          }
+        ])
+      );
+
+      // Fetch metadata for each NFT in parallel with error handling
+      const nftDataPromises = nftAccounts.map(async (account) => {
+        const mintAddress = account.account.data.parsed.info.mint;
+        
+        try {
+          // Fetch NFT metadata using UMI
+          const metadata = await fetchNFTMetadata(umi, mintAddress);
+          
+          // Check if NFT is listed
+          const listingInfo = listingMap.get(mintAddress);
+          
+          return {
+            nftMint: mintAddress,
+            metadata,
+            isListed: !!listingInfo,
+            listingInfo
+          };
+        } catch (metadataError) {
+          console.error(`Error fetching metadata for NFT ${mintAddress}:`, metadataError);
+          return {
+            nftMint: mintAddress,
+            metadata: {
+              name: `NFT #${mintAddress.slice(0, 6).toUpperCase()}`,
+              image: "/placeholder-1.png"
+            },
+            isListed: false
+          };
+        }
+      });
+
+      const nftData = await Promise.all(nftDataPromises);
+      console.log("Fetched NFT data:", nftData);
+
+      return nftData;
+
+    } catch (error: any) {
+      lastError = error;
+      console.error(`Attempt ${attempt + 1} failed:`, error);
+
+      if (attempt === maxRetries - 1) {
+        throw new Error(`Failed to fetch user NFTs after ${maxRetries} attempts: ${lastError?.message || "Unknown error"}`);
+      }
+
+      // Wait before retry (exponential backoff)
+      await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, attempt)));
+    }
+  }
+
+  throw lastError || new Error("Failed to fetch user NFTs");
+};
+
+// Helper function to get all listings with retry logic
+const getAllListingsWithRetry = async (program: Program<PikaVault>, maxRetries = 3) => {
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      console.log(`Fetching marketplace listings (attempt ${attempt + 1})...`);
+      return await getAllListings(program);
+    } catch (error: any) {
+      lastError = error;
+      console.warn(`Listings fetch attempt ${attempt + 1} failed:`, error);
+
+      if (attempt === maxRetries - 1) {
+        throw new Error(`Failed to fetch marketplace listings after ${maxRetries} attempts: ${error.message}`);
+      }
+
+      // Wait before retry
+      await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+    }
+  }
+
+  throw lastError || new Error("Failed to fetch marketplace listings");
+};
+
+// Helper function to fetch NFT metadata using UMI
+const fetchNFTMetadata = async (
+  umi: Umi, 
+  mintAddress: string
+): Promise<{ name: string; image: string; description?: string; attributes?: NFTAttribute[] }> => {
+  try {
+    // Import UMI functions
+    const { fetchDigitalAsset } = await import("@metaplex-foundation/mpl-token-metadata");
+    const { publicKey: umiPublicKey } = await import("@metaplex-foundation/umi");
+    
+    // Convert mint address to UMI public key
+    const mintPubkey = umiPublicKey(mintAddress);
+    
+    // Fetch digital asset (NFT) metadata
+    const digitalAsset = await fetchDigitalAsset(umi, mintPubkey);
+    
+    // Extract metadata
+    const metadata = digitalAsset.metadata;
+    const name = metadata.name || `NFT #${mintAddress.slice(0, 6).toUpperCase()}`;
+    
+    let imageUrl = "/placeholder-1.png";
+    let attributes: NFTAttribute[] | undefined = undefined;
+    
+    // Fetch off-chain metadata if URI exists
+    if (metadata.uri) {
+      try {
+        const response = await fetch(metadata.uri);
+        const offChainMetadata: NFTMetadata = await response.json();
+        imageUrl = offChainMetadata.image || imageUrl;
+        attributes = offChainMetadata.attributes;
+      } catch (error) {
+        console.warn("Failed to fetch off-chain metadata:", error);
+      }
+    }
+    
+    return {
+      name,
+      image: imageUrl,
+      description: metadata.uri ? undefined : undefined,
+      attributes
+    };
+  } catch (error) {
+    console.error("Error fetching NFT metadata for", mintAddress, ":", error);
+    return {
+      name: `NFT #${mintAddress.slice(0, 6).toUpperCase()}`,
+      image: "/placeholder-1.png"
+    };
+  }
+}; 

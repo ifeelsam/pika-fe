@@ -1,6 +1,11 @@
 "use client"
 
-import { createContext, useContext, useState, type ReactNode } from "react"
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import { useWallet } from "@solana/wallet-adapter-react"
+import { useAnchorProgram } from "@/lib/anchor/client"
+import { getUserOwnedNFTs, listNFT, delistNFT, findMarketplacePDA } from "@/lib/anchor/transactions"
+import { PublicKey } from "@solana/web3.js"
+import { MARKETPLACE_ADMIN } from "@/lib/anchor/config"
 
 type SortOption = "name" | "value" | "rarity" | "date"
 type ViewMode = "grid" | "list"
@@ -27,6 +32,13 @@ export type CardType = {
   rotation: number
   acquiredDate: string
   collection: string
+  nftMint: string
+  isListed: boolean
+  listingInfo?: {
+    listingPubkey: string
+    price: number
+    status: "active" | "sold" | "unlisted"
+  }
 }
 
 type CollectionContextType = {
@@ -42,11 +54,23 @@ type CollectionContextType = {
   viewMode: ViewMode
   setViewMode: (mode: ViewMode) => void
   totalValue: number
+  isLoading: boolean
+  error: string | null
+  refreshNFTs: () => Promise<void>
+  listNFTs: (cardIds: string[], price: number) => Promise<void>
+  delistNFTs: (cardIds: string[]) => Promise<void>
 }
 
 const CollectionContext = createContext<CollectionContextType | undefined>(undefined)
 
 export function CollectionProvider({ children }: { children: ReactNode }) {
+  const { publicKey } = useWallet()
+  const { program } = useAnchorProgram()
+  
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [cards, setCards] = useState<CardType[]>([])
+
   // Filter data
   const [filters, setFilters] = useState<FilterType[]>([
     {
@@ -66,16 +90,26 @@ export function CollectionProvider({ children }: { children: ReactNode }) {
         { id: "neo-thunder", label: "NEO THUNDER", active: false },
         { id: "pixel-pulse", label: "PIXEL PULSE", active: false },
         { id: "void-runners", label: "VOID RUNNERS", active: false },
+        { id: "pokevault", label: "POKEVAULT", active: false },
       ],
     },
     {
       id: "value",
       label: "VaLuE",
       options: [
-        { id: "under-100", label: "< 100", active: false },
-        { id: "100-500", label: "100-500", active: false },
-        { id: "500-1000", label: "500-1000", active: false },
-        { id: "over-1000", label: "> 1000", active: false },
+        { id: "under-1", label: "< 1 SOL", active: false },
+        { id: "1-5", label: "1-5 SOL", active: false },
+        { id: "5-10", label: "5-10 SOL", active: false },
+        { id: "over-10", label: "> 10 SOL", active: false },
+      ],
+    },
+    {
+      id: "status",
+      label: "StAtUs",
+      options: [
+        { id: "listed", label: "LISTED", active: false },
+        { id: "unlisted", label: "UNLISTED", active: false },
+        { id: "sold", label: "SOLD", active: false },
       ],
     },
   ])
@@ -84,117 +118,250 @@ export function CollectionProvider({ children }: { children: ReactNode }) {
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc")
   const [viewMode, setViewMode] = useState<ViewMode>("grid")
 
-  // Card data
-  const [cards] = useState<CardType[]>([
-    {
-      id: "001",
-      name: "ELECTRIC SURGE",
-      rarity: "legendary",
-      value: 1250,
-      floorPrice: 1100,
-      priceChange: 12.5,
-      imageUrl: "/electric-pokemon-card.png",
-      rotation: -3,
-      acquiredDate: "2025-01-15",
-      collection: "neo-thunder",
-    },
-    {
-      id: "042",
-      name: "CYBER STRIKE",
-      rarity: "epic",
-      value: 750,
-      floorPrice: 720,
-      priceChange: 4.2,
-      imageUrl: "/cyber-pokemon-card.png",
-      rotation: 2,
-      acquiredDate: "2025-02-03",
-      collection: "neo-thunder",
-    },
-    {
-      id: "107",
-      name: "DIGITAL WAVE",
-      rarity: "rare",
-      value: 320,
-      floorPrice: 350,
-      priceChange: -8.6,
-      imageUrl: "/digital-wave-pokemon-card.png",
-      rotation: -1,
-      acquiredDate: "2025-02-28",
-      collection: "neo-thunder",
-    },
-    {
-      id: "023",
-      name: "NEON BLAST",
-      rarity: "epic",
-      value: 680,
-      floorPrice: 650,
-      priceChange: 4.6,
-      imageUrl: "/neon-pokemon-card.png",
-      rotation: 3,
-      acquiredDate: "2025-03-12",
-      collection: "pixel-pulse",
-    },
-    {
-      id: "056",
-      name: "PIXEL STORM",
-      rarity: "rare",
-      value: 420,
-      floorPrice: 400,
-      priceChange: 5.0,
-      imageUrl: "/pixel-art-pokemon-storm-card.png",
-      rotation: -2,
-      acquiredDate: "2025-01-30",
-      collection: "pixel-pulse",
-    },
-    {
-      id: "089",
-      name: "QUANTUM LEAP",
-      rarity: "legendary",
-      value: 1580,
-      floorPrice: 1400,
-      priceChange: 12.9,
-      imageUrl: "/quantum-leap-pokemon-card.png",
-      rotation: 1,
-      acquiredDate: "2025-04-05",
-      collection: "pixel-pulse",
-    },
-    {
-      id: "112",
-      name: "STATIC PULSE",
-      rarity: "common",
-      value: 85,
-      floorPrice: 90,
-      priceChange: -5.6,
-      imageUrl: "/static-electricity-card.png",
-      rotation: -3,
-      acquiredDate: "2025-03-22",
-      collection: "void-runners",
-    },
-    {
-      id: "073",
-      name: "VOID RUNNER",
-      rarity: "epic",
-      value: 890,
-      floorPrice: 850,
-      priceChange: 4.7,
-      imageUrl: "/placeholder-oai5n.png",
-      rotation: 2,
-      acquiredDate: "2025-02-18",
-      collection: "void-runners",
-    },
-    {
-      id: "118",
-      name: "GLITCH KING",
-      rarity: "legendary",
-      value: 2100,
-      floorPrice: 1950,
-      priceChange: 7.7,
-      imageUrl: "/glitch-king-pokemon-card.png",
-      rotation: -1,
-      acquiredDate: "2025-01-05",
-      collection: "void-runners",
-    },
-  ])
+  // Helper functions
+  const getAttributeValue = (attributes: NFTAttribute[] | undefined, traitType: string): string => {
+    if (!attributes) return ""
+    const attribute = attributes.find(attr => 
+      attr.trait_type.toLowerCase() === traitType.toLowerCase()
+    )
+    return attribute ? String(attribute.value) : ""
+  }
+
+  const determineRarity = (attributes: NFTAttribute[] | undefined, price: number): CardType["rarity"] => {
+    const rarityFromAttributes = getAttributeValue(attributes, "rarity")
+    if (rarityFromAttributes) {
+      const rarity = rarityFromAttributes.toLowerCase()
+      if (["legendary", "epic", "rare", "common"].includes(rarity)) {
+        return rarity as CardType["rarity"]
+      }
+    }
+    
+    // Fallback to price-based rarity
+    if (price >= 10) return "legendary"
+    if (price >= 5) return "epic"
+    if (price >= 1) return "rare"
+    return "common"
+  }
+
+  const determineCollection = (nftMint: string): string => {
+    // Simple hash-based assignment for consistent collection grouping
+    const hash = nftMint.slice(-4)
+    const hashNum = parseInt(hash, 16) % 4
+    switch (hashNum) {
+      case 0: return "neo-thunder"
+      case 1: return "pixel-pulse"
+      case 2: return "void-runners"
+      default: return "pokevault"
+    }
+  }
+
+  // Generate random rotation for each card
+  const generateRotation = (id: string): number => {
+    const hash = id.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0)
+    return (hash % 7) - 3 // Random rotation between -3 and 3
+  }
+
+  // Load user's NFTs
+  const loadUserNFTs = async () => {
+    if (!program || !publicKey) {
+      setCards([])
+      return
+    }
+
+    try {
+      setIsLoading(true)
+      setError(null)
+      
+      console.log("Loading NFTs for user:", publicKey.toString())
+      
+      const userNFTs = await getUserOwnedNFTs(program, publicKey)
+      
+      console.log("User NFTs:", userNFTs)
+      
+      const formattedCards: CardType[] = userNFTs.map((nft, index) => {
+        const price = nft.listingInfo?.price || 1 // Default value for unlisted NFTs
+        const rarity = determineRarity(nft.metadata.attributes, price)
+        const collection = determineCollection(nft.nftMint)
+        
+        return {
+          id: nft.nftMint.slice(0, 8),
+          name: nft.metadata.name,
+          rarity,
+          value: price,
+          floorPrice: price * 0.9, // Estimated floor price
+          priceChange: Math.random() * 20 - 10, // Random price change for demo
+          imageUrl: nft.metadata.image,
+          rotation: generateRotation(nft.nftMint),
+          acquiredDate: new Date().toISOString().split('T')[0], // Today's date as placeholder
+          collection,
+          nftMint: nft.nftMint,
+          isListed: nft.isListed,
+          listingInfo: nft.listingInfo
+        }
+      })
+      
+      setCards(formattedCards)
+      
+    } catch (err: any) {
+      console.error("Error loading user NFTs:", err)
+      
+      // Provide more specific error messages
+      let errorMessage = "Failed to load NFTs"
+      
+      if (err.message?.includes("Failed to fetch") || err.message?.includes("fetch")) {
+        errorMessage = "Network connection failed. Please check your internet connection and try again."
+      } else if (err.message?.includes("timeout")) {
+        errorMessage = "Request timed out. The network might be slow. Please try again."
+      } else if (err.message?.includes("insufficient funds") || err.message?.includes("0x1")) {
+        errorMessage = "Insufficient SOL for transaction fees. Please add SOL to your wallet."
+      } else if (err.message?.includes("User rejected")) {
+        errorMessage = "Transaction was cancelled by user."
+      } else if (err.message?.includes("RPC")) {
+        errorMessage = "Solana network is experiencing issues. Please try again in a few moments."
+      } else if (err.message) {
+        errorMessage = err.message
+      }
+      
+      setError(errorMessage)
+      setCards([])
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Refresh NFTs with retry logic
+  const refreshNFTs = async (retryCount = 0) => {
+    try {
+      await loadUserNFTs()
+    } catch (error) {
+      if (retryCount < 2) {
+        console.log(`Retrying NFT fetch (attempt ${retryCount + 1})...`)
+        setTimeout(() => refreshNFTs(retryCount + 1), 2000)
+      } else {
+        console.error("Failed to refresh NFTs after retries")
+      }
+    }
+  }
+
+  // List NFTs on marketplace
+  const listNFTs = async (cardIds: string[], price: number) => {
+    if (!program || !publicKey) {
+      throw new Error("Wallet not connected")
+    }
+
+    try {
+      const [marketplace] = findMarketplacePDA(MARKETPLACE_ADMIN, program.programId)
+      const priceInLamports = Math.floor(price * 1000000000) // Convert SOL to lamports
+
+      // Find cards to list
+      const cardsToList = cards.filter(card => cardIds.includes(card.id) && !card.isListed)
+      
+      if (cardsToList.length === 0) {
+        throw new Error("No unlisted cards selected")
+      }
+
+      // List each NFT (could be batched in the future)
+      for (const card of cardsToList) {
+        console.log(`Listing NFT ${card.nftMint} for ${price} SOL`)
+        
+        try {
+          await listNFT(
+            program,
+            publicKey,
+            marketplace,
+            new PublicKey(card.nftMint),
+            priceInLamports
+          )
+        } catch (listError: any) {
+          console.error(`Failed to list NFT ${card.nftMint}:`, listError)
+          
+          // Provide specific error messages for listing failures
+          if (listError.message?.includes("insufficient funds")) {
+            throw new Error(`Insufficient SOL to pay transaction fees for listing ${card.name}`)
+          } else if (listError.message?.includes("User rejected")) {
+            throw new Error("Transaction was cancelled by user")
+          } else {
+            throw new Error(`Failed to list ${card.name}: ${listError.message || "Unknown error"}`)
+          }
+        }
+      }
+
+      // Refresh the NFT list
+      await refreshNFTs()
+      
+    } catch (error: any) {
+      console.error("Error listing NFTs:", error)
+      throw error
+    }
+  }
+
+  // Delist NFTs from marketplace  
+  const delistNFTs = async (cardIds: string[]) => {
+    if (!program || !publicKey) {
+      throw new Error("Wallet not connected")
+    }
+
+    try {
+      const [marketplace] = findMarketplacePDA(MARKETPLACE_ADMIN, program.programId)
+
+      // Find cards to delist
+      const cardsToDelisted = cards.filter(card => 
+        cardIds.includes(card.id) && 
+        card.isListed && 
+        card.listingInfo?.status === "active"
+      )
+      
+      if (cardsToDelisted.length === 0) {
+        throw new Error("No active listings selected")
+      }
+
+      // Delist each NFT
+      for (const card of cardsToDelisted) {
+        if (!card.listingInfo) continue
+        
+        console.log(`Delisting NFT ${card.nftMint}`)
+        
+        try {
+          await delistNFT(
+            program,
+            publicKey,
+            marketplace,
+            new PublicKey(card.nftMint),
+            new PublicKey(card.listingInfo.listingPubkey)
+          )
+        } catch (delistError: any) {
+          console.error(`Failed to delist NFT ${card.nftMint}:`, delistError)
+          
+          // Provide specific error messages for delisting failures
+          if (delistError.message?.includes("insufficient funds")) {
+            throw new Error(`Insufficient SOL to pay transaction fees for delisting ${card.name}`)
+          } else if (delistError.message?.includes("User rejected")) {
+            throw new Error("Transaction was cancelled by user")
+          } else {
+            throw new Error(`Failed to delist ${card.name}: ${delistError.message || "Unknown error"}`)
+          }
+        }
+      }
+
+      // Refresh the NFT list
+      await refreshNFTs()
+      
+    } catch (error: any) {
+      console.error("Error delisting NFTs:", error)
+      throw error
+    }
+  }
+
+  // Load NFTs when wallet connects or program changes
+  useEffect(() => {
+    if (publicKey && program) {
+      loadUserNFTs()
+    } else {
+      setCards([])
+      setIsLoading(false)
+      setError(null)
+    }
+  }, [publicKey, program])
 
   // Calculate total value
   const totalValue = cards.reduce((sum, card) => sum + card.value, 0)
@@ -253,14 +420,25 @@ export function CollectionProvider({ children }: { children: ReactNode }) {
           }
         } else if (filter.id === "value") {
           const matchesValue = activeOptions.some((option) => {
-            if (option.id === "under-100") return card.value < 100
-            if (option.id === "100-500") return card.value >= 100 && card.value <= 500
-            if (option.id === "500-1000") return card.value > 500 && card.value <= 1000
-            if (option.id === "over-1000") return card.value > 1000
+            if (option.id === "under-1") return card.value < 1
+            if (option.id === "1-5") return card.value >= 1 && card.value <= 5
+            if (option.id === "5-10") return card.value > 5 && card.value <= 10
+            if (option.id === "over-10") return card.value > 10
             return false
           })
 
           if (!matchesValue) {
+            return false
+          }
+        } else if (filter.id === "status") {
+          const matchesStatus = activeOptions.some((option) => {
+            if (option.id === "listed") return card.isListed && card.listingInfo?.status === "active"
+            if (option.id === "unlisted") return !card.isListed
+            if (option.id === "sold") return card.isListed && card.listingInfo?.status === "sold"
+            return false
+          })
+
+          if (!matchesStatus) {
             return false
           }
         }
@@ -302,6 +480,11 @@ export function CollectionProvider({ children }: { children: ReactNode }) {
         viewMode,
         setViewMode,
         totalValue,
+        isLoading,
+        error,
+        refreshNFTs,
+        listNFTs,
+        delistNFTs,
       }}
     >
       {children}

@@ -200,25 +200,31 @@ export function CollectionGrid({ selectedCards, setSelectedCards }: CollectionGr
                         }}
                       ></div>
 
-                      {/* Ownership marker - diagonal slash */}
-                      <div className="absolute top-0 left-0 w-16 h-16 overflow-hidden">
-                        <div
-                          className="absolute top-0 left-0 w-24 h-6 bg-pikavault-yellow rotate-45 origin-top-left"
-                          style={{ transform: "rotate(45deg) translate(-3px, -10px)" }}
-                        >
-                          <p
-                            className="text-pikavault-dark text-[10px] font-bold text-center"
-                            style={{ fontFamily: "'Monument Extended', sans-serif" }}
-                          >
-                            OWNED
-                          </p>
-                        </div>
+                      {/* Listing status badge */}
+                      <div className="absolute top-3 left-12">
+                        {card.isListed ? (
+                          <div className={`px-2 py-1 text-xs font-bold ${
+                            card.listingInfo?.status === "active" 
+                              ? "bg-pikavault-yellow text-pikavault-dark" 
+                              : card.listingInfo?.status === "sold"
+                              ? "bg-pikavault-pink text-white"
+                              : "bg-white/20 text-white"
+                          }`}>
+                            {card.listingInfo?.status === "active" ? "LISTED" 
+                             : card.listingInfo?.status === "sold" ? "SOLD" 
+                             : "UNLISTED"}
+                          </div>
+                        ) : (
+                          <div className="px-2 py-1 text-xs font-bold bg-white/20 text-white">
+                            UNLISTED
+                          </div>
+                        )}
                       </div>
 
                       {/* Price comparison */}
                       <div
                         className={`
-                          absolute top-3 right-12 px-2 py-1
+                          absolute top-3 right-3 px-2 py-1
                           ${card.priceChange >= 0 ? "bg-pikavault-cyan" : "bg-pikavault-pink"}
                         `}
                       >
@@ -227,7 +233,7 @@ export function CollectionGrid({ selectedCards, setSelectedCards }: CollectionGr
                           style={{ fontFamily: "'Monument Extended', sans-serif" }}
                         >
                           {card.priceChange >= 0 ? "+" : ""}
-                          {card.priceChange}%
+                          {card.priceChange.toFixed(1)}%
                         </p>
                       </div>
 
@@ -244,31 +250,19 @@ export function CollectionGrid({ selectedCards, setSelectedCards }: CollectionGr
                           <p className="text-white/70 text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                             #{card.id}
                           </p>
-                          <p
-                            className="text-white font-black"
-                            style={{ fontFamily: "'Monument Extended', sans-serif" }}
-                          >
-                            ${card.value}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Quick action buttons (visible on hover) */}
-                      {isHovered && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-pikavault-dark/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <div className="flex space-x-4">
-                            <button className="p-3 bg-pikavault-yellow text-pikavault-dark">
-                              <Eye className="w-5 h-5" />
-                            </button>
-                            <button className="p-3 bg-pikavault-pink text-white">
-                              <Tag className="w-5 h-5" />
-                            </button>
-                            <button className="p-3 bg-pikavault-cyan text-pikavault-dark">
-                              <Share2 className="w-5 h-5" />
-                            </button>
+                          <div className="text-right">
+                            <p
+                              className="text-white font-black"
+                              style={{ fontFamily: "'Monument Extended', sans-serif" }}
+                            >
+                              {card.isListed && card.listingInfo ? `${card.listingInfo.price.toFixed(2)}` : `${card.value.toFixed(2)}`} SOL
+                            </p>
+                            <p className="text-white/50 text-xs" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                              {card.isListed ? "Listed Price" : "Est. Value"}
+                            </p>
                           </div>
                         </div>
-                      )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -276,8 +270,8 @@ export function CollectionGrid({ selectedCards, setSelectedCards }: CollectionGr
             )
           })}
 
-          {/* Empty slots */}
-          {Array.from({ length: 3 }).map((_, index) => (
+          {/* Empty slots - only show if user has some NFTs */}
+          {filteredCards.length > 0 && Array.from({ length: 3 }).map((_, index) => (
             <div
               key={`empty-${index}`}
               className="relative"
@@ -343,21 +337,44 @@ export function CollectionGrid({ selectedCards, setSelectedCards }: CollectionGr
 
                   <div className="flex items-center space-x-6">
                     <div>
-                      <p
-                        className={`text-sm ${card.priceChange >= 0 ? "text-pikavault-cyan" : "text-pikavault-pink"}`}
-                        style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-                      >
-                        {card.priceChange >= 0 ? "+" : ""}
-                        {card.priceChange}%
-                      </p>
+                      {/* Listing status */}
+                      <div className="text-center">
+                        <div className={`px-2 py-1 text-xs font-bold ${
+                          card.isListed ? (
+                            card.listingInfo?.status === "active" 
+                              ? "bg-pikavault-yellow text-pikavault-dark" 
+                              : card.listingInfo?.status === "sold"
+                              ? "bg-pikavault-pink text-white"
+                              : "bg-white/20 text-white"
+                          ) : "bg-white/20 text-white"
+                        }`}>
+                          {card.isListed ? (
+                            card.listingInfo?.status === "active" ? "LISTED" 
+                             : card.listingInfo?.status === "sold" ? "SOLD" 
+                             : "UNLISTED"
+                          ) : "UNLISTED"}
+                        </div>
+                        <p
+                          className={`text-sm mt-1 ${card.priceChange >= 0 ? "text-pikavault-cyan" : "text-pikavault-pink"}`}
+                          style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                        >
+                          {card.priceChange >= 0 ? "+" : ""}
+                          {card.priceChange.toFixed(1)}%
+                        </p>
+                      </div>
                     </div>
 
-                    <p
-                      className="text-white font-black text-xl"
-                      style={{ fontFamily: "'Monument Extended', sans-serif" }}
-                    >
-                      ${card.value}
-                    </p>
+                    <div className="text-right">
+                      <p
+                        className="text-white font-black text-xl"
+                        style={{ fontFamily: "'Monument Extended', sans-serif" }}
+                      >
+                        {card.isListed && card.listingInfo ? `${card.listingInfo.price.toFixed(2)}` : `${card.value.toFixed(2)}`} SOL
+                      </p>
+                      <p className="text-white/50 text-xs" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                        {card.isListed ? "Listed Price" : "Est. Value"}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -369,26 +386,29 @@ export function CollectionGrid({ selectedCards, setSelectedCards }: CollectionGr
       {/* Context menu */}
       {contextMenuCard && (
         <>
-          <div className="fixed inset-0 z-40" onClick={closeContextMenu}></div>
           <div
-            className="fixed z-50 bg-pikavault-dark border-4 border-pikavault-yellow p-2 w-48"
+            className="fixed inset-0 z-40"
+            onClick={closeContextMenu}
+          />
+          <div
+            className="fixed bg-pikavault-dark border-4 border-pikavault-yellow z-50 min-w-48"
             style={{
-              top: contextMenuPosition.y,
               left: contextMenuPosition.x,
+              top: contextMenuPosition.y,
             }}
           >
-            <div className="space-y-1">
-              <button className="w-full text-left p-2 hover:bg-white/10 text-white flex items-center space-x-2">
+            <div className="p-2">
+              <button className="w-full text-left px-3 py-2 text-white hover:bg-white/10 flex items-center space-x-2">
                 <Eye className="w-4 h-4" />
                 <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>View Details</span>
               </button>
-              <button className="w-full text-left p-2 hover:bg-white/10 text-white flex items-center space-x-2">
+              <button className="w-full text-left px-3 py-2 text-white hover:bg-white/10 flex items-center space-x-2">
                 <Tag className="w-4 h-4" />
                 <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>List for Sale</span>
               </button>
-              <button className="w-full text-left p-2 hover:bg-white/10 text-white flex items-center space-x-2">
+              <button className="w-full text-left px-3 py-2 text-white hover:bg-white/10 flex items-center space-x-2">
                 <Share2 className="w-4 h-4" />
-                <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Share Card</span>
+                <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Share</span>
               </button>
             </div>
           </div>
