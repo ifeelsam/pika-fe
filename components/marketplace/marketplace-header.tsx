@@ -44,8 +44,7 @@ export function MarketplaceHeader() {
   return (
     <div ref={headerRef} className="mb-12">
       <h1
-        className="text-5xl md:text-7xl lg:text-8xl font-black mb-8 tracking-tight"
-        style={{ fontFamily: "'Monument Extended', sans-serif" }}
+        className="text-5xl md:text-7xl lg:text-8xl font-black mb-8 tracking-tight font-monument"
       >
         MARKET<span className="text-pikavault-yellow">PLACE</span>
       </h1>
@@ -60,8 +59,7 @@ export function MarketplaceHeader() {
               placeholder="SEARCH CARDS..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-transparent py-4 px-3 text-white outline-none placeholder:text-white/30"
-              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+              className="w-full bg-transparent py-4 px-3 text-white outline-none placeholder:text-white/30 font-space-grotesk"
             />
             {searchQuery && (
               <button

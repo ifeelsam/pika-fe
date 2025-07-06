@@ -33,11 +33,10 @@ export function Navigation() {
       <div className="container mx-auto px-6 flex justify-between items-center">
         <Link
           href="/"
-          className="text-2xl font-black text-pikavault-yellow tracking-wider relative group"
-          style={{ fontFamily: "'Monument Extended', sans-serif" }}
+          className="text-2xl font-black text-pikavault-yellow hover:text-white tracking-wider relative group font-monument"
         >
           PIKA
-          <span className="text-white">VAULT</span>
+          <span className="text-white hover:text-pikavault-yellow">VAULT</span>
           <span className="absolute -bottom-1 left-0 w-0 h-[3px] bg-pikavault-yellow group-hover:w-full transition-all duration-300"></span>
         </Link>
 
@@ -46,8 +45,7 @@ export function Navigation() {
             <Link
               key={item.name}
               href={item.href}
-              className="text-white hover:text-pikavault-yellow relative group text-lg font-medium tracking-wider"
-              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+              className="text-white hover:text-pikavault-yellow relative group text-lg font-medium tracking-wider font-space-grotesk"
             >
               {item.name}
               <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-pikavault-yellow group-hover:w-full transition-all duration-300"></span>

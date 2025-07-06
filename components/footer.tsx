@@ -16,8 +16,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           <div>
             <h3
-              className="text-xl font-bold text-pikavault-yellow mb-6"
-              style={{ fontFamily: "'Monument Extended', sans-serif" }}
+              className="text-xl font-bold text-pikavault-yellow mb-6 font-monument"
             >
               PIKAVAULT
             </h3>
@@ -27,7 +26,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="text-white text-lg font-bold mb-6" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
+            <h4 className="text-white text-lg font-bold mb-6 font-monument">
               EXPLORE
             </h4>
             <ul className="space-y-4">
@@ -35,8 +34,7 @@ export function Footer() {
                 <li key={item}>
                   <Link
                     href={`/${item.toLowerCase()}`}
-                    className="text-white/70 hover:text-pikavault-yellow transition-colors"
-                    style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                    className="text-white/70 hover:text-pikavault-yellow transition-colors font-space-grotesk"
                   >
                     {item}
                   </Link>
@@ -46,7 +44,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="text-white text-lg font-bold mb-6" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
+            <h4 className="text-white text-lg font-bold mb-6 font-monument">
               COMPANY
             </h4>
             <ul className="space-y-4">
@@ -54,8 +52,7 @@ export function Footer() {
                 <li key={item}>
                   <a
                     href={`/${item.toLowerCase()}`}
-                    className="text-white/70 hover:text-pikavault-yellow transition-colors"
-                    style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                    className="text-white/70 hover:text-pikavault-yellow transition-colors font-space-grotesk"
                   >
                     {item}
                   </a>
@@ -65,7 +62,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="text-white text-lg font-bold mb-6" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
+            <h4 className="text-white text-lg font-bold mb-6 font-monument">
               CONNECT
             </h4>
             <ul className="space-y-4">
@@ -73,8 +70,7 @@ export function Footer() {
                 <li key={item.name}>
                   <Link
                     href={item.href}
-                    className="text-white/70 hover:text-pikavault-yellow transition-colors"
-                    style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                    className="text-white/70 hover:text-pikavault-yellow transition-colors font-space-grotesk"
                   >
                     {item.name}
                   </Link>
@@ -85,7 +81,7 @@ export function Footer() {
         </div>
 
         <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-white/50 text-sm mb-4 md:mb-0" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+          <p className="text-white/50 text-sm mb-4 md:mb-0 font-space-grotesk">
             © {year} PikaVault. All rights reserved.
           </p>
 
@@ -94,8 +90,7 @@ export function Footer() {
               <a
                 key={item}
                 href={`/${item.toLowerCase()}`}
-                className="text-white/50 hover:text-pikavault-yellow text-sm transition-colors"
-                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                className="text-white/50 hover:text-pikavault-yellow text-sm transition-colors font-space-grotesk"
               >
                 {item}
               </a>
