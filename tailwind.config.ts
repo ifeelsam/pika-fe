@@ -19,6 +19,10 @@ const config = {
       },
     },
     extend: {
+      fontFamily: {
+        'monument': ['"Monument Extended"', 'Arial Black', 'Helvetica', 'sans-serif'],
+        'space-grotesk': ['"Space Grotesk"', 'Inter', 'system-ui', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
