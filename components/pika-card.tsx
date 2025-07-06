@@ -141,8 +141,7 @@ export function PikaCard({ id, name, rarity, imageUrl, image, set, number, price
           <div className="absolute bottom-0 left-0 w-full p-4">
             <div className="flex justify-between items-end">
               <h3
-                className="text-white text-xl font-bold leading-tight"
-                style={{ fontFamily: "'Monument Extended', sans-serif" }}
+                className="text-xl font-black tracking-tight font-monument"
               >
                 {name}
               </h3>
@@ -150,7 +149,7 @@ export function PikaCard({ id, name, rarity, imageUrl, image, set, number, price
             </div>
 
             <div className="mt-2 flex justify-between items-center">
-              <p className="text-white/70 text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+              <p className="text-white/70 text-sm font-space-grotesk">
                 #{id}
               </p>
             </div>
