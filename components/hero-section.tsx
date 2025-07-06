@@ -15,6 +15,7 @@ export function HeroSection() {
     if (typeof window !== "undefined") {
       gsap.registerPlugin(ScrollTrigger)
 
+      gsap.set(headlineRef.current, { opacity: 1 })
       // Headline animation
       const pikaChars = gsap.utils.toArray(".pika-char")
       const vaultChars = gsap.utils.toArray(".vault-char")
@@ -38,10 +39,25 @@ export function HeroSection() {
         ease: "back.out(1.7)",
       })
 
-      // Button animation
-      gsap.from(buttonRef.current, {
+      // Subheading animation
+      gsap.fromTo(subheadlineRef.current, {
+        opacity: 0,
+        y: 30,
+      }, {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        delay: 0.4,
+        ease: "power2.out",
+      })
+
+      // Button animation 
+      gsap.fromTo(buttonRef.current, {
         scale: 0.8,
         opacity: 0,
+      }, {
+        scale: 1,
+        opacity: 1,
         duration: 1,
         delay: 0.8,
         ease: "elastic.out(1, 0.5)",
@@ -82,8 +98,7 @@ export function HeroSection() {
       <div className="w-full max-w-7xl mx-auto">
         <h1
           ref={headlineRef}
-          className="text-4xl md:text-6xl lg:text-8xl font-black mb-6 leading-none tracking-tight filter blur-[1px] transition-all duration-300"
-          style={{ fontFamily: "'Monument Extended', sans-serif" }}
+          className="text-4xl md:text-6xl lg:text-8xl font-black mb-6 leading-none tracking-tight filter blur-[1px] transition-all duration-300 font-monument opacity-0"
         >
           <span className="text-white">{splitText("PIKA")}</span>
           <span className="text-pikavault-yellow">{splitText("VAULT", true)}</span>
@@ -91,17 +106,15 @@ export function HeroSection() {
 
         <p
           ref={subheadlineRef}
-          className="text-xl md:text-2xl lg:text-3xl mb-12 max-w-3xl"
-          style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+          className="text-xl md:text-2xl lg:text-3xl mb-12 max-w-3xl font-space-grotesk opacity-0"
         >
           The next evolution in digital collectibles.
         </p>
 
-        <div ref={buttonRef} className="relative group">
+        <div ref={buttonRef} className="relative group opacity-0">
           <Button
             onClick={() => redirect("/marketplace")}
-            className="bg-pikavault-yellow hover:bg-pikavault-yellow/90 text-pikavault-dark text-lg md:text-xl font-bold py-6 px-12 rounded-none transition-all duration-300 overflow-hidden group-hover:translate-x-1 group-hover:-translate-y-1"
-            style={{ fontFamily: "'Monument Extended', sans-serif" }}
+            className="bg-pikavault-yellow hover:bg-pikavault-yellow/90 text-pikavault-dark text-lg md:text-xl font-bold py-6 px-12 rounded-none transition-all duration-300 overflow-hidden group-hover:translate-x-1 group-hover:-translate-y-1 font-monument"
           >
             EXPLORE COLLECTION
             <span className="absolute inset-0 bg-pikavault-pink mix-blend-overlay opacity-0 group-hover:opacity-30 transition-opacity duration-300"></span>
@@ -112,7 +125,7 @@ export function HeroSection() {
 
       <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center">
         <span className="text-pikavault-yellow animate-bounce mb-2">↓</span>
-        <p className="text-sm opacity-60" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+        <p className="text-sm opacity-60 font-space-grotesk">
           SCROLL TO EXPLORE
         </p>
       </div>
