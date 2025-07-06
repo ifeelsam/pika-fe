@@ -118,7 +118,7 @@ export function BatchActionPanel({ selectedCards, onClearSelection }: BatchActio
         {/* Price input for listing */}
         {showPriceInput && (
           <div className="bg-white/5 border border-white/20 p-4 mb-4">
-            <h3 className="text-white text-lg font-bold mb-3" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
+            <h3 className="text-white text-lg font-bold mb-3 font-monument">
               SET LISTING PRICE
             </h3>
             <div className="flex gap-4 items-end">
@@ -140,15 +140,13 @@ export function BatchActionPanel({ selectedCards, onClearSelection }: BatchActio
               <Button
                 onClick={handleListNFTs}
                 disabled={isListing}
-                className="bg-pikavault-yellow hover:bg-pikavault-yellow/90 text-pikavault-dark font-bold py-4 px-6 rounded-none"
-                style={{ fontFamily: "'Monument Extended', sans-serif" }}
+                className="bg-pikavault-yellow hover:bg-pikavault-yellow/90 text-pikavault-dark py-4 px-6 font-bold rounded-none font-monument"
               >
                 {isListing ? "LISTING..." : "CONFIRM"}
               </Button>
               <Button
                 onClick={() => setShowPriceInput(false)}
-                className="bg-transparent border-2 border-white/30 hover:border-white/60 text-white font-bold py-4 px-6 rounded-none"
-                style={{ fontFamily: "'Monument Extended', sans-serif" }}
+                className="bg-transparent border-2 border-white/30 hover:border-white/60 text-white font-bold py-4 px-6 rounded-none font-monument"
               >
                 CANCEL
               </Button>
@@ -168,7 +166,7 @@ export function BatchActionPanel({ selectedCards, onClearSelection }: BatchActio
                 {selectedCards.length} CARDS SELECTED
               </p>
               <div className="flex flex-col gap-1">
-                <p className="text-xl font-black text-white" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
+                <p className="text-xl font-black text-white font-monument">
                   TOTAL: <span className="text-pikavault-yellow">{totalValue.toFixed(2)} SOL</span>
                 </p>
                 {unlistedCards.length > 0 && (
@@ -209,8 +207,7 @@ export function BatchActionPanel({ selectedCards, onClearSelection }: BatchActio
               <Button
                 onClick={handleDelistNFTs}
                 disabled={isDelisting || showPriceInput}
-                className="bg-pikavault-pink hover:bg-pikavault-pink/90 text-white font-bold py-4 px-6 rounded-none flex items-center space-x-2"
-                style={{ fontFamily: "'Monument Extended', sans-serif" }}
+                className="bg-pikavault-pink hover:bg-pikavault-pink/90 text-white font-bold py-4 px-6 rounded-none flex items-center space-x-2 font-monument"
               >
                 <Trash2 className="w-5 h-5" />
                 <span>{isDelisting ? "DELISTING..." : `DELIST (${listedCards.length})`}</span>

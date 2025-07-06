@@ -66,7 +66,7 @@ export function RelatedCards({ currentCard }: RelatedCardsProps) {
   return (
     <section ref={sectionRef} className="py-16">
       <div className="container mx-auto">
-        <h2 className="text-3xl md:text-4xl font-black mb-12" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
+        <h2 className="text-3xl md:text-4xl font-black mb-12 font-monument">
           RELATED <span className="text-pikavault-yellow">CARDS</span>
         </h2>
 

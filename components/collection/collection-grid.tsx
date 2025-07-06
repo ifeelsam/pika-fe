@@ -229,8 +229,7 @@ export function CollectionGrid({ selectedCards, setSelectedCards }: CollectionGr
                         `}
                       >
                         <p
-                          className="text-pikavault-dark text-sm font-bold"
-                          style={{ fontFamily: "'Monument Extended', sans-serif" }}
+                          className="text-pikavault-dark text-sm font-bold font-monument"
                         >
                           {card.priceChange >= 0 ? "+" : ""}
                           {card.priceChange.toFixed(1)}%
@@ -240,24 +239,22 @@ export function CollectionGrid({ selectedCards, setSelectedCards }: CollectionGr
                       {/* Card content */}
                       <div className="absolute bottom-0 left-0 w-full p-4">
                         <h3
-                          className="text-white text-xl font-bold leading-relaxed mb-1"
-                          style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                          className="text-white text-xl font-bold leading-relaxed mb-1 font-space-grotesk"
                         >
                           {card.name}
                         </h3>
 
                         <div className="flex justify-between items-center">
-                          <p className="text-white/70 text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                          <p className="text-white/70 text-sm font-space-grotesk">
                             #{card.id}
                           </p>
                           <div className="text-right">
                             <p
-                              className="text-white font-black"
-                              style={{ fontFamily: "'Monument Extended', sans-serif" }}
+                              className="text-white font-black font-monument"
                             >
                               {card.isListed && card.listingInfo ? `${card.listingInfo.price.toFixed(2)}` : `${card.value.toFixed(2)}`} SOL
                             </p>
-                            <p className="text-white/50 text-xs" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                            <p className="text-white/50 text-xs font-space-grotesk">
                               {card.isListed ? "Listed Price" : "Est. Value"}
                             </p>
                           </div>
@@ -327,10 +324,10 @@ export function CollectionGrid({ selectedCards, setSelectedCards }: CollectionGr
                   ></div>
 
                   <div className="flex-1">
-                    <h3 className="text-white font-bold" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                    <h3 className="text-white font-bold font-space-grotesk">
                       {card.name}
                     </h3>
-                    <p className="text-white/70 text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                    <p className="text-white/70 text-sm font-space-grotesk">
                       #{card.id} • {formatDate(card.acquiredDate)}
                     </p>
                   </div>
@@ -355,8 +352,7 @@ export function CollectionGrid({ selectedCards, setSelectedCards }: CollectionGr
                           ) : "UNLISTED"}
                         </div>
                         <p
-                          className={`text-sm mt-1 ${card.priceChange >= 0 ? "text-pikavault-cyan" : "text-pikavault-pink"}`}
-                          style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                          className={`text-sm mt-1 font-space-grotesk ${card.priceChange >= 0 ? "text-pikavault-cyan" : "text-pikavault-pink"}`}
                         >
                           {card.priceChange >= 0 ? "+" : ""}
                           {card.priceChange.toFixed(1)}%
@@ -366,12 +362,11 @@ export function CollectionGrid({ selectedCards, setSelectedCards }: CollectionGr
 
                     <div className="text-right">
                       <p
-                        className="text-white font-black text-xl"
-                        style={{ fontFamily: "'Monument Extended', sans-serif" }}
+                        className="text-white font-black text-xl font-monument"
                       >
                         {card.isListed && card.listingInfo ? `${card.listingInfo.price.toFixed(2)}` : `${card.value.toFixed(2)}`} SOL
                       </p>
-                      <p className="text-white/50 text-xs" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                      <p className="text-white/50 text-xs font-space-grotesk">
                         {card.isListed ? "Listed Price" : "Est. Value"}
                       </p>
                     </div>
@@ -400,15 +395,15 @@ export function CollectionGrid({ selectedCards, setSelectedCards }: CollectionGr
             <div className="p-2">
               <button className="w-full text-left px-3 py-2 text-white hover:bg-white/10 flex items-center space-x-2">
                 <Eye className="w-4 h-4" />
-                <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>View Details</span>
+                <span className="font-space-grotesk">View Details</span>
               </button>
               <button className="w-full text-left px-3 py-2 text-white hover:bg-white/10 flex items-center space-x-2">
                 <Tag className="w-4 h-4" />
-                <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>List for Sale</span>
+                <span className="font-space-grotesk">List for Sale</span>
               </button>
               <button className="w-full text-left px-3 py-2 text-white hover:bg-white/10 flex items-center space-x-2">
                 <Share2 className="w-4 h-4" />
-                <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Share</span>
+                <span className="font-space-grotesk">Share</span>
               </button>
             </div>
           </div>

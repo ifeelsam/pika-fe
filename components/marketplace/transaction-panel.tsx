@@ -253,7 +253,7 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
     >
       <div className="h-full flex flex-col p-6">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-2xl font-black" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
+          <h2 className="text-2xl font-black font-monument">
             {getPanelTitle()}
           </h2>
 
@@ -263,7 +263,7 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
         </div>
 
         <div className="flex-1 overflow-y-auto mb-6">
-          <h3 className="text-white/70 text-sm mb-4" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+          <h3 className="text-white/70 text-sm mb-4 font-space-grotesk">
             SELECTED CARDS ({selectedCards.length})
           </h3>
 
@@ -286,11 +286,11 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
                 ></div>
 
                 <div className="flex-1">
-                  <h4 className="text-white font-bold" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                  <h4 className="text-white font-bold font-space-grotesk">
                     {card.name}
                   </h4>
 
-                  <p className="text-white/70 text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                  <p className="text-white/70 text-sm font-space-grotesk">
                     #{card.id}
                   </p>
                   
@@ -304,7 +304,7 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
                   )}
                 </div>
 
-                <p className="text-white font-black" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
+                <p className="text-white font-black font-monument">
                   {card.price} SOL
                 </p>
               </div>
@@ -314,11 +314,11 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
 
         <div className="border-t border-white/20 pt-6">
           <div className="flex justify-between items-center mb-6">
-            <p className="text-white text-lg" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            <p className="text-white text-lg font-space-grotesk">
               TOTAL
             </p>
 
-            <p className="text-pikavault-yellow text-2xl font-black" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
+            <p className="text-pikavault-yellow text-2xl font-black font-monument">
               {totalPrice} SOL
             </p>
           </div>
@@ -326,7 +326,7 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
           <div className="space-y-4">
             {(delistError || purchaseError || escrowError) && (
               <div className="bg-pikavault-pink/20 border-2 border-pikavault-pink p-3 text-center">
-                <p className="text-pikavault-pink text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                <p className="text-pikavault-pink text-sm font-space-grotesk">
                   {delistError || purchaseError || escrowError}
                 </p>
               </div>
@@ -337,8 +337,7 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
               <Button
                 onClick={handleReleaseEscrow}
                 disabled={isReleasingEscrow || !publicKey}
-                className="w-full bg-pikavault-cyan hover:bg-pikavault-cyan/90 text-pikavault-dark text-lg font-bold py-6 rounded-none disabled:opacity-50"
-                style={{ fontFamily: "'Monument Extended', sans-serif" }}
+                className="w-full bg-pikavault-cyan hover:bg-pikavault-cyan/90 text-pikavault-dark text-lg font-bold py-6 rounded-none disabled:opacity-50 font-monument"
               >
                 {isReleasingEscrow ? "RELEASING..." : !publicKey ? "CONNECT WALLET" : "RELEASE ESCROW"}
               </Button>
@@ -347,8 +346,7 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
               <Button
                 onClick={handleDelist}
                 disabled={isDelisting}
-                className="w-full bg-pikavault-pink hover:bg-pikavault-pink/90 text-white text-lg font-bold py-6 rounded-none disabled:opacity-50"
-                style={{ fontFamily: "'Monument Extended', sans-serif" }}
+                className="w-full bg-pikavault-pink hover:bg-pikavault-pink/90 text-white text-lg font-bold py-6 rounded-none disabled:opacity-50 font-monument"
               >
                 {isDelisting ? "DELISTING..." : "DELIST"}
               </Button>
@@ -357,14 +355,13 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
               <Button
                 onClick={handlePurchase}
                 disabled={isPurchasing || !publicKey}
-                className="w-full bg-pikavault-yellow hover:bg-pikavault-yellow/90 text-pikavault-dark text-lg font-bold py-6 rounded-none disabled:opacity-50"
-                style={{ fontFamily: "'Monument Extended', sans-serif" }}
+                className="w-full bg-pikavault-yellow hover:bg-pikavault-yellow/90 text-pikavault-dark text-lg font-bold py-6 rounded-none disabled:opacity-50 font-monument"
               >
                 {isPurchasing ? "PURCHASING..." : !publicKey ? "CONNECT WALLET" : "BUY NOW"}
               </Button>
             ) : (
               // No available actions
-              <div className="text-center text-white/50 py-4" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+              <div className="text-center text-white/50 py-4 font-space-grotesk">
                 No actions available for selected cards
               </div>
             )}

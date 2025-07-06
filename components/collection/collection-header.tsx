@@ -111,8 +111,7 @@ export function CollectionHeader() {
   return (
     <div ref={headerRef} className="mb-12">
       <h1
-        className="text-5xl md:text-7xl lg:text-8xl font-black mb-8 tracking-tight"
-        style={{ fontFamily: "'Monument Extended', sans-serif" }}
+        className="text-5xl md:text-7xl lg:text-8xl font-black mb-8 tracking-tight font-monument"
       >
         {splitText("YOUR")} <span className="text-pikavault-yellow">{splitText("COLLECTION")}</span>
       </h1>
@@ -140,7 +139,7 @@ export function CollectionHeader() {
           </div>
 
           <div className="value-counter">
-            <p className="text-2xl font-black" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
+            <p className="text-2xl font-black font-monument">
               <span className="text-white/50">TOTAL VALUE:</span>{" "}
               <span className="text-pikavault-yellow">${displayValue.toLocaleString()}</span>
             </p>

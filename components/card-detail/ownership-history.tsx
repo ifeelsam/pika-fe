@@ -46,7 +46,7 @@ export function OwnershipHistory({ history }: OwnershipHistoryProps) {
   return (
     <section ref={sectionRef} className="py-16">
       <div className="container mx-auto">
-        <h2 className="text-3xl md:text-4xl font-black mb-12" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
+        <h2 className="text-3xl md:text-4xl font-black mb-12 font-monument">
           OWNERSHIP <span className="text-pikavault-yellow">HISTORY</span>
         </h2>
 
@@ -68,7 +68,7 @@ export function OwnershipHistory({ history }: OwnershipHistoryProps) {
                 <div className="flex-1 bg-white/5 border border-white/20 p-6">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="text-xl font-bold mb-2" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
+                      <p className="text-xl font-bold mb-2 font-monument">
                         {truncateAddress(entry.owner)}
                       </p>
                       <p className="text-white/70" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
@@ -82,8 +82,7 @@ export function OwnershipHistory({ history }: OwnershipHistoryProps) {
 
                     <div className="text-right">
                       <p
-                        className="text-2xl font-black text-pikavault-cyan mb-2"
-                        style={{ fontFamily: "'Monument Extended', sans-serif" }}
+                        className="text-2xl font-black text-pikavault-cyan mb-2 font-monument"
                       >
                         {entry.price} SOL
                       </p>
@@ -93,7 +92,7 @@ export function OwnershipHistory({ history }: OwnershipHistoryProps) {
                         rel="noopener noreferrer"
                         className="flex items-center space-x-1 text-white/70 hover:text-pikavault-yellow transition-colors"
                       >
-                        <span className="text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                        <span className="text-sm font-space-grotesk">
                           View TX
                         </span>
                         <ExternalLink className="w-4 h-4" />

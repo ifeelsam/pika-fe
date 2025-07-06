@@ -102,10 +102,10 @@ export function CardGrid({ selectedCards, setSelectedCards }: CardGridProps) {
   if (error) {
     return (
       <div className="text-center py-16">
-        <div className="text-red-400 text-lg mb-4" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+        <div className="text-red-400 text-lg mb-4 font-space-grotesk">
           Error loading marketplace
         </div>
-        <div className="text-white/70 text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+        <div className="text-white/70 text-sm font-space-grotesk">
           {error}
         </div>
       </div>
@@ -116,10 +116,10 @@ export function CardGrid({ selectedCards, setSelectedCards }: CardGridProps) {
   if (filteredCards.length === 0) {
     return (
       <div className="text-center py-16">
-        <div className="text-white/70 text-lg mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+        <div className="text-white/70 text-lg mb-2 font-space-grotesk">
           No NFTs found
         </div>
-        <div className="text-white/50 text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+        <div className="text-white/50 text-sm font-space-grotesk">
           Try adjusting your filters or check back later
         </div>
       </div>
@@ -232,14 +232,13 @@ export function CardGrid({ selectedCards, setSelectedCards }: CardGridProps) {
                   {/* Card content */}
                   <div className="absolute bottom-0 left-0 w-full p-4">
                     <h3
-                      className="text-white text-xl font-bold leading-relaxed mb-1"
-                      style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                      className="text-white text-xl font-bold leading-relaxed mb-1 font-space-grotesk"
                     >
                       {card.name}
                     </h3>
 
                     <div className="flex justify-between items-center">
-                      <p className="text-white/70 text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                      <p className="text-white/70 text-sm font-space-grotesk">
                         #{card.id} • {card.ownerAddress}
                       </p>
                     </div>
@@ -255,8 +254,7 @@ export function CardGrid({ selectedCards, setSelectedCards }: CardGridProps) {
                   }}
                 >
                   <p
-                    className="text-white text-lg font-black tracking-tight"
-                    style={{ fontFamily: "'Monument Extended', sans-serif" }}
+                    className="text-white text-lg font-black tracking-tight font-monument"
                   >
                     {card.price.toFixed(2)} SOL
                   </p>

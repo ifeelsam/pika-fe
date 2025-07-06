@@ -107,8 +107,7 @@ export function StatsBar() {
                 Total Cards
               </p>
               <p
-                className="stat-number text-5xl font-black text-white"
-                style={{ fontFamily: "'Monument Extended', sans-serif" }}
+                className="stat-number text-5xl font-black text-white font-monument"
               >
                 {totalCards}
               </p>
@@ -162,12 +161,11 @@ export function StatsBar() {
                 Portfolio Value
               </p>
               <p
-                className="text-5xl font-black text-pikavault-pink"
-                style={{ fontFamily: "'Monument Extended', sans-serif" }}
+                className="text-5xl font-black text-pikavault-pink font-monument"
               >
                 ${totalValue.toLocaleString()}
               </p>
-              <p className="text-white/50 text-xs" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+              <p className="text-white/50 text-xs font-space-grotesk">
                 Highest: {highestValueCard.name} (${highestValueCard.value})
               </p>
             </div>
