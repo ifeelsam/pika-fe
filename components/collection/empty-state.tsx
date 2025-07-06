@@ -4,6 +4,7 @@ import { useRef, useEffect } from "react"
 import { gsap } from "gsap"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
+import { redirect } from "next/navigation"
 
 export function LockedState() {
   const emptyRef = useRef<HTMLDivElement>(null)
@@ -79,39 +80,36 @@ export function LockedState() {
       <div className="shape absolute bottom-1/3 left-1/3 w-20 h-20 border-4 border-white/20 transform -rotate-15"></div>
 
       <h2
-        className="glitch-text text-7xl md:text-9xl font-black text-white mb-12 tracking-tight"
-        style={{
-          fontFamily: "'Monument Extended', sans-serif",
-          height: "200px",
-          display: "flex",
-          alignItems: "center",
-        }}
+        className="glitch-text text-7xl md:text-9xl font-black text-white mb-12 tracking-tight font-monument flex items-center h-36"
+        // style={{
+        //   height: "200px",
+        //   display: "flex",
+        //   alignItems: "center",
+        // }}
       >
         VAULT <span className="text-pikavault-yellow">EMPTY</span>
       </h2>
 
       <p
-        className="text-white/70 text-xl md:text-2xl max-w-2xl text-center mb-12"
-        style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+        className="text-white/70 text-xl md:text-2xl max-w-2xl text-center mb-12 font-space-grotesk"
       >
         Your collection is empty. Connect your wallet or purchase your first card to get started.
       </p>
 
       <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6">
-        <motion.div whileHover={{ scale: 1.05 }} className="relative">
+        {/* <motion.div whileHover={{ scale: 1.05 }} className="relative">
           <Button
-            className="bg-pikavault-yellow hover:bg-pikavault-yellow/90 text-pikavault-dark text-lg md:text-xl font-bold py-6 px-12 rounded-none"
-            style={{ fontFamily: "'Monument Extended', sans-serif" }}
+            className="bg-pikavault-yellow hover:bg-pikavault-yellow/90 text-pikavault-dark text-lg md:text-xl font-bold font-monument py-6 px-12 rounded-none"
           >
             CONNECT WALLET
           </Button>
           <div className="absolute inset-0 border-2 border-pikavault-yellow -z-10 translate-x-2 translate-y-2"></div>
-        </motion.div>
+        </motion.div> */}
 
         <motion.div whileHover={{ scale: 1.05 }} className="relative">
           <Button
-            className="bg-pikavault-pink hover:bg-pikavault-pink/90 text-white text-lg md:text-xl font-bold py-6 px-12 rounded-none"
-            style={{ fontFamily: "'Monument Extended', sans-serif" }}
+            onClick={() => redirect("/marketplace")}
+            className="bg-pikavault-pink hover:bg-pikavault-pink/90 text-white text-lg md:text-xl font-bold font-monument py-6 px-12 rounded-none"
           >
             BUY FIRST CARD
           </Button>

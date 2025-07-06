@@ -102,9 +102,7 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
             }}
           >
             <div className="flex items-center justify-center h-full">
-              <span
-                className="text-xs font-bold text-pikavault-dark"
-                style={{ fontFamily: "'Monument Extended', sans-serif" }}
+              <span className="text-xs font-bold text-pikavault-dark font-monument"
               >
                 {card.rarity.toUpperCase()}
               </span>
@@ -121,8 +119,7 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
         <div ref={priceRef} className="space-y-2">
           <div className="flex items-baseline space-x-4">
             <h2
-              className="text-6xl md:text-5xl font-black text-pikavault-pink"
-              style={{ fontFamily: "'Monument Extended', sans-serif" }}
+              className="text-6xl md:text-5xl font-black text-pikavault-pink font-monument"
             >
               {parseFloat(card.price)} SOL
             </h2>
@@ -136,22 +133,22 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
           </div>
 
           <div className="flex items-center space-x-4 text-white/50">
-            <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Floor: {card.floorPrice.toFixed(3)} SOL</span>
-            <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Last: {card.lastSalePrice.toFixed(3)} SOL</span>
+            <span className="font-space-grotesk">Floor: {card.floorPrice.toFixed(3)} SOL</span>
+            <span className="font-space-grotesk">Last: {card.lastSalePrice.toFixed(3)} SOL</span>
           </div>
         </div>
       </div>
 
       {/* Technical Specifications */}
       <div className="space-y-4 border-l-4 border-white/20 pl-6">
-        <h3 className="text-xl font-bold text-white/70" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
+        <h3 className="text-xl font-bold font-monument text-white/70">
           SPECIFICATIONS
         </h3>
 
         <div className="space-y-3">
           {/* Condition */}
           <div className="flex justify-between items-center">
-            <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Condition</span>
+            <span className="font-space-grotesk">Condition</span>
             <div className="flex items-center space-x-2">
               <span
                 className="text-2xl font-black"
@@ -159,7 +156,7 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
               >
                 {card.conditionGrade}
               </span>
-              <span className="text-white/70" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+              <span className="text-white/70 font-space-grotesk">
                 ({card.condition})
               </span>
             </div>
@@ -167,7 +164,7 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
 
           {/* Edition */}
           <div className="flex justify-between items-center">
-            <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Edition</span>
+            <span className="font-space-grotesk">Edition</span>
             <span className="font-mono text-[#00FF85]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               {card.editionNumber}/{card.printRun}
             </span>
@@ -175,7 +172,7 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
 
           {/* Authentication */}
           <div className="flex justify-between items-center">
-            <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>NFT Mint</span>
+            <span className="font-space-grotesk">NFT Mint</span>
             <button
               onClick={() => copyHash(card.nftMint)}
               className="flex items-center space-x-2 text-white/70 hover:text-pikavault-yellow transition-colors"
@@ -187,7 +184,7 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
 
           {/* Blockchain verification */}
           <div className="flex justify-between items-center">
-            <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Blockchain</span>
+            <span className="font-space-grotesk">Blockchain</span>
             <a
               href={`https://explorer.solana.com/address/${card.nftMint}?cluster=${NETWORK}`}
               target="_blank"
@@ -205,8 +202,7 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
       <div className="space-y-4">
         {/* Primary CTA */}
         <Button
-          className="w-full bg-pikavault-yellow hover:bg-pikavault-yellow/90 text-pikavault-dark text-xl font-black py-6 rounded-none transition-all duration-300 hover:scale-105"
-          style={{ fontFamily: "'Monument Extended', sans-serif" }}
+          className="w-full bg-pikavault-yellow hover:bg-pikavault-yellow/90 text-pikavault-dark text-xl font-black font-monument py-6 rounded-none transition-all duration-300 hover:scale-105"
           onClick={() => onSound("click")}
           onMouseEnter={() => onSound("hover")}
         >
@@ -257,16 +253,16 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
 
       {/* Seller information */}
       <div className="border-t border-white/20 pt-6">
-        <h4 className="text-lg font-bold mb-4" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
+        <h4 className="text-lg font-bold mb-4 font-monument">
           SELLER
         </h4>
 
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-bold" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            <p className="font-bold font-space-grotesk">
               {card.seller.username}
             </p>
-            <p className="text-white/70 text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            <p className="text-white/70 text-sm font-space-grotesk">
               {card.seller.rating}/5 • {card.seller.totalSales} sales
             </p>
           </div>

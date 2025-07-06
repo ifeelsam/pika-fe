@@ -43,7 +43,7 @@ export function FilterBar() {
   return (
     <div ref={filterBarRef} className="mb-12" style={{ opacity: isAnimated ? 1 : 0 }}>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
+        <h2 className="text-2xl font-bold font-monument">
           FILTERS
         </h2>
 
@@ -54,11 +54,11 @@ export function FilterBar() {
               className="flex items-center space-x-2 text-white/70 hover:text-pikavault-yellow transition-colors group"
             >
               <X className="w-5 h-5 group-hover:scale-125 transition-transform" />
-              <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>RESET</span>
+              <span className="font-space-grotesk">RESET</span>
             </button>
           )}
 
-          <p className="text-white/70" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+          <p className="text-white/70 font-space-grotesk">
             {filteredCards.length} CARDS
           </p>
         </div>
@@ -68,7 +68,7 @@ export function FilterBar() {
         <div className="flex space-x-6 min-w-max">
           {filters.map((filter) => (
             <div key={filter.id} className="space-y-3">
-              <h3 className="text-white/70 text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+              <h3 className="text-white/70 text-sm font-space-grotesk">
                 {filter.label}
               </h3>
 
@@ -78,14 +78,13 @@ export function FilterBar() {
                     key={option.id}
                     onClick={() => toggleFilter(filter.id, option.id)}
                     className={`
-                      px-4 py-3 border-4 transition-all duration-300
+                      px-4 py-3 border-4 transition-all duration-300 font-space-grotesk
                       ${
                         option.active
                           ? "border-pikavault-yellow bg-pikavault-yellow/10 scale-105"
                           : "border-white/20 hover:border-white/40"
                       }
                     `}
-                    style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                   >
                     {option.label}
                   </button>

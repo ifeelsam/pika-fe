@@ -125,7 +125,7 @@ export function CardInspectionModal({ isOpen, onClose, card, currentView, onView
       <div ref={modalRef} className="relative w-full h-full flex flex-col">
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b border-white/20">
-          <h2 className="text-2xl font-black" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
+          <h2 className="text-2xl font-black font-monument">
             CARD INSPECTION
           </h2>
 
