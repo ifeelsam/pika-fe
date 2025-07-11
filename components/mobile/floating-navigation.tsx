@@ -136,9 +136,14 @@ export function FloatingNavigation() {
                 ABOUT
               </MenuLink>
               
-              <div>
-                <WalletConnection/>
-              </div>
+              {/* Wallet Connection - prevents menu from closing */}
+              <motion.div
+                onTap={() => setMenuOpen(true)}
+                onClick={() => setMenuOpen(true)}
+                className="relative z-50"
+              >
+                <WalletConnection />
+              </motion.div>
               {/* Close Button */}
               <motion.button
                 className="mt-8 w-12 h-12 border-2  border-pikavault-yellow text-pikavault-yellow flex items-center justify-center font-black text-xl"
