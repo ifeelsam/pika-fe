@@ -164,7 +164,7 @@ export function HeroCardStack() {
 
       {/* Headline with Electric Effects */}
       <motion.h1
-        className="text-[46px] font-black mb-6 text-center leading-none font-monument"
+        className="text-[40px] font-black mb-6 text-center leading-none font-monument"
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.8 }}
@@ -215,7 +215,7 @@ export function HeroCardStack() {
         >
           {/* Lightning Bolt Animation */}
           <motion.div
-            className="absolute left-6 top-1/4 -translate-y-1/2 text-2xl"
+            className="absolute pl-4 top-1/4 -translate-y-1/2 text-2xl"
             animate={{
               rotate: [0, 15, -15, 0],
               scale: [1, 1.2, 1],

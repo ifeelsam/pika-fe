@@ -136,7 +136,7 @@ export function FloatingNavigation() {
                 ABOUT
               </MenuLink>
               
-              <div className="scale-90" onClick={() => setMenuOpen(false)}>
+              <div>
                 <WalletConnection/>
               </div>
               {/* Close Button */}
