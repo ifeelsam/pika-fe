@@ -94,7 +94,7 @@ export default function CardDetailPage({ params }: CardDetailPageProps) {
         </div>
 
         {/* Price Chart */}
-        <div className="mb-8">
+        <div className="hidden sm:block mb-8">
           <PriceChart 
             data={enhancedCard?.priceHistory || [
               { date: "2025-01-01", price: card.price * 0.8 },

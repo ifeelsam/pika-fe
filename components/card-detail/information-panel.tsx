@@ -119,7 +119,7 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
         <div ref={priceRef} className="space-y-2">
           <div className="flex items-baseline space-x-4">
             <h2
-              className="text-6xl md:text-5xl font-black text-pikavault-pink font-monument"
+              className="text-3xl sm:text-4xl md:text-5xl font-black text-pikavault-pink font-monument"
             >
               {parseFloat(card.price)} SOL
             </h2>
