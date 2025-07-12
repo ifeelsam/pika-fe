@@ -2,11 +2,10 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Menu, X } from "lucide-react"
 import { WalletConnection } from "@/components/wallet-connection"
+import { HamburgerNav } from "@/components/ui/hamburger"
 
 export function Navigation() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [scrollPosition, setScrollPosition] = useState(0)
 
   useEffect(() => {
@@ -56,34 +55,9 @@ export function Navigation() {
         </nav>
 
         <div className="flex items-center space-x-4 lg:hidden">
-          <button
-            className="text-white hover:text-pikavault-yellow transition-colors"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          <HamburgerNav />
         </div>
       </div>
-
-      {/* Mobile menu */}
-      {isMenuOpen && (
-        <div className="fixed inset-0 bg-pikavault-dark pt-24 px-6 z-40 md:hidden">
-          <nav className="flex flex-col space-y-8">
-            {navItems.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="text-white hover:text-pikavault-yellow text-2xl font-bold tracking-wider"
-                style={{ fontFamily: "'Monument Extended', sans-serif" }}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {item.name}
-              </Link>
-            ))}
-            <WalletConnection />
-          </nav>
-        </div>
-      )}
     </header>
   )
 }
