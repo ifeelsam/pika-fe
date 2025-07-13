@@ -90,7 +90,7 @@ export function OwnershipHistory({ history }: OwnershipHistoryProps) {
                         href={`https://explorer.solana.com/tx/${entry.txHash}?cluster=${NETWORK}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center space-x-1 text-white/70 hover:text-pikavault-yellow transition-colors"
+                        className="flex items-center space-x-1 text-white/70 md:hover:text-pikavault-yellow transition-colors"
                       >
                         <span className="text-sm font-space-grotesk">
                           View TX

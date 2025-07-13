@@ -175,7 +175,7 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
             <span className="font-space-grotesk">NFT Mint</span>
             <button
               onClick={() => copyHash(card.nftMint)}
-              className="flex items-center space-x-2 text-white/70 hover:text-pikavault-yellow transition-colors"
+              className="flex items-center space-x-2 text-white/70 md:hover:text-pikavault-yellow transition-colors"
             >
               <span className="font-mono text-sm">{truncateHash(card.nftMint)}</span>
               <Copy className="w-4 h-4" />
@@ -189,7 +189,7 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
               href={`https://explorer.solana.com/address/${card.nftMint}?cluster=${NETWORK}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center space-x-2 text-pikavault-cyan hover:text-pikavault-cyan/80 transition-colors"
+              className="flex items-center space-x-2 text-pikavault-cyan md:hover:text-pikavault-cyan/80 transition-colors"
             >
               <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Verified</span>
               <ExternalLink className="w-4 h-4" />
@@ -202,7 +202,7 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
       <div className="space-y-4">
         {/* Primary CTA */}
         <Button
-          className="w-full bg-pikavault-yellow hover:bg-pikavault-yellow/90 text-pikavault-dark text-xl font-black font-monument py-6 rounded-none transition-all duration-300 hover:scale-105"
+          className="w-full bg-pikavault-yellow md:hover:bg-pikavault-yellow/90 text-pikavault-dark text-xl font-black font-monument py-6 rounded-none transition-all duration-300 md:hover:scale-105"
           onClick={() => onSound("click")}
           onMouseEnter={() => onSound("hover")}
         >
@@ -211,7 +211,7 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
 
         {/* Secondary CTA */}
         {/* <Button
-          className="w-full bg-transparent border-4 border-pikavault-pink hover:bg-pikavault-pink/10 text-white text-lg font-bold py-4 rounded-none transition-all duration-300"
+          className="w-full bg-transparent border-4 border-pikavault-pink md:hover:bg-pikavault-pink/10 text-white text-lg font-bold py-4 rounded-none transition-all duration-300"
           style={{ fontFamily: "'Monument Extended', sans-serif" }}
           onClick={() => onSound("click")}
           onMouseEnter={() => onSound("hover")}
@@ -229,7 +229,7 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
             className={`p-4 border-2 transition-all duration-300 ${
               isWatchlisted
                 ? "bg-pikavault-pink/20 border-pikavault-pink text-pikavault-pink"
-                : "bg-transparent border-white/30 text-white hover:border-white/60"
+                : "bg-transparent border-white/30 text-white md:hover:border-white/60"
             }`}
           >
             <Heart className={`w-5 h-5 ${isWatchlisted ? "fill-current" : ""}`} />
@@ -237,14 +237,14 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
 
           <Button
             onClick={() => onSound("click")}
-            className="p-4 bg-transparent border-2 border-white/30 text-white hover:border-white/60 transition-all duration-300"
+            className="p-4 bg-transparent border-2 border-white/30 text-white md:hover:border-white/60 transition-all duration-300"
           >
             <Share2 className="w-5 h-5" />
           </Button>
 
           {/* <Button
             onClick={() => onSound("click")}
-            className="p-4 bg-transparent border-2 border-white/30 text-white hover:border-white/60 transition-all duration-300"
+            className="p-4 bg-transparent border-2 border-white/30 text-white md:hover:border-white/60 transition-all duration-300"
           >
             <MessageCircle className="w-5 h-5" />
           </Button> */}
@@ -269,7 +269,7 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
 
           <Button
             onClick={() => onSound("click")}
-            className="bg-pikavault-cyan hover:bg-pikavault-cyan/90 text-pikavault-dark font-bold px-6 py-2 rounded-none"
+            className="bg-pikavault-cyan md:hover:bg-pikavault-cyan/90 text-pikavault-dark font-bold px-6 py-2 rounded-none"
             style={{ fontFamily: "'Monument Extended', sans-serif" }}
           >
             CONTACT

@@ -236,7 +236,7 @@ export function CardDisplay({ card, currentView, onViewChange, onInspectionOpen,
             className={`px-4 py-2 border-2 transition-all duration-300 ${
               currentView === "front"
                 ? `bg-[${rarityColor}] border-pikavault-cyan text-pikavault-cyan`
-                : "bg-transparent border-white/30 text-white hover:border-pikavault-cyan/50 hover:text-pikavault-cyan/50 hover:bg-pikavault-cyan/10"
+                : "bg-transparent border-white/30 text-white md:hover:border-pikavault-cyan/50 md:hover:text-pikavault-cyan/50 md:hover:bg-pikavault-cyan/10"
             }`}
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
@@ -251,7 +251,7 @@ export function CardDisplay({ card, currentView, onViewChange, onInspectionOpen,
             className={`px-4 py-2 border-2 transition-all duration-300 ${
               currentView === "back"
                 ? `bg-[${rarityColor}] border-pikavault-yellow text-pikavault-yellow`
-                : "bg-transparent border-white/30 text-white hover:text-pikavault-yellow/50 hover:bg-pikavault-yellow/10 hover:border-pikavault-yellow/50"
+                : "bg-transparent border-white/30 text-white md:hover:text-pikavault-yellow/50 md:hover:bg-pikavault-yellow/10 md:hover:border-pikavault-yellow/50"
             }`}
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
@@ -267,7 +267,7 @@ export function CardDisplay({ card, currentView, onViewChange, onInspectionOpen,
               className={`px-4 py-2 border-2 transition-all duration-300 ${
                 currentView === "holo"
                   ? `bg-[${rarityColor}] border-[${rarityColor}] text-pikavault-pink`
-                  : "bg-transparent border-white/30 text-white hover:border-pink/50 hover:text-pikavault-pink/50 hover:bg-pikavault-pink/10"
+                  : "bg-transparent border-white/30 text-white md:hover:border-pink/50 md:hover:text-pikavault-pink/50 md:hover:bg-pikavault-pink/10"
               }`}
               style={{ fontFamily: "'Space Grotesk', sans-serif" }}
             >
