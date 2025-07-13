@@ -13,9 +13,10 @@ interface OwnershipHistoryProps {
     price: number
     txHash: string
   }>
+  listingPrice?: number
 }
 
-export function OwnershipHistory({ history }: OwnershipHistoryProps) {
+export function OwnershipHistory({ history, listingPrice }: OwnershipHistoryProps) {
   const sectionRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -50,12 +51,20 @@ export function OwnershipHistory({ history }: OwnershipHistoryProps) {
           OWNERSHIP <span className="text-pikavault-yellow">HISTORY</span>
         </h2>
 
-        <div className="relative">
-          {/* Timeline line */}
-          <div className="absolute left-4 md:left-8 top-0 bottom-0 w-1 bg-pikavault-yellow/30"></div>
+        {history.length === 0 ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="text-white/70 text-lg mb-2">No ownership history available</div>
+              <div className="text-white/50 text-sm">This NFT may not have any recorded transactions yet.</div>
+            </div>
+          </div>
+        ) : (
+          <div className="relative">
+            {/* Timeline line */}
+            <div className="absolute left-4 md:left-8 top-0 bottom-0 w-1 bg-pikavault-yellow/30"></div>
 
-          <div className="space-y-8">
-            {history.map((entry, index) => (
+            <div className="space-y-8">
+              {history.map((entry, index) => (
               <div key={index} className="history-item relative flex items-center space-x-8">
                 {/* Timeline dot */}
                 <div className="relative z-10">
@@ -83,7 +92,7 @@ export function OwnershipHistory({ history }: OwnershipHistoryProps) {
                       <p
                         className="text-xl md:text-2xl font-black text-pikavault-cyan mb-2 font-monument"
                       >
-                        {entry.price} SOL
+                        {entry.price === 0 && listingPrice ? listingPrice : entry.price} SOL
                       </p>
                       <a
                         href={`https://explorer.solana.com/tx/${entry.txHash}?cluster=${NETWORK}`}
@@ -103,6 +112,7 @@ export function OwnershipHistory({ history }: OwnershipHistoryProps) {
             ))}
           </div>
         </div>
+        )}
       </div>
     </section>
   )

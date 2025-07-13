@@ -112,7 +112,7 @@ declare global {
     nftMetadata: NFTMetadata | null
     isLoading: boolean
     error: string | null
-    getEnhancedCardData: (card: BaseCardData | null, metadata: NFTMetadata | null) => EnhancedCardData | null
+    getEnhancedCardData: (card: BaseCardData | null, metadata: NFTMetadata | null, realOwnershipHistory?: Array<{ owner: string; date: string; price: number; txHash: string }>) => EnhancedCardData | null
     getAttributeValue: (attributes: NFTAttribute[] | undefined, traitType: string) => string
     determineRarity: (attributes: NFTAttribute[] | undefined, price: number) => CardRarity
     getConditionDescription: (condition: string) => string

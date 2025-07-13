@@ -1,8 +1,47 @@
 import { useState, useEffect } from "react"
 import { useAnchorProgram } from "@/lib/anchor/client"
-import { createUmiInstance } from "@/lib/anchor/transactions"
+import { createUmiInstance, getNFTOwnershipHistory } from "@/lib/anchor/transactions"
 import { fetchDigitalAsset } from "@metaplex-foundation/mpl-token-metadata"
 import { publicKey as umiPublicKey } from "@metaplex-foundation/umi"
+
+export const useOwnershipHistory = (nftMint: string | undefined) => {
+  const { program } = useAnchorProgram()
+  const [ownershipHistory, setOwnershipHistory] = useState<Array<{ owner: string; date: string; price: number; txHash: string }>>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchOwnershipHistory = async () => {
+    if (!nftMint || !program) return
+
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      console.log("Fetching ownership history for NFT:", nftMint)
+      const history = await getNFTOwnershipHistory(program, nftMint)
+      setOwnershipHistory(history)
+    } catch (err: any) {
+      console.error("Error fetching ownership history:", err)
+      setError(err.message || "Failed to fetch ownership history")
+      setOwnershipHistory([]) // Reset to empty array on error
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (nftMint && program) {
+      fetchOwnershipHistory()
+    }
+  }, [nftMint, program])
+
+  return {
+    ownershipHistory,
+    isLoading,
+    error,
+    refetch: fetchOwnershipHistory
+  }
+}
 
 export const useNFTMetadata = (nftMint: string | undefined): UseNFTMetadataReturn => {
   const { program } = useAnchorProgram()
@@ -99,7 +138,7 @@ export const useNFTMetadata = (nftMint: string | undefined): UseNFTMetadataRetur
   }
 
   // Create enhanced card data using real metadata
-  const getEnhancedCardData = (card: BaseCardData | null, metadata: NFTMetadata | null): EnhancedCardData | null => {
+  const getEnhancedCardData = (card: BaseCardData | null, metadata: NFTMetadata | null, realOwnershipHistory?: Array<{ owner: string; date: string; price: number; txHash: string }>): EnhancedCardData | null => {
     if (!card) return null
 
     const attributes = metadata?.attributes || []
@@ -112,6 +151,18 @@ export const useNFTMetadata = (nftMint: string | undefined): UseNFTMetadataRetur
     const rarity = determineRarity(attributes, card.price)
     const editionNumber = parseInt(getAttributeValue(attributes, "edition")) || parseInt(getAttributeValue(attributes, "print_number")) || parseInt(card.id) || 42
     const printRun = parseInt(getAttributeValue(attributes, "print_run")) || parseInt(getAttributeValue(attributes, "total_supply")) || 1000
+
+    // Use real ownership history if available, otherwise fall back to default
+    const ownershipHistory = realOwnershipHistory && realOwnershipHistory.length > 0 
+      ? realOwnershipHistory 
+      : [
+          {
+            owner: card.ownerAddress,
+            date: new Date().toISOString().split('T')[0],
+            price: card.price,
+            txHash: `${card.listingPubkey.slice(-8)}...`,
+          }
+        ]
 
     return {
       ...card,
@@ -163,20 +214,7 @@ export const useNFTMetadata = (nftMint: string | undefined): UseNFTMetadataRetur
         { date: "2025-01-15", price: card.price * 0.9 },
         { date: "2025-01-20", price: card.price },
       ],
-      ownershipHistory: [
-        {
-          owner: card.ownerAddress,
-          date: "2025-01-20",
-          price: card.price * 0.9,
-          txHash: `0x${card.listingPubkey.slice(-8)}...`,
-        },
-        {
-          owner: `${card.ownerAddress.slice(0, 10)}...different`,
-          date: "2025-01-15",
-          price: card.price * 0.8,
-          txHash: `0x${card.id}...`,
-        },
-      ],
+      ownershipHistory,
       rawAttributes: attributes,
     }
   }

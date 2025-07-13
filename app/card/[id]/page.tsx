@@ -9,7 +9,7 @@ import { OwnershipHistory } from "@/components/card-detail/ownership-history"
 import { RelatedCards } from "@/components/card-detail/related-cards"
 import { BackgroundEffects } from "@/components/background-effects"
 import { Navigation } from "@/components/navigation"
-import { useNFTMetadata } from "@/hooks/use-nft-metadata"
+import { useNFTMetadata, useOwnershipHistory } from "@/hooks/use-nft-metadata"
 
 interface CardDetailPageProps {
   params: Promise<{ id: string }>
@@ -39,8 +39,15 @@ export default function CardDetailPage({ params }: CardDetailPageProps) {
     getEnhancedCardData 
   } = useNFTMetadata(card?.nftMint)
   
-  // Create enhanced card data with real metadata
-  const enhancedCard = getEnhancedCardData(card || null, nftMetadata)
+  // Fetch real ownership history for this NFT
+  const { 
+    ownershipHistory, 
+    isLoading: historyLoading, 
+    error: historyError 
+  } = useOwnershipHistory(card?.nftMint)
+  
+  // Create enhanced card data with real metadata and ownership history
+  const enhancedCard = getEnhancedCardData(card || null, nftMetadata, ownershipHistory)
 
   // Sound effects handler
   const playSound = (soundType: "hover" | "click" | "success") => {
@@ -109,22 +116,68 @@ export default function CardDetailPage({ params }: CardDetailPageProps) {
 
         {/* Ownership History */}
         <div className="mb-8">
-          <OwnershipHistory 
-            history={enhancedCard?.ownershipHistory || [
-              {
-                owner: card.ownerAddress,
-                date: "2025-01-20",
-                price: card.price * 0.9,
-                txHash: `${card.listingPubkey.slice(-8)}...`,
-              },
-              {
-                owner: `${card.ownerAddress.slice(0, 10)}...different`,
-                date: "2025-01-15",
-                price: card.price * 0.8,
-                txHash: `${card.id}...`,
-              },
-            ]}
-          />
+          {historyLoading ? (
+            <section className="py-16">
+              <div className="container mx-auto">
+                <h2 className="text-2xl md:text-4xl font-black mb-12 font-monument">
+                  OWNERSHIP <span className="text-pikavault-yellow">HISTORY</span>
+                </h2>
+                
+                <div className="relative">
+                  {/* Timeline line */}
+                  <div className="absolute left-4 md:left-8 top-0 bottom-0 w-1 bg-pikavault-yellow/30"></div>
+
+                  <div className="space-y-8">
+                    {/* Skeleton Loading Items */}
+                    {[1, 2, 3].map((index) => (
+                      <div key={index} className="relative flex items-center space-x-8 animate-pulse">
+                        {/* Timeline dot skeleton */}
+                        <div className="relative z-10">
+                          <div className="w-10 h-10 md:w-16 md:h-16 bg-gray-700 flex items-center justify-center">
+                            <div className="w-6 h-6 md:w-8 md:h-8 bg-gray-600 rounded"></div>
+                          </div>
+                        </div>
+
+                        {/* Content skeleton */}
+                        <div className="flex-1 bg-white/5 border border-white/20 p-6">
+                          <div className="md:flex md:justify-between md:items-start">
+                            <div className="space-y-3">
+                              {/* Address skeleton */}
+                              <div className="h-5 md:h-6 bg-gray-600 rounded w-32 md:w-40"></div>
+                              {/* Date skeleton */}
+                              <div className="h-4 bg-gray-700 rounded w-24 md:w-32"></div>
+                            </div>
+                            <div className="mt-6 md:mt-0 md:text-right space-y-3">
+                              {/* Price skeleton */}
+                              <div className="h-6 md:h-8 bg-gray-600 rounded w-20 md:w-24"></div>
+                              {/* Transaction link skeleton */}
+                              <div className="h-4 bg-gray-700 rounded w-16 md:w-20"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </section>
+          ) : historyError ? (
+            <div className="py-16">
+              <div className="container mx-auto">
+                <h2 className="text-2xl md:text-4xl font-black mb-12 font-monument">
+                  OWNERSHIP <span className="text-pikavault-yellow">HISTORY</span>
+                </h2>
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-red-400">Error loading ownership history</div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <OwnershipHistory 
+              history={enhancedCard?.ownershipHistory || []}
+              listingPrice={card.price}
+            />
+          )}
         </div>
 
         {/* Related Cards */}

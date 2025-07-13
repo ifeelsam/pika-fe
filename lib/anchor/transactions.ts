@@ -743,3 +743,132 @@ const fetchNFTMetadata = async (
     };
   }
 }; 
+
+// Get real ownership history for an NFT by fetching blockchain transactions
+export const getNFTOwnershipHistory = async (
+  program: Program<PikaVault>,
+  nftMint: string
+): Promise<Array<{ owner: string; date: string; price: number; txHash: string }>> => {
+  try {
+    if (!program?.provider.connection) {
+      throw new Error("No connection available");
+    }
+
+    const nftMintPubkey = new PublicKey(nftMint);
+    console.log(`Fetching ownership history for NFT: ${nftMint}`);
+
+    // Get signature history for the NFT mint address
+    const signatures = await program.provider.connection.getSignaturesForAddress(
+      nftMintPubkey,
+      { limit: 50 } // Limit to recent transactions
+    );
+
+    console.log(`Found ${signatures.length} signatures for NFT`);
+
+    const ownershipHistory: Array<{ owner: string; date: string; price: number; txHash: string }> = [];
+
+    // Process signatures in batches to avoid rate limiting
+    const batchSize = 10;
+    for (let i = 0; i < signatures.length; i += batchSize) {
+      const batch = signatures.slice(i, i + batchSize);
+      
+      const transactionPromises = batch.map(async (signatureInfo) => {
+        try {
+          // Get the full transaction details
+          const transaction = await program.provider.connection.getTransaction(
+            signatureInfo.signature,
+            { maxSupportedTransactionVersion: 0 }
+          );
+
+          if (!transaction) return null;
+
+          // Parse the transaction to extract ownership transfers and prices
+          const blockTime = transaction.blockTime;
+          const date = blockTime ? new Date(blockTime * 1000).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+          
+          // Check if this is a marketplace transaction (contains our program)
+          let accountKeys: any[] = [];
+          if ('accountKeys' in transaction.transaction.message) {
+            accountKeys = transaction.transaction.message.accountKeys;
+          } else if ('getAccountKeys' in transaction.transaction.message) {
+            accountKeys = transaction.transaction.message.getAccountKeys().staticAccountKeys;
+          }
+          
+          const isMarketplaceTransaction = accountKeys.some(
+            (account: any) => account.equals(program.programId)
+          );
+
+          if (isMarketplaceTransaction) {
+            // Try to extract price from program logs
+            let price = 0;
+            if (transaction.meta?.logMessages) {
+              for (const log of transaction.meta.logMessages) {
+                // Look for price in listing or purchase logs
+                if (log.includes('listing_price') || log.includes('sale_amount')) {
+                  const priceMatch = log.match(/(\d+)/);
+                  if (priceMatch) {
+                    price = parseInt(priceMatch[1]) / 1000000000; // Convert lamports to SOL
+                  }
+                }
+              }
+            }
+
+                         // Extract the owner from pre/post token balances
+             let owner = "";
+             if (transaction.meta?.preTokenBalances && transaction.meta?.postTokenBalances) {
+               // Find the token account that received the NFT
+               const postBalance = transaction.meta.postTokenBalances.find(
+                 balance => balance.mint === nftMint && balance.uiTokenAmount.uiAmount === 1
+               );
+              
+              if (postBalance) {
+                owner = postBalance.owner || "";
+              }
+            }
+
+            // If we couldn't extract from balances, try to get from account keys
+            if (!owner && accountKeys.length > 0) {
+              // Use the first signer as a fallback
+              owner = accountKeys[0].toString();
+            }
+
+            if (owner) {
+              return {
+                owner,
+                date,
+                price: price || 0,
+                txHash: signatureInfo.signature
+              };
+            }
+          }
+
+          return null;
+        } catch (error) {
+          console.error(`Error processing transaction ${signatureInfo.signature}:`, error);
+          return null;
+        }
+      });
+
+      const results = await Promise.all(transactionPromises);
+      
+      // Add valid results to history
+      results.forEach(result => {
+        if (result) {
+          ownershipHistory.push(result);
+        }
+      });
+    }
+
+    // Sort by date (newest first)
+    ownershipHistory.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    console.log(`Found ${ownershipHistory.length} ownership history entries`);
+    return ownershipHistory;
+
+  } catch (error) {
+    console.error("Error fetching NFT ownership history:", error);
+    
+    // Return empty array on error, let the UI handle fallback
+    return [];
+  }
+}; 
