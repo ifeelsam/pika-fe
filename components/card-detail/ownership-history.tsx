@@ -46,32 +46,32 @@ export function OwnershipHistory({ history }: OwnershipHistoryProps) {
   return (
     <section ref={sectionRef} className="py-16">
       <div className="container mx-auto">
-        <h2 className="text-3xl md:text-4xl font-black mb-12 font-monument">
+        <h2 className="text-2xl md:text-4xl font-black mb-12 font-monument">
           OWNERSHIP <span className="text-pikavault-yellow">HISTORY</span>
         </h2>
 
         <div className="relative">
           {/* Timeline line */}
-          <div className="absolute left-8 top-0 bottom-0 w-1 bg-pikavault-yellow/30"></div>
+          <div className="absolute left-4 md:left-8 top-0 bottom-0 w-1 bg-pikavault-yellow/30"></div>
 
           <div className="space-y-8">
             {history.map((entry, index) => (
               <div key={index} className="history-item relative flex items-center space-x-8">
                 {/* Timeline dot */}
                 <div className="relative z-10">
-                  <div className="w-16 h-16 bg-pikavault-yellow flex items-center justify-center">
+                  <div className="w-10 h-10 md:w-16 md:h-16 bg-pikavault-yellow flex items-center justify-center">
                     <User className="w-8 h-8 text-pikavault-dark" />
                   </div>
                 </div>
 
                 {/* Content */}
                 <div className="flex-1 bg-white/5 border border-white/20 p-6">
-                  <div className="flex justify-between items-start">
+                  <div className="md:flex md:justify-between md:items-start">
                     <div>
-                      <p className="text-xl font-bold mb-2 font-monument">
+                      <p className="text-md md:text-xl font-bold mb-2 font-monument">
                         {truncateAddress(entry.owner)}
                       </p>
-                      <p className="text-white/70" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                      <p className="text-white/70 text-sm font-space-grotesk">
                         {new Date(entry.date).toLocaleDateString("en-US", {
                           year: "numeric",
                           month: "long",
@@ -79,10 +79,9 @@ export function OwnershipHistory({ history }: OwnershipHistoryProps) {
                         })}
                       </p>
                     </div>
-
-                    <div className="text-right">
+                    <div className="mt-6 md:mt-0 md:text-right">
                       <p
-                        className="text-2xl font-black text-pikavault-cyan mb-2 font-monument"
+                        className="text-xl md:text-2xl font-black text-pikavault-cyan mb-2 font-monument"
                       >
                         {entry.price} SOL
                       </p>
@@ -92,7 +91,7 @@ export function OwnershipHistory({ history }: OwnershipHistoryProps) {
                         rel="noopener noreferrer"
                         className="flex items-center space-x-1 text-white/70 md:hover:text-pikavault-yellow transition-colors"
                       >
-                        <span className="text-sm font-space-grotesk">
+                        <span className="text-xs md:text-sm font-space-grotesk">
                           View TX
                         </span>
                         <ExternalLink className="w-4 h-4" />
