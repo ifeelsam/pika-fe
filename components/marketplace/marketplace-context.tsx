@@ -1,7 +1,7 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
-import { useAnchorProgram } from "@/lib/anchor/client"
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react"
+import { useAnchorProgram, useReadOnlyProgram } from "@/lib/anchor/client"
 import { getAllListings, createUmiInstance } from "@/lib/anchor/transactions"
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js"
 import { fetchDigitalAsset } from "@metaplex-foundation/mpl-token-metadata"
@@ -10,7 +10,8 @@ import { publicKey as umiPublicKey } from "@metaplex-foundation/umi"
 const MarketplaceContext = createContext<MarketplaceContextType | undefined>(undefined)
 
 export function MarketplaceProvider({ children }: { children: ReactNode }) {
-  const { program } = useAnchorProgram()
+  const { program } = useAnchorProgram() // For transactions that require wallet
+  const { readOnlyProgram } = useReadOnlyProgram() // For reading public data
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -102,12 +103,12 @@ export function MarketplaceProvider({ children }: { children: ReactNode }) {
   // Enhanced function to fetch NFT metadata with attributes for rarity determination
   const fetchNFTMetadata = async (nftMint: string): Promise<{ name: string; image: string; description?: string; attributes?: NFTAttribute[] }> => {
     try {
-      if (!program?.provider.connection) {
+      if (!readOnlyProgram?.provider.connection) {
         throw new Error("No connection available")
       }
 
       // Create UMI instance
-      const umi = createUmiInstance(program.provider.connection.rpcEndpoint)
+      const umi = createUmiInstance(readOnlyProgram.provider.connection.rpcEndpoint)
       
       // Convert mint address to UMI public key
       const mintPubkey = umiPublicKey(nftMint)
@@ -150,14 +151,14 @@ export function MarketplaceProvider({ children }: { children: ReactNode }) {
   }
 
   // Load listings from blockchain
-  const loadListings = async () => {
-    if (!program) return
+  const loadListings = useCallback(async () => {
+    if (!readOnlyProgram) return
 
     try {
       setIsLoading(true)
       setError(null)
 
-      const listings = await getAllListings(program)
+      const listings = await getAllListings(readOnlyProgram)
       
       // Fetch metadata for all NFTs in parallel
       const metadataPromises = listings.map(listing => 
@@ -211,17 +212,17 @@ export function MarketplaceProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [readOnlyProgram])
 
   // Refresh listings function
   const refreshListings = async () => {
     await loadListings()
   }
 
-  // Load listings on mount and when program changes
+  // Load listings on mount and when loadListings changes
   useEffect(() => {
     loadListings()
-  }, [program])
+  }, [loadListings])
 
   // Toggle filter option
   const toggleFilter = (filterId: string, optionId: string) => {
@@ -320,6 +321,7 @@ export function MarketplaceProvider({ children }: { children: ReactNode }) {
         isLoading,
         error,
         refreshListings,
+        program, // Wallet-connected program for transactions
       }}
     >
       {children}

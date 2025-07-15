@@ -105,6 +105,7 @@ declare global {
     isLoading: boolean
     error: string | null
     refreshListings: () => Promise<void>
+    program: any // Wallet-connected program for transactions
   }
 
   // Hook return types
