@@ -80,8 +80,8 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
   // Share function with native sharing support
   const handleShare = async () => {
     const shareData = {
-      title: `${card.name} #${card.setNumber}`,
-      text: `Check out this ${card.rarity} ${card.name} from ${card.setName} - ${parseFloat(card.price)} SOL on PikaVault!`,
+      title: `${card.name} #${card.setNumber || card.id}`,
+      text: `Check out this ${card.rarity} ${card.name} ${card.setName ? `from ${card.setName}` : ''} - ${parseFloat(card.price)} SOL on PikaVault!`,
       url: window.location.href,
     }
 
@@ -90,7 +90,8 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
         await navigator.share(shareData)
         onSound("success")
       } else {
-        await navigator.clipboard.writeText(window.location.href)
+        const shareText = `${shareData.title}\n\n${shareData.text}\n\n${shareData.url}`
+        await navigator.clipboard.writeText(shareText)
         setCopied(true)
         onSound("success")
         setTimeout(() => setCopied(false), 2000)
