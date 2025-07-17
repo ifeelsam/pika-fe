@@ -77,6 +77,36 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
     setTimeout(() => setCopied(false), 2000)
   }
 
+  // Share function with native sharing support
+  const handleShare = async () => {
+    const shareData = {
+      title: `${card.name} #${card.setNumber}`,
+      text: `Check out this ${card.rarity} ${card.name} from ${card.setName} - ${parseFloat(card.price)} SOL on PikaVault!`,
+      url: window.location.href,
+    }
+
+    try {
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+        await navigator.share(shareData)
+        onSound("success")
+      } else {
+        await navigator.clipboard.writeText(window.location.href)
+        setCopied(true)
+        onSound("success")
+        setTimeout(() => setCopied(false), 2000)
+      }
+    } catch (error) {
+      try {
+        await navigator.clipboard.writeText(window.location.href)
+        setCopied(true)
+        onSound("success")
+        setTimeout(() => setCopied(false), 2000)
+      } catch (clipboardError) {
+        console.error("Sharing failed:", error)
+      }
+    }
+  }
+
   // Truncate hash
   const truncateHash = (hash: string) => `${hash.slice(0, 8)}...${hash.slice(-8)}`
 
@@ -236,7 +266,10 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
           </Button>
 
           <Button
-            onClick={() => onSound("click")}
+            onClick={() => {
+              handleShare()
+              onSound("click")
+            }}
             className="p-4 bg-transparent border-2 border-white/30 text-white md:hover:border-white/60 transition-all duration-300"
           >
             <Share2 className="w-5 h-5" />
@@ -280,7 +313,7 @@ export function InformationPanel({ card, isWatchlisted, onWatchlistToggle, onSou
       {/* Copy notification */}
       {copied && (
         <div className="fixed top-24 right-8 bg-[#00FF85] text-pikavault-dark px-4 py-2 font-bold z-50">
-          Hash copied to clipboard!
+          Copied to clipboard!
         </div>
       )}
     </div>
