@@ -114,12 +114,12 @@ export function HeroSection() {
         <div ref={buttonRef} className="relative group opacity-0">
           <Button
             onClick={() => redirect("/marketplace")}
-            className="bg-pikavault-yellow hover:bg-pikavault-yellow/90 text-pikavault-dark text-lg md:text-xl font-bold py-6 px-12 rounded-none transition-all duration-300 overflow-hidden group-hover:translate-x-1 group-hover:-translate-y-1 font-monument"
+            className="bg-pikavault-yellow sm:hover:bg-pikavault-yellow/90 text-pikavault-dark text-lg md:text-xl font-bold py-6 px-12 rounded-none transition-all duration-300 overflow-hidden group-sm:hover:translate-x-1 group-sm:hover:-translate-y-1 font-monument"
           >
             EXPLORE COLLECTION
-            <span className="absolute inset-0 bg-pikavault-pink mix-blend-overlay opacity-0 group-hover:opacity-30 transition-opacity duration-300"></span>
+            <span className="absolute inset-0 bg-pikavault-pink mix-blend-overlay opacity-0 group-sm:hover:opacity-30 transition-opacity duration-300"></span>
           </Button>
-          <div className="absolute inset-0 border-2 border-pikavault-yellow -z-10 translate-x-2 translate-y-2 group-hover:translate-x-4 group-hover:translate-y-4 transition-all duration-300"></div>
+          <div className="absolute inset-0 border-2 border-pikavault-yellow -z-10 translate-x-2 translate-y-2 group-sm:hover:translate-x-4 group-sm:hover:translate-y-4 transition-all duration-300"></div>
         </div>
       </div>
 

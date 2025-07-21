@@ -107,7 +107,7 @@ export function VerificationProcess({ cardData, updateCardData, onSound }: Verif
               className={`p-4 border-4 transition-all duration-300 ${
                 cardData.condition === grade.id
                   ? "border-pikavault-yellow bg-pikavault-yellow/10"
-                  : "border-white/30 hover:border-white/60"
+                  : "border-white/30 sm:hover:border-white/60"
               }`}
               style={{ fontFamily: "'Monument Extended', sans-serif" }}
               onMouseEnter={() => onSound("hover")}
@@ -162,7 +162,7 @@ export function VerificationProcess({ cardData, updateCardData, onSound }: Verif
               onSound("hover")
             }}
             onMouseLeave={() => setShowPriceTooltip(false)}
-            className="text-white/70 hover:text-white"
+            className="text-white/70 sm:hover:text-white"
           >
             <Info className="w-5 h-5" />
           </button>
@@ -247,7 +247,7 @@ export function VerificationProcess({ cardData, updateCardData, onSound }: Verif
             className={`p-4 border-4 transition-all duration-300 ${
               cardData.listingType === "fixed"
                 ? "border-pikavault-yellow bg-pikavault-yellow/10"
-                : "border-white/30 hover:border-white/60"
+                : "border-white/30 sm:hover:border-white/60"
             }`}
             style={{ fontFamily: "'Monument Extended', sans-serif" }}
             onMouseEnter={() => onSound("hover")}
@@ -262,7 +262,7 @@ export function VerificationProcess({ cardData, updateCardData, onSound }: Verif
             className={`p-4 border-4 transition-all duration-300 ${
               cardData.listingType === "auction"
                 ? "border-pikavault-yellow bg-pikavault-yellow/10"
-                : "border-white/30 hover:border-white/60"
+                : "border-white/30 sm:hover:border-white/60"
             }`}
             style={{ fontFamily: "'Monument Extended', sans-serif" }}
             onMouseEnter={() => onSound("hover")}
@@ -289,7 +289,7 @@ export function VerificationProcess({ cardData, updateCardData, onSound }: Verif
               className={`p-3 border-2 transition-all duration-300 ${
                 cardData.duration === duration.id
                   ? "border-pikavault-cyan bg-pikavault-cyan/10"
-                  : "border-white/30 hover:border-white/60"
+                  : "border-white/30 sm:hover:border-white/60"
               }`}
               style={{ fontFamily: "'Space Grotesk', sans-serif" }}
               onMouseEnter={() => onSound("hover")}

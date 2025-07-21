@@ -32,11 +32,11 @@ export function Navigation() {
       <div className="container mx-auto px-6 flex justify-between items-center">
         <Link
           href="/"
-          className="text-2xl font-black text-pikavault-yellow hover:text-white tracking-wider relative group font-monument"
+          className="text-2xl font-black text-pikavault-yellow sm:hover:text-white tracking-wider relative group font-monument"
         >
           PIKA
-          <span className="text-white hover:text-pikavault-yellow">VAULT</span>
-          <span className="absolute -bottom-1 left-0 w-0 h-[3px] bg-pikavault-yellow group-hover:w-full transition-all duration-300"></span>
+          <span className="text-white sm:hover:text-pikavault-yellow">VAULT</span>
+          <span className="absolute -bottom-1 left-0 w-0 h-[3px] bg-pikavault-yellow group-sm:hover:w-full transition-all duration-300"></span>
         </Link>
 
         <nav className="hidden lg:flex items-center space-x-8">
@@ -44,10 +44,10 @@ export function Navigation() {
             <Link
               key={item.name}
               href={item.href}
-              className="text-white hover:text-pikavault-yellow relative group text-lg font-medium tracking-wider font-space-grotesk"
+              className="text-white sm:hover:text-pikavault-yellow relative group text-lg font-medium tracking-wider font-space-grotesk"
             >
               {item.name}
-              <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-pikavault-yellow group-hover:w-full transition-all duration-300"></span>
+              <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-pikavault-yellow group-sm:hover:w-full transition-all duration-300"></span>
             </Link>
           ))}
 

@@ -137,7 +137,7 @@ export function CardInspectionModal({ isOpen, onClose, card, currentView, onView
                 className={`px-3 py-1 border transition-all duration-300 ${
                   currentView === "front"
                     ? "bg-pikavault-yellow border-pikavault-yellow text-pikavault-dark"
-                    : "bg-transparent border-white/30 text-white hover:border-white/60"
+                    : "bg-transparent border-white/30 text-white sm:hover:border-white/60"
                 }`}
                 style={{ fontFamily: "'Space Grotesk', sans-serif" }}
               >
@@ -149,7 +149,7 @@ export function CardInspectionModal({ isOpen, onClose, card, currentView, onView
                 className={`px-3 py-1 border transition-all duration-300 ${
                   currentView === "back"
                     ? "bg-pikavault-yellow border-pikavault-yellow text-pikavault-dark"
-                    : "bg-transparent border-white/30 text-white hover:border-white/60"
+                    : "bg-transparent border-white/30 text-white sm:hover:border-white/60"
                 }`}
                 style={{ fontFamily: "'Space Grotesk', sans-serif" }}
               >
@@ -162,7 +162,7 @@ export function CardInspectionModal({ isOpen, onClose, card, currentView, onView
                   className={`px-3 py-1 border transition-all duration-300 ${
                     currentView === "holo"
                       ? "bg-pikavault-yellow border-pikavault-yellow text-pikavault-dark"
-                      : "bg-transparent border-white/30 text-white hover:border-white/60"
+                      : "bg-transparent border-white/30 text-white sm:hover:border-white/60"
                   }`}
                   style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                 >
@@ -176,7 +176,7 @@ export function CardInspectionModal({ isOpen, onClose, card, currentView, onView
               <button
                 onClick={() => handleZoom("out")}
                 disabled={zoom <= 1}
-                className="p-2 border border-white/30 text-white hover:border-white/60 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-2 border border-white/30 text-white sm:hover:border-white/60 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <ZoomOut className="w-4 h-4" />
               </button>
@@ -188,7 +188,7 @@ export function CardInspectionModal({ isOpen, onClose, card, currentView, onView
               <button
                 onClick={() => handleZoom("in")}
                 disabled={zoom >= 4}
-                className="p-2 border border-white/30 text-white hover:border-white/60 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-2 border border-white/30 text-white sm:hover:border-white/60 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <ZoomIn className="w-4 h-4" />
               </button>
@@ -196,7 +196,7 @@ export function CardInspectionModal({ isOpen, onClose, card, currentView, onView
 
             <button
               onClick={onClose}
-              className="p-2 border border-white/30 text-white hover:border-white/60 hover:text-pikavault-pink transition-colors"
+              className="p-2 border border-white/30 text-white sm:hover:border-white/60 sm:hover:text-pikavault-pink transition-colors"
             >
               <X className="w-5 h-5" />
             </button>

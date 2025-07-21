@@ -155,7 +155,7 @@ export function CollectionGrid({ selectedCards, setSelectedCards }: CollectionGr
                       ${
                         isSelected
                           ? `border-[${rarityColor}] scale-110 z-10`
-                          : "border-white/30 group-hover:border-white/70"
+                          : "border-white/30 group-sm:hover:border-white/70"
                       }
                       ${isHovered && !isSelected ? "scale-[1.3]" : ""}
                     `}
@@ -182,7 +182,7 @@ export function CollectionGrid({ selectedCards, setSelectedCards }: CollectionGr
                           ${
                             isSelected
                               ? `bg-[${rarityColor}] border-[${rarityColor}]`
-                              : "bg-pikavault-dark/70 border-white/30 opacity-0 group-hover:opacity-100"
+                              : "bg-pikavault-dark/70 border-white/30 opacity-0 group-sm:hover:opacity-100"
                           }
                           border-2
                         `}
@@ -295,7 +295,7 @@ export function CollectionGrid({ selectedCards, setSelectedCards }: CollectionGr
                 className={`
                   relative bg-pikavault-dark border-l-4 p-4 cursor-pointer
                   ${isSelected ? `border-[${rarityColor}]` : "border-white/30"}
-                  transition-all duration-300 hover:bg-white/5
+                  transition-all duration-300 sm:hover:bg-white/5
                 `}
                 style={{
                   // Only apply opacity after GSAP animation is complete
@@ -393,15 +393,15 @@ export function CollectionGrid({ selectedCards, setSelectedCards }: CollectionGr
             }}
           >
             <div className="p-2">
-              <button className="w-full text-left px-3 py-2 text-white hover:bg-white/10 flex items-center space-x-2">
+              <button className="w-full text-left px-3 py-2 text-white sm:hover:bg-white/10 flex items-center space-x-2">
                 <Eye className="w-4 h-4" />
                 <span className="font-space-grotesk">View Details</span>
               </button>
-              <button className="w-full text-left px-3 py-2 text-white hover:bg-white/10 flex items-center space-x-2">
+              <button className="w-full text-left px-3 py-2 text-white sm:hover:bg-white/10 flex items-center space-x-2">
                 <Tag className="w-4 h-4" />
                 <span className="font-space-grotesk">List for Sale</span>
               </button>
-              <button className="w-full text-left px-3 py-2 text-white hover:bg-white/10 flex items-center space-x-2">
+              <button className="w-full text-left px-3 py-2 text-white sm:hover:bg-white/10 flex items-center space-x-2">
                 <Share2 className="w-4 h-4" />
                 <span className="font-space-grotesk">Share</span>
               </button>

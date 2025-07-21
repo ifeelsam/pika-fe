@@ -255,7 +255,7 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
                 </div>
               ) : searchQuery ? (
                 <button
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 sm:hover:text-white"
                   onClick={clearSearch}
                   onMouseEnter={() => onSound("hover")}
                 >
@@ -279,7 +279,7 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
               {recentSearches.map((term, index) => (
                 <button
                   key={index}
-                  className="flex items-center gap-1 bg-white/10 hover:bg-white/20 px-3 py-1 text-sm transition-colors"
+                  className="flex items-center gap-1 bg-white/10 sm:hover:bg-white/20 px-3 py-1 text-sm transition-colors"
                   onClick={() => {
                     setSearchQuery(term)
                     handleSearch()
@@ -301,7 +301,7 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
                   {searchResults.length} results
                 </span>
                 <button
-                  className="text-white/50 hover:text-white"
+                  className="text-white/50 sm:hover:text-white"
                   onClick={() => setShowResults(false)}
                   onMouseEnter={() => onSound("hover")}
                 >
@@ -313,7 +313,7 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
                 <button
                   key={card.id}
                   className={`w-full p-3 flex items-center gap-4 transition-colors border-b border-white/10 ${
-                    highlightedCardId === card.id ? "bg-pikavault-yellow/20" : "hover:bg-white/20"
+                    highlightedCardId === card.id ? "bg-pikavault-yellow/20" : "sm:hover:bg-white/20"
                   }`}
                   onClick={() => handleSelectCard(card)}
                   onMouseEnter={() => {
@@ -358,7 +358,7 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
                 No cards found matching "{searchQuery}"
               </p>
               <button
-                className="text-pikavault-cyan text-sm hover:underline"
+                className="text-pikavault-cyan text-sm sm:hover:underline"
                 onClick={clearSearch}
                 onMouseEnter={() => onSound("hover")}
               >
@@ -412,7 +412,7 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
                 className={`flex flex-col items-center p-4 border-4 min-w-[150px] transition-all duration-300 ${
                   cardData.set === set.name
                     ? "border-pikavault-yellow bg-pikavault-yellow/10"
-                    : "border-white/30 hover:border-white/60"
+                    : "border-white/30 sm:hover:border-white/60"
                 }`}
                 onMouseEnter={() => onSound("hover")}
               >
@@ -463,7 +463,7 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
               className={`p-4 border-4 transition-all duration-300 ${
                 cardData.rarity === rarity.id
                   ? `border-[${rarity.color}] bg-[${rarity.color}]/10`
-                  : "border-white/30 hover:border-white/60"
+                  : "border-white/30 sm:hover:border-white/60"
               }`}
               style={{ fontFamily: "'Monument Extended', sans-serif" }}
               onMouseEnter={() => onSound("hover")}
@@ -491,7 +491,7 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
               className={`p-3 border-2 transition-all duration-300 ${
                 cardData.language === language
                   ? "border-pikavault-cyan bg-pikavault-cyan/10"
-                  : "border-white/30 hover:border-white/60"
+                  : "border-white/30 sm:hover:border-white/60"
               }`}
               style={{ fontFamily: "'Space Grotesk', sans-serif" }}
               onMouseEnter={() => onSound("hover")}

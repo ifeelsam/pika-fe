@@ -169,7 +169,7 @@ export function CardGrid({ selectedCards, setSelectedCards }: CardGridProps) {
                   ${
                     isSelected
                       ? `border-[${rarityColor}] scale-110 z-10`
-                      : "border-white/30 group-hover:border-white/70"
+                      : "border-white/30 group-sm:hover:border-white/70"
                   }
                   ${isHovered && !isSelected ? "scale-105" : ""}
                 `}
@@ -204,7 +204,7 @@ export function CardGrid({ selectedCards, setSelectedCards }: CardGridProps) {
                       ${
                         isSelected
                           ? `bg-[${rarityColor}] border-[${rarityColor}]`
-                          : "bg-pikavault-dark/70 border-white/30 opacity-0 group-hover:opacity-100"
+                          : "bg-pikavault-dark/70 border-white/30 opacity-0 group-sm:hover:opacity-100"
                       }
                       border-2
                     `}

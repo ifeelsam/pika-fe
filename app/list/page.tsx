@@ -345,7 +345,7 @@ export default function ListingPage() {
               <p className="text-red-300 text-sm">{publishingError}</p>
               <button
                 onClick={() => setPublishingError(null)}
-                className="mt-2 text-red-400 hover:text-red-300 text-sm underline"
+                className="mt-2 text-red-400 sm:hover:text-red-300 text-sm underline"
               >
                 Dismiss
               </button>
@@ -489,7 +489,7 @@ export default function ListingPage() {
                   className={`px-8 py-4 border-4 transition-all duration-300 ${
                     activeStep === 0
                       ? "border-white/20 text-white/50 cursor-not-allowed"
-                      : "border-white/50 text-white hover:border-white"
+                      : "border-white/50 text-white sm:hover:border-white"
                   }`}
                   style={{ fontFamily: "'Monument Extended', sans-serif" }}
                   onMouseEnter={() => activeStep !== 0 && playSound("hover")}
@@ -523,8 +523,8 @@ export default function ListingPage() {
                     (activeStep === 2 && !cardData.condition)
                       ? "bg-white/20 text-white/50 cursor-not-allowed"
                       : activeStep === 3
-                        ? "bg-pikavault-yellow text-pikavault-dark hover:bg-pikavault-yellow/90"
-                        : "bg-pikavault-cyan text-pikavault-dark hover:bg-pikavault-cyan/90"
+                        ? "bg-pikavault-yellow text-pikavault-dark sm:hover:bg-pikavault-yellow/90"
+                        : "bg-pikavault-cyan text-pikavault-dark sm:hover:bg-pikavault-cyan/90"
                   }`}
                   style={{ fontFamily: "'Monument Extended', sans-serif" }}
                   onMouseEnter={() => {

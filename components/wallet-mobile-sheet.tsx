@@ -73,7 +73,7 @@ export function WalletMobileSheet({
           </h3>
           <button
             onClick={onClose}
-            className="p-2 text-white/70 hover:text-white"
+            className="p-2 text-white/70 sm:hover:text-white"
             onMouseEnter={() => playSound("hover")}
           >
             <X className="w-6 h-6" />
@@ -91,7 +91,7 @@ export function WalletMobileSheet({
               <p className="font-mono text-white truncate">{walletData.address}</p>
               <button
                 onClick={onCopy}
-                className="p-2 hover:text-pikavault-yellow transition-colors"
+                className="p-2 sm:hover:text-pikavault-yellow transition-colors"
                 onMouseEnter={() => playSound("hover")}
               >
                 {isCopied ? <Check className="w-5 h-5 text-green-500" /> : <Copy className="w-5 h-5" />}
@@ -130,7 +130,7 @@ export function WalletMobileSheet({
           {/* Actions */}
           <div className="space-y-4 pt-4">
             <button
-              className="w-full p-4 bg-transparent border-2 border-white/30 text-white hover:border-white/60 transition-colors flex items-center justify-center space-x-2"
+              className="w-full p-4 bg-transparent border-2 border-white/30 text-white sm:hover:border-white/60 transition-colors flex items-center justify-center space-x-2"
               onMouseEnter={() => playSound("hover")}
               onClick={() => {
                 window.open(`https://explorer.solana.com/address/${walletData.address}?cluster=devnet`, "_blank")
@@ -142,7 +142,7 @@ export function WalletMobileSheet({
             </button>
 
             <button
-              className="w-full p-4 bg-transparent border-2 border-pikavault-pink text-pikavault-pink hover:bg-pikavault-pink hover:text-white transition-colors"
+              className="w-full p-4 bg-transparent border-2 border-pikavault-pink text-pikavault-pink sm:hover:bg-pikavault-pink sm:hover:text-white transition-colors"
               onMouseEnter={() => playSound("hover")}
               onClick={onDisconnect}
             >

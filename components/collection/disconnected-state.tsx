@@ -230,7 +230,7 @@ export function DisconnectedState() {
         {/* <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6 mb-8">
           <motion.div whileHover={{ scale: 1.05 }} className="relative">
             <div className="wallet-adapter-button-trigger">
-              <WalletMultiButton className="w-64 h-16 text-xl font-black rounded-none relative overflow-hidden bg-gradient-to-r from-pikavault-yellow to-pikavault-cyan text-pikavault-dark hover:from-pikavault-yellow/90 hover:to-pikavault-cyan/90" />
+              <WalletMultiButton className="w-64 h-16 text-xl font-black rounded-none relative overflow-hidden bg-gradient-to-r from-pikavault-yellow to-pikavault-cyan text-pikavault-dark sm:hover:from-pikavault-yellow/90 sm:hover:to-pikavault-cyan/90" />
             </div>
             <div className="absolute inset-0 border-4 border-pikavault-yellow -z-10 translate-x-2 translate-y-2 animate-pulse"></div>
           </motion.div>

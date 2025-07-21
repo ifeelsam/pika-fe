@@ -189,7 +189,7 @@ export function CardCollection() {
                         transform: `rotate(${card.rotation}deg)`,
                       }}
                     >
-                      <div className="group relative w-[320px] aspect-[3/4] cursor-pointer transition-all duration-500 hover:scale-105">
+                      <div className="group relative w-[320px] aspect-[3/4] cursor-pointer transition-all duration-500 sm:hover:scale-105">
                         <div
                           className="absolute inset-0 rounded-none bg-pikavault-dark border-4 transition-all duration-300 overflow-hidden transform-gpu"
                           style={{
@@ -207,7 +207,7 @@ export function CardCollection() {
                           <div className="relative w-full h-full overflow-hidden">
                             {/* Card image */}
                             <div
-                              className="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+                              className="w-full h-full bg-cover bg-center transition-transform duration-500 group-sm:hover:scale-105"
                               style={{
                                 backgroundImage: `url(${card.imageUrl})`,
                               }}
@@ -289,7 +289,7 @@ export function CardCollection() {
 
           <Button
             onClick={() => redirect("/marketplace")}
-            className="bg-pikavault-pink hover:bg-pikavault-pink/90 text-white text-lg font-bold py-6 px-12 rounded-none transition-all duration-300 overflow-hidden"
+            className="bg-pikavault-pink sm:hover:bg-pikavault-pink/90 text-white text-lg font-bold py-6 px-12 rounded-none transition-all duration-300 overflow-hidden"
             style={{ fontFamily: "'Monument Extended', sans-serif" }}
           >
             VIEW ALL

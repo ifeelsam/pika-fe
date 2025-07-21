@@ -272,7 +272,7 @@ export function UploadZone({ onImageUpload, uploadedImages, isProcessing, onSoun
               className={`px-6 py-3 ${
                 isUploading 
                   ? "bg-gray-500 cursor-not-allowed" 
-                  : "bg-pikavault-cyan hover:bg-pikavault-cyan/90"
+                  : "bg-pikavault-cyan sm:hover:bg-pikavault-cyan/90"
               } text-pikavault-dark font-bold flex items-center space-x-2`}
               style={{ fontFamily: "'Monument Extended', sans-serif" }}
               onMouseEnter={() => !isUploading && onSound("hover")}
@@ -304,7 +304,7 @@ export function UploadZone({ onImageUpload, uploadedImages, isProcessing, onSoun
                 className={`px-6 py-3 ${
                   isUploading 
                     ? "bg-gray-500 cursor-not-allowed" 
-                    : "bg-pikavault-yellow hover:bg-pikavault-yellow/90"
+                    : "bg-pikavault-yellow sm:hover:bg-pikavault-yellow/90"
                 } text-pikavault-dark font-bold`}
                 style={{ fontFamily: "'Monument Extended', sans-serif" }}
                 onMouseEnter={() => !isUploading && onSound("hover")}
@@ -317,7 +317,7 @@ export function UploadZone({ onImageUpload, uploadedImages, isProcessing, onSoun
                 className={`px-6 py-3 ${
                   isUploading 
                     ? "bg-gray-500 cursor-not-allowed" 
-                    : "bg-pikavault-pink hover:bg-pikavault-pink/90"
+                    : "bg-pikavault-pink sm:hover:bg-pikavault-pink/90"
                 } text-white font-bold`}
                 style={{ fontFamily: "'Monument Extended', sans-serif" }}
                 onMouseEnter={() => !isUploading && onSound("hover")}
@@ -362,7 +362,7 @@ export function UploadZone({ onImageUpload, uploadedImages, isProcessing, onSoun
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {uploadedImages.map((image, index) => (
               <div key={index} className="relative group">
-                <div className="relative aspect-square overflow-hidden border-2 border-white/30 group-hover:border-white/70 transition-colors duration-300">
+                <div className="relative aspect-square overflow-hidden border-2 border-white/30 group-sm:hover:border-white/70 transition-colors duration-300">
                   <img
                     src={image || "/placeholder.svg"}
                     alt={`Card image ${index + 1}`}
@@ -376,7 +376,7 @@ export function UploadZone({ onImageUpload, uploadedImages, isProcessing, onSoun
                 </div>
                 <button
                   onClick={() => removeImage(index)}
-                  className="absolute top-2 right-2 w-8 h-8 bg-pikavault-pink text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  className="absolute top-2 right-2 w-8 h-8 bg-pikavault-pink text-white flex items-center justify-center opacity-0 group-sm:hover:opacity-100 transition-opacity duration-300"
                   onMouseEnter={() => onSound("hover")}
                 >
                   <X className="w-5 h-5" />

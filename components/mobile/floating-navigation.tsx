@@ -164,7 +164,7 @@ export function FloatingNavigation() {
 const HamburgerMenu = ({ menuOpen, setMenuOpen }: HamburgerMenuProps) => {
   return (
     <motion.button
-      className="relative w-10 h-10 flex items-center justify-center bg-black/20 border-2 border-transparent hover:border-pikavault-yellow/50 transition-colors duration-200"
+      className="relative w-10 h-10 flex items-center justify-center bg-black/20 border-2 border-transparent sm:hover:border-pikavault-yellow/50 transition-colors duration-200"
       onTap={() => setMenuOpen(!menuOpen)}
       whileTap={{ scale: 0.9 }}
       whileHover={{ backgroundColor: "rgba(246,255,0,0.1)" }}
@@ -225,7 +225,7 @@ const MenuLink = ({ href, children, onClick }: MenuLinkProps) => {
     >
       <Link
         href={href}
-        className="text-2xl font-black text-white hover:text-pikavault-yellow font-monument tracking-wider relative group"
+        className="text-2xl font-black text-white sm:hover:text-pikavault-yellow font-monument tracking-wider relative group"
         onClick={onClick}
       >
         {children}
@@ -239,7 +239,7 @@ const MenuLink = ({ href, children, onClick }: MenuLinkProps) => {
         />
         
         {/* Geometric accent */}
-        <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-pikavault-yellow opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-pikavault-yellow opacity-0 group-sm:hover:opacity-100 transition-opacity duration-300" />
       </Link>
     </motion.div>
   )

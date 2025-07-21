@@ -141,7 +141,7 @@ export function PriceChart({ data, currentPrice }: PriceChartProps) {
                   cy={y}
                   r="4"
                   fill={isPositive ? "#00F5FF" : "#FF2D55"}
-                  className="hover:r-6 transition-all duration-200"
+                  className="sm:hover:r-6 transition-all duration-200"
                 />
               )
             })}

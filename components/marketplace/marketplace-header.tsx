@@ -64,7 +64,7 @@ export function MarketplaceHeader() {
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="p-2 mr-2 text-white/50 hover:text-pikavault-yellow transition-colors"
+                className="p-2 mr-2 text-white/50 sm:hover:text-pikavault-yellow transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>

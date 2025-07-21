@@ -169,7 +169,7 @@ export function Footer() {
             <div key={link.name} className="flex items-center">
               <motion.a
                 href={link.href}
-                className="text-pikavault-teal hover:text-pikavault-yellow font-bold text-sm font-monument px-3 py-2 transition-colors duration-300"
+                className="text-pikavault-teal sm:hover:text-pikavault-yellow font-bold text-sm font-monument px-3 py-2 transition-colors duration-300"
                 whileTap={{ scale: 0.95 }}
               >
                 {link.name}
@@ -207,7 +207,7 @@ export function Footer() {
           {socialIcons.map((social) => (
             <motion.button
               key={social.name}
-              className="relative w-12 h-12 bg-pikavault-dark border-2 border-pikavault-yellow flex items-center justify-center text-pikavault-yellow hover:bg-pikavault-yellow hover:text-pikavault-dark transition-all duration-300 group"
+              className="relative w-12 h-12 bg-pikavault-dark border-2 border-pikavault-yellow flex items-center justify-center text-pikavault-yellow sm:hover:bg-pikavault-yellow sm:hover:text-pikavault-dark transition-all duration-300 group"
               whileTap={{ scale: 0.9 }}
               onTap={() => handleSocialClick(social.name, social.href)}
             >
@@ -219,7 +219,7 @@ export function Footer() {
               <SparkEffect isActive={sparkingIcon === social.name} />
               
               {/* Hover geometric effect */}
-              <div className="absolute -inset-1 border-2 border-pikavault-yellow opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="absolute -inset-1 border-2 border-pikavault-yellow opacity-0 group-sm:hover:opacity-100 transition-opacity duration-300">
                 <div className="absolute -top-1 -left-1 w-2 h-2 bg-pikavault-yellow"></div>
                 <div className="absolute -top-1 -right-1 w-2 h-2 bg-pikavault-yellow"></div>
                 <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-pikavault-yellow"></div>

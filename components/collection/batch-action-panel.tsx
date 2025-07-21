@@ -140,13 +140,13 @@ export function BatchActionPanel({ selectedCards, onClearSelection }: BatchActio
               <Button
                 onClick={handleListNFTs}
                 disabled={isListing}
-                className="bg-pikavault-yellow hover:bg-pikavault-yellow/90 text-pikavault-dark py-4 px-6 font-bold rounded-none font-monument"
+                className="bg-pikavault-yellow sm:hover:bg-pikavault-yellow/90 text-pikavault-dark py-4 px-6 font-bold rounded-none font-monument"
               >
                 {isListing ? "LISTING..." : "CONFIRM"}
               </Button>
               <Button
                 onClick={() => setShowPriceInput(false)}
-                className="bg-transparent border-2 border-white/30 hover:border-white/60 text-white font-bold py-4 px-6 rounded-none font-monument"
+                className="bg-transparent border-2 border-white/30 sm:hover:border-white/60 text-white font-bold py-4 px-6 rounded-none font-monument"
               >
                 CANCEL
               </Button>
@@ -157,7 +157,7 @@ export function BatchActionPanel({ selectedCards, onClearSelection }: BatchActio
         {/* Main panel content */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
           <div className="flex items-center space-x-4">
-            <button onClick={onClearSelection} className="p-2 text-white/70 hover:text-pikavault-yellow transition-colors">
+            <button onClick={onClearSelection} className="p-2 text-white/70 sm:hover:text-pikavault-yellow transition-colors">
               <X className="w-6 h-6" />
             </button>
 
@@ -194,7 +194,7 @@ export function BatchActionPanel({ selectedCards, onClearSelection }: BatchActio
               <Button
                 onClick={() => setShowPriceInput(true)}
                 disabled={isListing || showPriceInput}
-                className="bg-pikavault-yellow hover:bg-pikavault-yellow/90 text-pikavault-dark font-bold py-4 px-6 rounded-none flex items-center space-x-2"
+                className="bg-pikavault-yellow sm:hover:bg-pikavault-yellow/90 text-pikavault-dark font-bold py-4 px-6 rounded-none flex items-center space-x-2"
                 style={{ fontFamily: "'Monument Extended', sans-serif" }}
               >
                 <Tag className="w-5 h-5" />
@@ -207,7 +207,7 @@ export function BatchActionPanel({ selectedCards, onClearSelection }: BatchActio
               <Button
                 onClick={handleDelistNFTs}
                 disabled={isDelisting || showPriceInput}
-                className="bg-pikavault-pink hover:bg-pikavault-pink/90 text-white font-bold py-4 px-6 rounded-none flex items-center space-x-2 font-monument"
+                className="bg-pikavault-pink sm:hover:bg-pikavault-pink/90 text-white font-bold py-4 px-6 rounded-none flex items-center space-x-2 font-monument"
               >
                 <Trash2 className="w-5 h-5" />
                 <span>{isDelisting ? "DELISTING..." : `DELIST (${listedCards.length})`}</span>

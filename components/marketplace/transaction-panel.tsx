@@ -257,7 +257,7 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
             {getPanelTitle()}
           </h2>
 
-          <button onClick={onClose} className="p-2 text-white/70 hover:text-pikavault-yellow transition-colors">
+          <button onClick={onClose} className="p-2 text-white/70 sm:hover:text-pikavault-yellow transition-colors">
             <X className="w-6 h-6" />
           </button>
         </div>
@@ -337,7 +337,7 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
               <Button
                 onClick={handleReleaseEscrow}
                 disabled={isReleasingEscrow || !publicKey}
-                className="w-full bg-pikavault-cyan hover:bg-pikavault-cyan/90 text-pikavault-dark text-lg font-bold py-6 rounded-none disabled:opacity-50 font-monument"
+                className="w-full bg-pikavault-cyan sm:hover:bg-pikavault-cyan/90 text-pikavault-dark text-lg font-bold py-6 rounded-none disabled:opacity-50 font-monument"
               >
                 {isReleasingEscrow ? "RELEASING..." : !publicKey ? "CONNECT WALLET" : "RELEASE ESCROW"}
               </Button>
@@ -346,7 +346,7 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
               <Button
                 onClick={handleDelist}
                 disabled={isDelisting}
-                className="w-full bg-pikavault-pink hover:bg-pikavault-pink/90 text-white text-lg font-bold py-6 rounded-none disabled:opacity-50 font-monument"
+                className="w-full bg-pikavault-pink sm:hover:bg-pikavault-pink/90 text-white text-lg font-bold py-6 rounded-none disabled:opacity-50 font-monument"
               >
                 {isDelisting ? "DELISTING..." : "DELIST"}
               </Button>
@@ -355,7 +355,7 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
               <Button
                 onClick={handlePurchase}
                 disabled={isPurchasing || !publicKey}
-                className="w-full bg-pikavault-yellow hover:bg-pikavault-yellow/90 text-pikavault-dark text-lg font-bold py-6 rounded-none disabled:opacity-50 font-monument"
+                className="w-full bg-pikavault-yellow sm:hover:bg-pikavault-yellow/90 text-pikavault-dark text-lg font-bold py-6 rounded-none disabled:opacity-50 font-monument"
               >
                 {isPurchasing ? "PURCHASING..." : !publicKey ? "CONNECT WALLET" : "BUY NOW"}
               </Button>
@@ -369,7 +369,7 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
             <Button
               onClick={handleViewCard}
               disabled={isDelisting || isPurchasing || isReleasingEscrow}
-              className="w-full bg-transparent border-4 border-pikavault-cyan hover:bg-pikavault-cyan/10 text-white text-lg font-bold py-6 rounded-none disabled:opacity-50"
+              className="w-full bg-transparent border-4 border-pikavault-cyan sm:hover:bg-pikavault-cyan/10 text-white text-lg font-bold py-6 rounded-none disabled:opacity-50"
               style={{ fontFamily: "'Monument Extended', sans-serif" }}
             >
               VIEW CARD

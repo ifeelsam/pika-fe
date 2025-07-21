@@ -289,7 +289,7 @@ export default function SearchPage() {
               />
               {searchQuery && (
                 <button
-                  className="absolute right-20 text-white/50 hover:text-white"
+                  className="absolute right-20 text-white/50 sm:hover:text-white"
                   onClick={clearSearch}
                   onMouseEnter={() => playSound("hover")}
                 >
@@ -298,7 +298,7 @@ export default function SearchPage() {
               )}
               <button
                 onClick={() => handleSearch(searchQuery)}
-                className="absolute right-6 text-white/70 hover:text-pikavault-cyan transition-colors duration-300"
+                className="absolute right-6 text-white/70 sm:hover:text-pikavault-cyan transition-colors duration-300"
                 onMouseEnter={() => playSound("hover")}
                 onMouseDown={() => playSound("click")}
               >
@@ -319,7 +319,7 @@ export default function SearchPage() {
                       setSearchQuery(search)
                       handleSearch(search)
                     }}
-                    className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white/80 hover:text-white transition-all duration-300"
+                    className="px-3 py-1 bg-white/10 sm:hover:bg-white/20 text-white/80 sm:hover:text-white transition-all duration-300"
                     style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                     onMouseEnter={() => playSound("hover")}
                   >
@@ -344,7 +344,7 @@ export default function SearchPage() {
                 className={`px-4 py-2 transition-all duration-300 ${
                   activeFilter === filter
                     ? "bg-pikavault-cyan text-pikavault-dark font-bold"
-                    : "bg-white/10 text-white/70 hover:bg-white/20 hover:text-white"
+                    : "bg-white/10 text-white/70 sm:hover:bg-white/20 sm:hover:text-white"
                 }`}
                 style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                 onMouseEnter={() => playSound("hover")}
@@ -355,7 +355,7 @@ export default function SearchPage() {
 
             <button
               onClick={toggleSortOrder}
-              className="ml-auto flex items-center gap-2 px-4 py-2 bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-all duration-300"
+              className="ml-auto flex items-center gap-2 px-4 py-2 bg-white/10 text-white/70 sm:hover:bg-white/20 sm:hover:text-white transition-all duration-300"
               style={{ fontFamily: "'Space Grotesk', sans-serif" }}
               onMouseEnter={() => playSound("hover")}
             >
@@ -383,7 +383,7 @@ export default function SearchPage() {
 
               <div ref={resultsRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {searchResults.map((card) => (
-                  <div key={card.id} className="transform transition-all duration-300 hover:scale-[1.02]">
+                  <div key={card.id} className="transform transition-all duration-300 sm:hover:scale-[1.02]">
                     <PikaCard
                       id={card.id}
                       name={card.name}
@@ -413,7 +413,7 @@ export default function SearchPage() {
               </p>
               <button
                 onClick={clearSearch}
-                className="mt-8 px-8 py-4 bg-pikavault-cyan text-pikavault-dark hover:bg-pikavault-cyan/90 transition-all duration-300"
+                className="mt-8 px-8 py-4 bg-pikavault-cyan text-pikavault-dark sm:hover:bg-pikavault-cyan/90 transition-all duration-300"
                 style={{ fontFamily: "'Monument Extended', sans-serif" }}
                 onMouseEnter={() => playSound("hover")}
               >

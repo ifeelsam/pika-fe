@@ -99,7 +99,7 @@ export function LockedState() {
       <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-6">
         {/* <motion.div whileHover={{ scale: 1.05 }} className="relative">
           <Button
-            className="bg-pikavault-yellow hover:bg-pikavault-yellow/90 text-pikavault-dark text-lg md:text-xl font-bold font-monument py-6 px-12 rounded-none"
+            className="bg-pikavault-yellow sm:hover:bg-pikavault-yellow/90 text-pikavault-dark text-lg md:text-xl font-bold font-monument py-6 px-12 rounded-none"
           >
             CONNECT WALLET
           </Button>
@@ -109,7 +109,7 @@ export function LockedState() {
         <motion.div whileHover={{ scale: 1.05 }} className="relative">
           <Button
             onClick={() => redirect("/marketplace")}
-            className="bg-pikavault-pink hover:bg-pikavault-pink/90 text-white text-lg md:text-xl font-bold font-monument py-6 px-12 rounded-none"
+            className="bg-pikavault-pink sm:hover:bg-pikavault-pink/90 text-white text-lg md:text-xl font-bold font-monument py-6 px-12 rounded-none"
           >
             BUY FIRST CARD
           </Button>

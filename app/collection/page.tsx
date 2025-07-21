@@ -59,7 +59,7 @@ function CollectionContent() {
               </p>
               <button
                 onClick={() => refreshNFTs()}
-                className="bg-pikavault-yellow hover:bg-pikavault-yellow/90 text-pikavault-dark font-bold py-2 px-4 transition-colors"
+                className="bg-pikavault-yellow sm:hover:bg-pikavault-yellow/90 text-pikavault-dark font-bold py-2 px-4 transition-colors"
                 style={{ fontFamily: "'Monument Extended', sans-serif" }}
               >
                 TRY AGAIN

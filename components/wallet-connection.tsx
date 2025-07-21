@@ -130,7 +130,7 @@ export function WalletConnection() {
                 <p className="font-mono text-white text-sm truncate">{publicKey?.toString()}</p>
                 <button
                   onClick={copyAddress}
-                  className="p-1 hover:text-pikavault-yellow transition-colors"
+                  className="p-1 sm:hover:text-pikavault-yellow transition-colors"
                   onMouseEnter={() => playSound("hover")}
                 >
                   {isCopied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
@@ -169,7 +169,7 @@ export function WalletConnection() {
             {/* Actions */}
             <div className="space-y-2 pt-2 border-t border-white/20">
               <button
-                className="w-full p-2 bg-transparent border-2 border-white/30 text-white hover:border-white/60 transition-colors flex items-center justify-center space-x-2"
+                className="w-full p-2 bg-transparent border-2 border-white/30 text-white sm:hover:border-white/60 transition-colors flex items-center justify-center space-x-2"
                 onMouseEnter={() => playSound("hover")}
                 onClick={() => {
                   window.open(`https://explorer.solana.com/address/${publicKey?.toString()}?cluster=devnet`, "_blank")

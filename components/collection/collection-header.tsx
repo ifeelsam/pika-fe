@@ -123,7 +123,7 @@ export function CollectionHeader() {
             <p className="text-white/70" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               {publicKey && truncateAddress(publicKey?.toString())}
             </p>
-            <button onClick={copyAddress} className="p-1 text-white/50 hover:text-pikavault-yellow transition-colors">
+            <button onClick={copyAddress} className="p-1 text-white/50 sm:hover:text-pikavault-yellow transition-colors">
               <Copy className="w-4 h-4" />
             </button>
             {isCopied && (
@@ -152,7 +152,7 @@ export function CollectionHeader() {
             className={`p-3 border-4 ${
               viewMode === "grid"
                 ? "bg-pikavault-yellow/10 border-pikavault-yellow text-pikavault-yellow"
-                : "bg-transparent border-white/20 text-white/70 hover:border-white/40"
+                : "bg-transparent border-white/20 text-white/70 sm:hover:border-white/40"
             }`}
           >
             <Grid className="w-5 h-5" />
@@ -163,7 +163,7 @@ export function CollectionHeader() {
             className={`p-3 border-4 ${
               viewMode === "list"
                 ? "bg-pikavault-yellow/10 border-pikavault-yellow text-pikavault-yellow"
-                : "bg-transparent border-white/20 text-white/70 hover:border-white/40"
+                : "bg-transparent border-white/20 text-white/70 sm:hover:border-white/40"
             }`}
           >
             <List className="w-5 h-5" />

@@ -34,7 +34,7 @@ export function Footer() {
                 <li key={item}>
                   <Link
                     href={`/${item.toLowerCase()}`}
-                    className="text-white/70 hover:text-pikavault-yellow transition-colors font-space-grotesk"
+                    className="text-white/70 sm:hover:text-pikavault-yellow transition-colors font-space-grotesk"
                   >
                     {item}
                   </Link>
@@ -52,7 +52,7 @@ export function Footer() {
                 <li key={item}>
                   <a
                     href={`/${item.toLowerCase()}`}
-                    className="text-white/70 hover:text-pikavault-yellow transition-colors font-space-grotesk"
+                    className="text-white/70 sm:hover:text-pikavault-yellow transition-colors font-space-grotesk"
                   >
                     {item}
                   </a>
@@ -70,7 +70,7 @@ export function Footer() {
                 <li key={item.name}>
                   <Link
                     href={item.href}
-                    className="text-white/70 hover:text-pikavault-yellow transition-colors font-space-grotesk"
+                    className="text-white/70 sm:hover:text-pikavault-yellow transition-colors font-space-grotesk"
                   >
                     {item.name}
                   </Link>
@@ -90,7 +90,7 @@ export function Footer() {
               <a
                 key={item}
                 href={`/${item.toLowerCase()}`}
-                className="text-white/50 hover:text-pikavault-yellow text-sm transition-colors font-space-grotesk"
+                className="text-white/50 sm:hover:text-pikavault-yellow text-sm transition-colors font-space-grotesk"
               >
                 {item}
               </a>

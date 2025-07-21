@@ -117,7 +117,7 @@ export function PublishConfirmation({
                   href={txExplorerUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center space-x-1 text-white/70 hover:text-pikavault-yellow transition-colors mt-1 break-all"
+                  className="flex items-center space-x-1 text-white/70 sm:hover:text-pikavault-yellow transition-colors mt-1 break-all"
                 >
                   <span className="font-mono text-xs" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                     {transactionSignature}
@@ -136,7 +136,7 @@ export function PublishConfirmation({
                   href={nftExplorerUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center space-x-1 text-white/70 hover:text-pikavault-yellow transition-colors mt-1 break-all"
+                  className="flex items-center space-x-1 text-white/70 sm:hover:text-pikavault-yellow transition-colors mt-1 break-all"
                 >
                   <span className="font-mono text-xs" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                     {nftMintAddress}
@@ -172,14 +172,14 @@ export function PublishConfirmation({
         <div className="flex justify-center space-x-6 mt-4">
           <Link
             href="/marketplace"
-            className="text-white/70 hover:text-pikavault-yellow transition-colors"
+            className="text-white/70 sm:hover:text-pikavault-yellow transition-colors"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
             Go to Marketplace
           </Link>
           <Link
             href="/collection"
-            className="text-white/70 hover:text-pikavault-yellow transition-colors"
+            className="text-white/70 sm:hover:text-pikavault-yellow transition-colors"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
             View My Collection

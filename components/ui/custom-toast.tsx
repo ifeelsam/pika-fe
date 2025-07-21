@@ -177,7 +177,7 @@ export function CustomToast({
           ${isSuccess ? "bg-pikavault-cyan" : "bg-pikavault-pink/90"}
           border-4 ${isSuccess ? "border-pikavault-yellow" : "border-pikavault-yellow"}
           backdrop-blur-sm shadow-2xl
-          hover:scale-105 hover:shadow-[0_0_30px_rgba(246,255,0,0.5)]
+          sm:hover:scale-105 sm:hover:shadow-[0_0_30px_rgba(246,255,0,0.5)]
         `}
         style={{
           clipPath: "polygon(0 0, 100% 0, 85% 100%, 0 100%)",
@@ -189,7 +189,7 @@ export function CustomToast({
             e.stopPropagation()
             handleClose()
           }}
-          className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center text-white hover:text-pikavault-yellow transition-colors"
+          className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center text-white sm:hover:text-pikavault-yellow transition-colors"
         >
           <X className="w-4 h-4" strokeWidth={3} />
         </button>
@@ -226,7 +226,7 @@ export function CustomToast({
           {/* Action Button */}
           {!isSuccess && !isConnecting && (
               <CustomWalletButton
-                className="bg-pikavault-yellow text-pikavault-dark hover:bg-pikavault-yellow/90 text-sm font-bold rounded-none"
+                className="bg-pikavault-yellow text-pikavault-dark sm:hover:bg-pikavault-yellow/90 text-sm font-bold rounded-none"
               />
           )}
 

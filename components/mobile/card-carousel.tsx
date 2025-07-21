@@ -335,7 +335,7 @@ export function FeaturedCardsCarousel() {
                           />
                           
                           {/* Holographic effect that follows interaction */}
-                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transform translate-x-full group-hover:translate-x-0 transition-all duration-700" />
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-sm:hover:opacity-100 transform translate-x-full group-sm:hover:translate-x-0 transition-all duration-700" />
                           
                           {/* Front card has enhanced border */}
                           {cardIndex === 0 && (
@@ -410,7 +410,7 @@ export function FeaturedCardsCarousel() {
                         </p>
                       </div>
                       <button
-                        className="text-white hover:text-pikavault-yellow text-2xl"
+                        className="text-white sm:hover:text-pikavault-yellow text-2xl"
                         onClick={() => setSelectedCollection(null)}
                       >
                         ×
