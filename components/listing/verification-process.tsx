@@ -316,13 +316,13 @@ export function VerificationProcess({ cardData, updateCardData, onSound }: Verif
           <div className="flex justify-between items-center">
             <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Platform Fee (5%)</span>
             <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-              -${((cardData.price || cardData.suggestedPrice) * 0.05).toFixed(2)}
+              -${((cardData.price || cardData.suggestedPrice || 0) * 0.05).toFixed(2)}
             </span>
           </div>
           <div className="flex justify-between items-center">
             <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Transaction Fee (2.5%)</span>
             <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-              -${((cardData.price || cardData.suggestedPrice) * 0.025).toFixed(2)}
+              -${((cardData.price || cardData.suggestedPrice || 0) * 0.025).toFixed(2)}
             </span>
           </div>
           <div className="border-t border-white/20 pt-2 flex justify-between items-center">
@@ -333,7 +333,7 @@ export function VerificationProcess({ cardData, updateCardData, onSound }: Verif
               className="text-xl font-black text-pikavault-cyan"
               style={{ fontFamily: "'Monument Extended', sans-serif" }}
             >
-              ${((cardData.price || cardData.suggestedPrice) * 0.925).toFixed(2)}
+              ${((cardData.price || cardData.suggestedPrice || 0) * 0.925).toFixed(2)}
             </span>
           </div>
         </div>
