@@ -24,6 +24,7 @@ import { Keypair } from "@solana/web3.js"
 import { createMint } from "@solana/spl-token"
 import { MARKETPLACE_ADMIN } from "@/lib/anchor/config"
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js"
+import { searchCardsByName, formatCardForApp, detectCardFromText } from "@/lib/tcg-api"
 
 export default function ListingPage() {
   const [activeStep, setActiveStep] = useState(0)
@@ -123,8 +124,8 @@ export default function ListingPage() {
     }
   }, [connected])
 
-  // Handle image upload
-  const handleImageUpload = (images: string[]) => {
+  // Handle image upload and card detection
+  const handleImageUpload = async (images: string[]) => {
     if (!connected) {
       setShowToast(true)
       return
@@ -133,21 +134,56 @@ export default function ListingPage() {
     setUploadedImages(images)
     setIsProcessing(true)
 
-    // Simulate AI processing
-    setTimeout(() => {
-      setIsProcessing(false)
-      // Auto-populate card data based on "detected" information
+    try {
       if (images.length > 0) {
-        setCardData({
-          ...cardData,
-          name: "ELECTRIC SURGE",
-          set: "NEO THUNDER",
-          number: "001/150",
-          rarity: "legendary",
-          suggestedPrice: 1250,
-        })
+        // For demo purposes, try to detect popular Pokemon cards
+        // In a real implementation, you'd use OCR on the uploaded image
+        const popularCards = ['Charizard', 'Pikachu', 'Mewtwo', 'Blastoise', 'Venusaur', 'Gyarados', 'Dragonite']
+        const randomCard = popularCards[Math.floor(Math.random() * popularCards.length)]
+        
+        console.log(`Attempting to detect card... searching for: ${randomCard}`)
+        
+        // Search for cards using the TCG API
+        const searchResults = await searchCardsByName(randomCard, 5)
+        
+        if (searchResults.length > 0) {
+          // Use the first result and format it for our app
+          const detectedCard = searchResults[0]
+          const formattedCard = formatCardForApp(detectedCard)
+          
+          console.log('Card detected:', detectedCard.name, 'from set:', detectedCard.set.name)
+          
+          setCardData({
+            ...cardData,
+            ...formattedCard
+          })
+        } else {
+          // Fallback to manual entry if no card detected
+          console.log('No card detected, user will need to enter details manually')
+          setCardData({
+            ...cardData,
+            name: "",
+            set: "",
+            number: "",
+            rarity: "",
+            suggestedPrice: 0,
+          })
+        }
       }
-    }, 3000)
+    } catch (error) {
+      console.error('Error during card detection:', error)
+      // Fallback to manual entry on error
+      setCardData({
+        ...cardData,
+        name: "",
+        set: "",
+        number: "",
+        rarity: "",
+        suggestedPrice: 0,
+      })
+    }
+    
+    setIsProcessing(false)
   }
 
   // Update card data

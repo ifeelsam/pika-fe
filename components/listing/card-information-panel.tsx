@@ -5,8 +5,9 @@ import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { gsap } from "gsap"
 import { Check, Search, X, Star, Clock } from "lucide-react"
+import { searchCardsByName, formatCardForApp } from "@/lib/tcg-api"
 
-// Add a new interface for search results
+// Interface for search results from TCG API
 interface CardSearchResult {
   id: string
   name: string
@@ -14,7 +15,8 @@ interface CardSearchResult {
   number: string
   rarity: string
   image: string
-  year: number
+  year?: number
+  artist?: string
 }
 
 // Update the CardInformationPanel component to include search results
@@ -28,68 +30,25 @@ interface CardInformationPanelProps {
     isGraded: boolean
     gradingCompany: string
     gradingScore: string
+    suggestedPrice: number
   }
   updateCardData: (data: Partial<CardInformationPanelProps["cardData"]>) => void
   onSound: (soundType: "hover" | "click" | "success" | "error") => void
 }
 
-// Add mock search results data after the component interface
-const MOCK_SEARCH_RESULTS: CardSearchResult[] = [
-  {
-    id: "pikachu-001",
-    name: "Pikachu",
-    set: "BASE SET",
-    number: "058/102",
-    rarity: "common",
-    image: "/pikachu-card.png",
-    year: 1999,
-  },
-  {
-    id: "charizard-004",
-    name: "Charizard",
-    set: "BASE SET",
-    number: "004/102",
-    rarity: "rare holo",
-    image: "/charizard-card.png",
-    year: 1999,
-  },
-  {
-    id: "mewtwo-010",
-    name: "Mewtwo",
-    set: "BASE SET",
-    number: "010/102",
-    rarity: "rare holo",
-    image: "/mewtwo-card.png",
-    year: 1999,
-  },
-  {
-    id: "bulbasaur-044",
-    name: "Bulbasaur",
-    set: "BASE SET",
-    number: "044/102",
-    rarity: "common",
-    image: "/bulbasaur-card.png",
-    year: 1999,
-  },
-  {
-    id: "gengar-094",
-    name: "Gengar",
-    set: "FOSSIL",
-    number: "094/062",
-    rarity: "rare holo",
-    image: "/gengar-card.png",
-    year: 1999,
-  },
-  {
-    id: "lucario-122",
-    name: "Lucario",
-    set: "DIAMOND & PEARL",
-    number: "122/130",
-    rarity: "rare holo",
-    image: "/lucario-card.png",
-    year: 2007,
-  },
-]
+// Convert TCG API card to search result format
+const convertTCGCardToSearchResult = (card: any): CardSearchResult => {
+  return {
+    id: card.id,
+    name: card.name,
+    set: card.set.name,
+    number: card.number,
+    rarity: card.rarity,
+    image: card.images?.small || card.images?.large || "",
+    year: card.set.releaseDate ? new Date(card.set.releaseDate).getFullYear() : undefined,
+    artist: card.artist
+  }
+}
 
 // Update the CardInformationPanel component function
 export function CardInformationPanel({ cardData, updateCardData, onSound }: CardInformationPanelProps) {
@@ -149,26 +108,37 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
   // Mock languages
   const languages = ["English", "Japanese", "French", "German", "Italian", "Spanish", "Chinese", "Korean"]
 
-  // Handle search input change
-  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle search input change with real-time API search
+  const handleSearchInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value
     setSearchQuery(query)
 
-    if (query.length > 1) {
-      // Simulate search results
-      const filteredResults = MOCK_SEARCH_RESULTS.filter(
-        (card) =>
-          card.name.toLowerCase().includes(query.toLowerCase()) || card.set.toLowerCase().includes(query.toLowerCase()),
-      )
-      setSearchResults(filteredResults)
-      setShowResults(true)
+    if (query.length > 2) {
+      try {
+        setIsSearching(true)
+        
+        // Search for cards using the real TCG API
+        const apiResults = await searchCardsByName(query, 10)
+        const searchResults = apiResults.map(convertTCGCardToSearchResult)
+        
+        setSearchResults(searchResults)
+        setShowResults(true)
+        console.log(`Found ${searchResults.length} cards for query: ${query}`)
+      } catch (error) {
+        console.error('Error searching cards:', error)
+        setSearchResults([])
+        setShowResults(false)
+      } finally {
+        setIsSearching(false)
+      }
     } else {
       setShowResults(false)
+      setSearchResults([])
     }
   }
 
-  // Handle search
-  const handleSearch = () => {
+  // Handle manual search
+  const handleSearch = async () => {
     if (!searchQuery) return
 
     setIsSearching(true)
@@ -179,41 +149,81 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
       setRecentSearches((prev) => [searchQuery, ...prev].slice(0, 3))
     }
 
-    // Simulate search delay
-    setTimeout(() => {
-      setIsSearching(false)
-      setShowResults(false)
-
-      // In a real app, this would search a database
-      const matchingCard = MOCK_SEARCH_RESULTS.find((card) =>
-        card.name.toLowerCase().includes(searchQuery.toLowerCase()),
-      )
-
-      if (matchingCard) {
+    try {
+      // Search using the real TCG API
+      const apiResults = await searchCardsByName(searchQuery, 5)
+      
+      if (apiResults.length > 0) {
+        // Use the first result and format it for our app
+        const selectedCard = apiResults[0]
+        const formattedCard = formatCardForApp(selectedCard)
+        
         updateCardData({
-          name: matchingCard.name,
-          set: matchingCard.set,
-          number: matchingCard.number,
-          rarity: matchingCard.rarity,
+          name: formattedCard.name,
+          set: formattedCard.set,
+          number: formattedCard.number,
+          rarity: formattedCard.rarity,
         })
+        
+        console.log('Selected card from search:', selectedCard.name)
         onSound("success")
       } else {
+        console.log('No cards found for query:', searchQuery)
         onSound("error")
       }
-    }, 800)
+    } catch (error) {
+      console.error('Error searching cards:', error)
+      onSound("error")
+    } finally {
+      setIsSearching(false)
+      setShowResults(false)
+    }
   }
 
   // Handle card selection from search results
-  const handleSelectCard = (card: CardSearchResult) => {
+  const handleSelectCard = async (card: CardSearchResult) => {
     setSearchQuery(card.name)
     setShowResults(false)
-    updateCardData({
-      name: card.name,
-      set: card.set,
-      number: card.number,
-      rarity: card.rarity,
-    })
-    onSound("success")
+    
+    try {
+      // Get the full card data from the API for accurate pricing
+      const apiResults = await searchCardsByName(card.name, 1)
+      
+      if (apiResults.length > 0) {
+        const fullCard = apiResults[0]
+        const formattedCard = formatCardForApp(fullCard)
+        
+        updateCardData({
+          name: formattedCard.name,
+          set: formattedCard.set,
+          number: formattedCard.number,
+          rarity: formattedCard.rarity,
+          suggestedPrice: formattedCard.suggestedPrice,
+        })
+        
+        console.log('Selected card with pricing:', fullCard.name, 'Suggested price:', formattedCard.suggestedPrice)
+      } else {
+        // Fallback to basic card data
+        updateCardData({
+          name: card.name,
+          set: card.set,
+          number: card.number,
+          rarity: card.rarity,
+        })
+      }
+      
+      onSound("success")
+    } catch (error) {
+      console.error('Error getting full card data:', error)
+      // Fallback to basic card data from search result
+      updateCardData({
+        name: card.name,
+        set: card.set,
+        number: card.number,
+        rarity: card.rarity,
+      })
+      onSound("success")
+    }
 
     // Add to recent searches
     if (!recentSearches.includes(card.name)) {
@@ -225,6 +235,7 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
   const clearSearch = () => {
     setSearchQuery("")
     setShowResults(false)
+    setSearchResults([])
     onSound("click")
   }
 
@@ -327,6 +338,10 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
                       src={card.image || "/placeholder.svg"}
                       alt={card.name}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        // Fallback if image fails to load
+                        (e.target as HTMLImageElement).src = "/placeholder.svg"
+                      }}
                     />
                   </div>
                   <div className="flex-1 text-left">
@@ -337,14 +352,23 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
                       <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{card.set}</span>
                       <span>•</span>
                       <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{card.number}</span>
+                      {card.year && (
+                        <>
+                          <span>•</span>
+                          <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{card.year}</span>
+                        </>
+                      )}
                     </div>
+                    {card.artist && (
+                      <div className="text-xs text-white/50 mt-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                        Artist: {card.artist}
+                      </div>
+                    )}
                   </div>
                   <div className="flex-shrink-0">
-                    {card.rarity === "legendary" && <Star className="w-5 h-5 text-pikavault-yellow" />}
-                    {card.rarity === "epic" && <Star className="w-5 h-5 text-pikavault-pink" />}
-                    {card.rarity === "rare" && <Star className="w-5 h-5 text-pikavault-cyan" />}
-                    {card.rarity === "ultra rare" && <Star className="w-5 h-5 text-[#FF9500]" />}
-                    {card.rarity === "common" && <Star className="w-5 h-5 text-white/50" />}
+                    {(card.rarity.toLowerCase().includes("rare holo") || card.rarity.toLowerCase().includes("rare")) && <Star className="w-5 h-5 text-pikavault-yellow" />}
+                    {card.rarity.toLowerCase().includes("uncommon") && <Star className="w-5 h-5 text-pikavault-cyan" />}
+                    {card.rarity.toLowerCase().includes("common") && <Star className="w-5 h-5 text-white/50" />}
                   </div>
                 </button>
               ))}
@@ -564,3 +588,4 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
     </div>
   )
 }
+
