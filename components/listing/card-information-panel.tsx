@@ -240,14 +240,14 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
   }
 
   return (
-    <div ref={panelRef} className="space-y-8">
+    <div ref={panelRef} className="space-y-8 relative">
       {/* Card search */}
-      <div className="space-y-4">
+      <div className="space-y-4 relative z-10">
         <h3 className="text-xl font-bold" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
           SEARCH CARD
         </h3>
 
-        <div ref={searchRef} className="relative">
+        <div ref={searchRef} className="relative z-[100]">
           <div className="flex space-x-2">
             <div className="relative flex-1">
               <input
@@ -306,7 +306,7 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
 
           {/* Search results dropdown */}
           {showResults && searchResults.length > 0 && (
-            <div className="absolute z-50 w-full mt-2 bg-pikavault-dark border-4 border-pikavault-yellow max-h-[400px] overflow-y-auto shadow-xl">
+            <div className="absolute z-[9999] w-full mt-2 bg-pikavault-dark/95 border-4 border-pikavault-yellow max-h-[400px] overflow-y-auto shadow-2xl backdrop-blur-sm" style={{ boxShadow: '0 0 20px rgba(246, 255, 0, 0.3)' }}>
               <div className="p-2 border-b border-white/20 flex justify-between items-center">
                 <span className="text-white/70 text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                   {searchResults.length} results
@@ -377,7 +377,7 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
 
           {/* No results message */}
           {showResults && searchQuery.length > 1 && searchResults.length === 0 && (
-            <div className="absolute z-50 w-full mt-2 bg-pikavault-dark border-4 border-white/30 p-4 text-center shadow-xl">
+            <div className="absolute z-[9999] w-full mt-2 bg-pikavault-dark/95 border-4 border-white/30 p-4 text-center shadow-2xl backdrop-blur-sm">
               <p className="text-white/70 mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                 No cards found matching "{searchQuery}"
               </p>
