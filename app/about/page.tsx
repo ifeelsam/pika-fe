@@ -23,12 +23,15 @@ export default function AboutPage() {
       sections.forEach((section, index) => {
         ScrollTrigger.create({
           trigger: section,
-          start: "top 60%",
-          end: "bottom 40%",
+          start: "top 80%", // Activate earlier when section is approaching
+          end: "bottom 20%",
           onEnter: () => setActiveStep(index),
           onEnterBack: () => setActiveStep(index),
         })
       })
+
+      // Pre-activate the first step
+      setActiveStep(0)
 
       // Custom cursor effect
       const cursor = document.createElement("div")
@@ -87,14 +90,14 @@ export default function AboutPage() {
             className="w-full bg-pikavault-yellow"
             style={{
               height: `${(activeStep + 1) * 25}%`,
-              transition: "height 0.5s cubic-bezier(0.17, 0.67, 0.83, 0.67)",
+              transition: "height 0.3s cubic-bezier(0.17, 0.67, 0.83, 0.67)",
             }}
           ></div>
         </div>
         {[0, 1, 2, 3].map((step) => (
           <div
             key={step}
-            className={`absolute w-6 h-6 left-0 transform -translate-x-1/2 transition-all duration-300 ${
+            className={`absolute w-6 h-6 left-0 transform -translate-x-1/2 transition-all duration-150 ${
               step <= activeStep ? "bg-pikavault-yellow" : "bg-white/20"
             }`}
             style={{ top: `${step * 25 + 25}%` }}

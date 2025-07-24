@@ -41,25 +41,25 @@ export function ProcessStep({
         gsap.from(numberRef.current, {
           scale: 0.5,
           opacity: 0,
-          duration: 1,
+          duration: 0.6,
           scrollTrigger: {
             trigger: stepRef.current,
-            start: "top 80%",
-            end: "bottom 20%",
+            start: "top 90%", // Start earlier
+            end: "bottom 10%",
             toggleActions: "play none none reverse",
           },
         })
 
         // Content animation
         gsap.from(contentRef.current, {
-          x: isLeft ? -50 : 50,
+          x: isLeft ? -30 : 30,
           opacity: 0,
-          duration: 1,
-          delay: 0.3,
+          duration: 0.6,
+          delay: 0.1, // Reduced delay from 0.3 to 0.1
           scrollTrigger: {
             trigger: stepRef.current,
-            start: "top 80%",
-            end: "bottom 20%",
+            start: "top 90%", // Start earlier
+            end: "bottom 10%",
             toggleActions: "play none none reverse",
           },
         })
@@ -84,7 +84,7 @@ export function ProcessStep({
         // Trigger scan effect when scrolled into view
         ScrollTrigger.create({
           trigger: calloutRef.current,
-          start: "top 80%",
+          start: "top 90%", // Start earlier
           onEnter: scanAnimation,
         })
 
@@ -111,7 +111,7 @@ export function ProcessStep({
       <div
         ref={numberRef}
         className={`absolute ${isLeft ? "left-0" : "right-0"} -top-24 md:-top-32 z-10`}
-        style={{ opacity: isActive ? 1 : 0.3, transition: "opacity 0.5s ease" }}
+        style={{ opacity: isActive ? 1 : 0.3, transition: "opacity 0.2s ease" }}
       >
         <div
           className="text-[200px] md:text-[300px] font-black leading-none"
@@ -135,7 +135,7 @@ export function ProcessStep({
           borderRight: !isLeft ? `4px solid ${color}` : "none",
           backgroundColor: `${color}10`,
           opacity: isActive ? 1 : 0.5,
-          transition: "opacity 0.5s ease",
+          transition: "opacity 0.2s ease",
         }}
       >
         <div className="mb-8 h-48 md:h-64">{visualComponent}</div>
