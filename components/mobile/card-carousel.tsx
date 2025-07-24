@@ -335,7 +335,7 @@ export function FeaturedCardsCarousel() {
                           />
                           
                           {/* Holographic effect that follows interaction */}
-                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-sm:hover:opacity-100 transform translate-x-full group-sm:hover:translate-x-0 transition-all duration-700" />
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 sm:group-hover:opacity-100 transform translate-x-full sm:group-hover:translate-x-0 transition-all duration-700" />
                           
                           {/* Front card has enhanced border */}
                           {cardIndex === 0 && (

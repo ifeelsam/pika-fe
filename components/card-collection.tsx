@@ -207,7 +207,7 @@ export function CardCollection() {
                           <div className="relative w-full h-full overflow-hidden">
                             {/* Card image */}
                             <div
-                              className="w-full h-full bg-cover bg-center transition-transform duration-500 group-sm:hover:scale-105"
+                              className="w-full h-full bg-cover bg-center transition-transform duration-500 sm:group-hover:scale-105"
                               style={{
                                 backgroundImage: `url(${card.imageUrl})`,
                               }}

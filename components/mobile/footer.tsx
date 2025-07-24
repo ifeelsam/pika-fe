@@ -219,7 +219,7 @@ export function Footer() {
               <SparkEffect isActive={sparkingIcon === social.name} />
               
               {/* Hover geometric effect */}
-              <div className="absolute -inset-1 border-2 border-pikavault-yellow opacity-0 group-sm:hover:opacity-100 transition-opacity duration-300">
+              <div className="absolute -inset-1 border-2 border-pikavault-yellow opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300">
                 <div className="absolute -top-1 -left-1 w-2 h-2 bg-pikavault-yellow"></div>
                 <div className="absolute -top-1 -right-1 w-2 h-2 bg-pikavault-yellow"></div>
                 <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-pikavault-yellow"></div>

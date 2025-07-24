@@ -144,7 +144,7 @@ export function HeroCardStack() {
               
               {/* Holographic Shine Effect */}
               <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-sm:hover:opacity-100"
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 sm:group-hover:opacity-100"
                 initial={{ x: "-100%" }}
                 animate={{ x: cardHover === card.id ? "100%" : "-100%" }}
                 transition={{ duration: 0.8, ease: "easeInOut" }}

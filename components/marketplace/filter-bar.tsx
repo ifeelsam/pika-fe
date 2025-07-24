@@ -53,7 +53,7 @@ export function FilterBar() {
               onClick={resetFilters}
               className="flex items-center space-x-2 text-white/70 sm:hover:text-pikavault-yellow transition-colors group"
             >
-              <X className="w-5 h-5 group-sm:hover:scale-125 transition-transform" />
+              <X className="w-5 h-5 sm:group-hover:scale-125 transition-transform" />
               <span className="font-space-grotesk">RESET</span>
             </button>
           )}

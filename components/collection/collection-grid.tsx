@@ -155,7 +155,7 @@ export function CollectionGrid({ selectedCards, setSelectedCards }: CollectionGr
                       ${
                         isSelected
                           ? `border-[${rarityColor}] scale-110 z-10`
-                          : "border-white/30 group-sm:hover:border-white/70"
+                          : "border-white/30 sm:group-hover:border-white/70"
                       }
                       ${isHovered && !isSelected ? "scale-[1.3]" : ""}
                     `}
@@ -182,7 +182,7 @@ export function CollectionGrid({ selectedCards, setSelectedCards }: CollectionGr
                           ${
                             isSelected
                               ? `bg-[${rarityColor}] border-[${rarityColor}]`
-                              : "bg-pikavault-dark/70 border-white/30 opacity-0 group-sm:hover:opacity-100"
+                              : "bg-pikavault-dark/70 border-white/30 opacity-0 sm:group-hover:opacity-100"
                           }
                           border-2
                         `}

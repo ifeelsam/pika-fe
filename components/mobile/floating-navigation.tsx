@@ -239,7 +239,7 @@ const MenuLink = ({ href, children, onClick }: MenuLinkProps) => {
         />
         
         {/* Geometric accent */}
-        <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-pikavault-yellow opacity-0 group-sm:hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-pikavault-yellow opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300" />
       </Link>
     </motion.div>
   )

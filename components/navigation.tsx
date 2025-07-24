@@ -36,7 +36,7 @@ export function Navigation() {
         >
           PIKA
           <span className="text-white sm:hover:text-pikavault-yellow">VAULT</span>
-          <span className="absolute -bottom-1 left-0 w-0 h-[3px] bg-pikavault-yellow group-sm:hover:w-full transition-all duration-300"></span>
+          <span className="absolute -bottom-1 left-0 w-0 h-[3px] bg-pikavault-yellow sm:group-hover:w-full transition-all duration-300"></span>
         </Link>
 
         <nav className="hidden lg:flex items-center space-x-8">
@@ -47,7 +47,7 @@ export function Navigation() {
               className="text-white sm:hover:text-pikavault-yellow relative group text-lg font-medium tracking-wider font-space-grotesk"
             >
               {item.name}
-              <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-pikavault-yellow group-sm:hover:w-full transition-all duration-300"></span>
+              <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-pikavault-yellow sm:group-hover:w-full transition-all duration-300"></span>
             </Link>
           ))}
 

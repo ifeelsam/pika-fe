@@ -362,7 +362,7 @@ export function UploadZone({ onImageUpload, uploadedImages, isProcessing, onSoun
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {uploadedImages.map((image, index) => (
               <div key={index} className="relative group">
-                <div className="relative aspect-square overflow-hidden border-2 border-white/30 group-sm:hover:border-white/70 transition-colors duration-300">
+                <div className="relative aspect-square overflow-hidden border-2 border-white/30 sm:group-hover:border-white/70 transition-colors duration-300">
                   <img
                     src={image || "/placeholder.svg"}
                     alt={`Card image ${index + 1}`}
@@ -376,7 +376,7 @@ export function UploadZone({ onImageUpload, uploadedImages, isProcessing, onSoun
                 </div>
                 <button
                   onClick={() => removeImage(index)}
-                  className="absolute top-2 right-2 w-8 h-8 bg-pikavault-pink text-white flex items-center justify-center opacity-0 group-sm:hover:opacity-100 transition-opacity duration-300"
+                  className="absolute top-2 right-2 w-8 h-8 bg-pikavault-pink text-white flex items-center justify-center opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300"
                   onMouseEnter={() => onSound("hover")}
                 >
                   <X className="w-5 h-5" />
