@@ -124,8 +124,8 @@ export default function ListingPage() {
     }
   }, [connected])
 
-  // Handle image upload and card detection
-  const handleImageUpload = async (images: string[]) => {
+  // Handle image upload with mock card detection
+  const handleImageUpload = (images: string[]) => {
     if (!connected) {
       setShowToast(true)
       return
@@ -134,56 +134,59 @@ export default function ListingPage() {
     setUploadedImages(images)
     setIsProcessing(true)
 
-    try {
+    // Simulate AI processing with mock data for fast demo
+    setTimeout(() => {
+      setIsProcessing(false)
+      // Auto-populate card data based on "detected" information
       if (images.length > 0) {
-        // For demo purposes, try to detect popular Pokemon cards
-        // In a real implementation, you'd use OCR on the uploaded image
-        const popularCards = ['Charizard', 'Pikachu', 'Mewtwo', 'Blastoise', 'Venusaur', 'Gyarados', 'Dragonite']
-        const randomCard = popularCards[Math.floor(Math.random() * popularCards.length)]
+        // Mock detection results - random popular cards for demo
+        const mockCards = [
+          {
+            name: "Charizard",
+            set: "Base Set",
+            number: "004/102",
+            rarity: "rare",
+            suggestedPrice: 35000, // $350.00
+          },
+          {
+            name: "Pikachu",
+            set: "Base Set", 
+            number: "025/102",
+            rarity: "common",
+            suggestedPrice: 5000, // $50.00
+          },
+          {
+            name: "Blastoise",
+            set: "Base Set",
+            number: "009/102", 
+            rarity: "rare",
+            suggestedPrice: 15000, // $150.00
+          },
+          {
+            name: "Venusaur",
+            set: "Base Set",
+            number: "015/102",
+            rarity: "rare", 
+            suggestedPrice: 12000, // $120.00
+          },
+          {
+            name: "Mewtwo",
+            set: "Base Set",
+            number: "010/102",
+            rarity: "rare",
+            suggestedPrice: 25000, // $250.00
+          }
+        ]
+
+        const randomCard = mockCards[Math.floor(Math.random() * mockCards.length)]
+        console.log('Mock card detected:', randomCard.name)
         
-        console.log(`Attempting to detect card... searching for: ${randomCard}`)
-        
-        // Search for cards using the TCG API
-        const searchResults = await searchCardsByName(randomCard, 5)
-        
-        if (searchResults.length > 0) {
-          // Use the first result and format it for our app
-          const detectedCard = searchResults[0]
-          const formattedCard = formatCardForApp(detectedCard)
-          
-          console.log('Card detected:', detectedCard.name, 'from set:', detectedCard.set.name)
-          
-          setCardData({
-            ...cardData,
-            ...formattedCard
-          })
-        } else {
-          // Fallback to manual entry if no card detected
-          console.log('No card detected, user will need to enter details manually')
-          setCardData({
-            ...cardData,
-            name: "",
-            set: "",
-            number: "",
-            rarity: "",
-            suggestedPrice: 0,
-          })
-        }
+        setCardData({
+          ...cardData,
+          ...randomCard
+        })
       }
-    } catch (error) {
-      console.error('Error during card detection:', error)
-      // Fallback to manual entry on error
-      setCardData({
-        ...cardData,
-        name: "",
-        set: "",
-        number: "",
-        rarity: "",
-        suggestedPrice: 0,
-      })
-    }
-    
-    setIsProcessing(false)
+    }, 2000) // Fast 2-second simulation
   }
 
   // Update card data

@@ -248,15 +248,111 @@ export function getMarketPrice(card: PokemonCard, condition: string = 'near mint
   }
 }
 
+// Clean up card name to extract base Pokemon name
+function cleanCardName(name: string): string {
+  // Remove possessive names (Ash's, Team Rocket's, etc.)
+  let cleanName = name.replace(/^[A-Za-z\s]+\'s\s+/, '')
+  
+  // Remove prefixes like "Dark", "Light", "Team Rocket's", etc.
+  cleanName = cleanName.replace(/^(Dark|Light|Shining|Crystal|Delta Species|Team Rocket's|Rocket's|Giovanni's|Lt\. Surge's|Misty's|Brock's|Erika's|Koga's|Sabrina's|Blaine's|)\s+/, '')
+  
+  // Remove suffixes like "ex", "GX", "V", "VMAX", etc.
+  cleanName = cleanName.replace(/\s+(ex|EX|GX|V|VMAX|VSTAR|Prime|LEGEND|BREAK|Tag Team|&.*)?$/i, '')
+  
+  // Remove level indicators like "Lv.X"
+  cleanName = cleanName.replace(/\s+Lv\.\d+/i, '')
+  
+  // Remove numbers and special characters at the end
+  cleanName = cleanName.replace(/\s+\d+.*$/, '')
+  
+  // Trim and return
+  return cleanName.trim()
+}
+
+// Clean up set name to be more readable
+function cleanSetName(setName: string): string {
+  // Remove "Pokemon " prefix if present
+  let cleanSet = setName.replace(/^Pokemon\s+/i, '')
+  
+  // Simplify common set name patterns
+  const setMappings: { [key: string]: string } = {
+    'Base Set': 'Base Set',
+    'Base Set 2': 'Base Set 2',
+    'Jungle': 'Jungle',
+    'Fossil': 'Fossil',
+    'Team Rocket': 'Team Rocket',
+    'Gym Heroes': 'Gym Heroes',
+    'Gym Challenge': 'Gym Challenge',
+    'Neo Genesis': 'Neo Genesis',
+    'Neo Discovery': 'Neo Discovery',
+    'Neo Destiny': 'Neo Destiny',
+    'Neo Revelation': 'Neo Revelation'
+  }
+  
+  // Check if we have a simplified mapping
+  for (const [original, simplified] of Object.entries(setMappings)) {
+    if (cleanSet.toLowerCase().includes(original.toLowerCase())) {
+      return simplified
+    }
+  }
+  
+  // Remove redundant words and shorten long names
+  cleanSet = cleanSet.replace(/\s+(Series|Collection|Expansion|Set)$/i, '')
+  
+  // Limit length for display
+  if (cleanSet.length > 25) {
+    cleanSet = cleanSet.substring(0, 22) + '...'
+  }
+  
+  return cleanSet
+}
+
+// Normalize rarity names
+function normalizeRarity(rarity: string): string {
+  const rarityMappings: { [key: string]: string } = {
+    'common': 'common',
+    'uncommon': 'uncommon',
+    'rare': 'rare',
+    'rare holo': 'rare',
+    'rare holo ex': 'rare',
+    'rare holo gx': 'rare',
+    'rare holo v': 'rare',
+    'rare holo vmax': 'rare',
+    'rare holo vstar': 'rare',
+    'rare prime': 'rare',
+    'rare legend': 'legendary',
+    'rare ace': 'rare',
+    'rare break': 'rare',
+    'rare prism star': 'rare',
+    'rare rainbow': 'rare',
+    'rare secret': 'rare',
+    'rare shiny': 'rare',
+    'rare shiny gx': 'rare',
+    'rare ultra': 'rare',
+    'radiant rare': 'rare',
+    'amazing rare': 'rare',
+    'classic collection': 'rare',
+    'double rare': 'rare',
+    'hyper rare': 'rare',
+    'illustration rare': 'rare',
+    'special illustration rare': 'rare',
+    'ultra rare': 'rare',
+    'promo': 'rare'
+  }
+  
+  const normalizedKey = rarity.toLowerCase()
+  return rarityMappings[normalizedKey] || 'common'
+}
+
 // Format card data for our application
 export function formatCardForApp(card: PokemonCard) {
   const marketPrice = getMarketPrice(card)
   
   return {
-    name: card.name,
-    set: card.set.name,
+    name: cleanCardName(card.name),
+    set: cleanSetName(card.set.name),
     number: card.number,
-    rarity: card.rarity.toLowerCase(),
+    rarity: normalizeRarity(card.rarity),
     language: "English", // Default, could be enhanced later
     condition: "", // User will specify
     conditionNotes: "",
@@ -271,7 +367,10 @@ export function formatCardForApp(card: PokemonCard) {
     tcgId: card.id,
     artist: card.artist,
     setId: card.set.id,
-    images: card.images
+    images: card.images,
+    originalName: card.name, // Keep original for reference
+    originalSet: card.set.name,
+    originalRarity: card.rarity
   }
 }
 

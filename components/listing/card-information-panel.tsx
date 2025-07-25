@@ -17,6 +17,7 @@ interface CardSearchResult {
   image: string
   year?: number
   artist?: string
+  originalName?: string
 }
 
 // Update the CardInformationPanel component to include search results
@@ -38,15 +39,24 @@ interface CardInformationPanelProps {
 
 // Convert TCG API card to search result format
 const convertTCGCardToSearchResult = (card: any): CardSearchResult => {
+  // Clean the card name for display but keep original in a separate field
+  const cleanName = card.name
+    .replace(/^[A-Za-z\s]+\'s\s+/, '') // Remove possessive names
+    .replace(/^(Dark|Light|Shining|Crystal|Team Rocket's|Rocket's|Giovanni's|Lt\. Surge's|Misty's|Brock's|Erika's|Koga's|Sabrina's|Blaine's|)\s+/, '') // Remove prefixes
+    .replace(/\s+(ex|EX|GX|V|VMAX|VSTAR|Prime|LEGEND|BREAK|Tag Team|&.*)?$/i, '') // Remove suffixes
+    .replace(/\s+Lv\.\d+/i, '') // Remove level indicators
+    .trim()
+
   return {
     id: card.id,
-    name: card.name,
-    set: card.set.name,
+    name: cleanName || card.name, // Use cleaned name, fallback to original
+    set: card.set.name.replace(/^Pokemon\s+/i, ''), // Remove "Pokemon " prefix
     number: card.number,
     rarity: card.rarity,
     image: card.images?.small || card.images?.large || "",
     year: card.set.releaseDate ? new Date(card.set.releaseDate).getFullYear() : undefined,
-    artist: card.artist
+    artist: card.artist,
+    originalName: card.name // Keep original name for reference
   }
 }
 
@@ -348,6 +358,11 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
                     <div className="font-bold" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
                       {card.name}
                     </div>
+                    {card.originalName && card.originalName !== card.name && (
+                      <div className="text-xs text-white/50 italic mb-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                        Original: {card.originalName}
+                      </div>
+                    )}
                     <div className="flex items-center gap-2 text-sm text-white/70">
                       <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{card.set}</span>
                       <span>•</span>
