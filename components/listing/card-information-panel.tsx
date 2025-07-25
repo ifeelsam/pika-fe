@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { gsap } from "gsap"
 import { Check, Search, X, Star, Clock } from "lucide-react"
 import { searchCardsByName, formatCardForApp } from "@/lib/tcg-api"
@@ -70,6 +70,7 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
   const panelRef = useRef<HTMLDivElement>(null)
   const searchRef = useRef<HTMLDivElement>(null)
   const [highlightedCardId, setHighlightedCardId] = useState<string | null>(null)
+  const [debouncedQuery, setDebouncedQuery] = useState("")
 
   // Animation for panel
   useEffect(() => {
@@ -118,11 +119,17 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
   // Mock languages
   const languages = ["English", "Japanese", "French", "German", "Italian", "Spanish", "Chinese", "Korean"]
 
-  // Handle search input change with real-time API search
-  const handleSearchInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value
-    setSearchQuery(query)
+  // Debounce the search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery)
+    }, 400)
 
+    return () => clearTimeout(timer)
+  }, [searchQuery])
+
+  // Perform search when debounced query changes
+  const performSearch = useCallback(async (query: string) => {
     if (query.length > 2) {
       try {
         setIsSearching(true)
@@ -142,6 +149,29 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
         setIsSearching(false)
       }
     } else {
+      setShowResults(false)
+      setSearchResults([])
+      setIsSearching(false)
+    }
+  }, [])
+
+  // Effect to trigger search when debounced query changes
+  useEffect(() => {
+    if (debouncedQuery !== searchQuery) return // Only search when debounce is complete
+    
+    performSearch(debouncedQuery)
+  }, [debouncedQuery, performSearch])
+
+  // Handle search input change (now just updates the query, no immediate search)
+  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value
+    setSearchQuery(query)
+    
+    // Show loading state if user is typing and will trigger a search
+    if (query.length > 2) {
+      setIsSearching(true)
+    } else {
+      setIsSearching(false)
       setShowResults(false)
       setSearchResults([])
     }
@@ -270,7 +300,7 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 onFocus={() => searchQuery.length > 1 && setShowResults(true)}
               />
-              {isSearching ? (
+              {(isSearching || (searchQuery.length > 2 && searchQuery !== debouncedQuery)) ? (
                 <div className="absolute right-4 top-1/2 -translate-y-1/2">
                   <div className="w-5 h-5 border-2 border-pikavault-yellow border-t-transparent rounded-full animate-spin"></div>
                 </div>
@@ -319,7 +349,7 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
             <div className="absolute z-[9999] w-full mt-2 bg-pikavault-dark/95 border-4 border-pikavault-yellow max-h-[400px] overflow-y-auto shadow-2xl backdrop-blur-sm" style={{ boxShadow: '0 0 20px rgba(246, 255, 0, 0.3)' }}>
               <div className="p-2 border-b border-white/20 flex justify-between items-center">
                 <span className="text-white/70 text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                  {searchResults.length} results
+                  {isSearching ? 'Searching...' : `${searchResults.length} results`}
                 </span>
                 <button
                   className="text-white/50 sm:hover:text-white"
