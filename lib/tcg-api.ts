@@ -96,79 +96,27 @@ interface SearchCardsParams {
   orderBy?: string
 }
 
-// Get API key from environment
-const getApiKey = () => {
-  return process.env.NEXT_PUBLIC_TCG_API || ''
-}
+// Note: Direct API calls are replaced with proxy routes to avoid CORS issues
+// The actual API key is handled server-side in our Next.js API routes
 
-// Base API URL
-const BASE_URL = 'https://api.pokemontcg.io/v2'
-
-// Create headers with API key
-const createHeaders = () => {
-  const apiKey = getApiKey()
-  return {
-    'Content-Type': 'application/json',
-    ...(apiKey && { 'X-Api-Key': apiKey })
-  }
-}
-
-// Search for cards with various filters
+// Search for cards with various filters using our proxy API
 export async function searchCards(params: SearchCardsParams = {}): Promise<TCGApiResponse> {
   try {
-    const searchParams = new URLSearchParams()
-    
-    // Build query string from search parameters
-    const queries: string[] = []
-    
+    // For now, we'll primarily use searchCardsByName through our proxy
+    // This function can be extended later for more complex searches
     if (params.name) {
-      queries.push(`name:"*${params.name}*"`)
-    }
-    if (params.set) {
-      queries.push(`set.name:"*${params.set}*"`)
-    }
-    if (params.rarity) {
-      queries.push(`rarity:${params.rarity}`)
-    }
-    if (params.supertype) {
-      queries.push(`supertype:${params.supertype}`)
-    }
-    if (params.types) {
-      queries.push(`types:${params.types}`)
+      const cards = await searchCardsByName(params.name, params.pageSize || 20)
+      return {
+        data: cards,
+        page: 1,
+        pageSize: params.pageSize || 20,
+        count: cards.length,
+        totalCount: cards.length
+      }
     }
     
-    if (queries.length > 0) {
-      searchParams.append('q', queries.join(' '))
-    }
-    
-    if (params.page) {
-      searchParams.append('page', params.page.toString())
-    }
-    if (params.pageSize) {
-      searchParams.append('pageSize', params.pageSize.toString())
-    } else {
-      searchParams.append('pageSize', '20') // Default page size
-    }
-    if (params.orderBy) {
-      searchParams.append('orderBy', params.orderBy)
-    }
-
-    const url = `${BASE_URL}/cards?${searchParams.toString()}`
-    console.log('Searching cards with URL:', url)
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: createHeaders()
-    })
-
-    if (!response.ok) {
-      throw new Error(`TCG API error: ${response.status} ${response.statusText}`)
-    }
-
-    const data: TCGApiResponse = await response.json()
-    console.log(`Found ${data.totalCount} cards, returning ${data.data.length} results`)
-    
-    return data
+    // Fallback for other search types - could be extended to use additional proxy routes
+    throw new Error('Only name-based searches are currently supported')
     
   } catch (error) {
     console.error('Error searching cards:', error)
@@ -176,19 +124,20 @@ export async function searchCards(params: SearchCardsParams = {}): Promise<TCGAp
   }
 }
 
-// Get a specific card by ID
+// Get a specific card by ID using our proxy API
 export async function getCardById(id: string): Promise<PokemonCard> {
   try {
-    const url = `${BASE_URL}/cards/${id}`
-    console.log('Fetching card with ID:', id)
+    const url = `/api/tcg/cards/${encodeURIComponent(id)}`
     
     const response = await fetch(url, {
       method: 'GET',
-      headers: createHeaders()
+      headers: {
+        'Content-Type': 'application/json'
+      }
     })
 
     if (!response.ok) {
-      throw new Error(`TCG API error: ${response.status} ${response.statusText}`)
+      throw new Error(`API error: ${response.status} ${response.statusText}`)
     }
 
     const data: { data: PokemonCard } = await response.json()
@@ -202,16 +151,27 @@ export async function getCardById(id: string): Promise<PokemonCard> {
   }
 }
 
-// Search for cards by name (useful for card detection)
+// Search for cards by name using our proxy API (useful for card detection)
 export async function searchCardsByName(name: string, limit: number = 10): Promise<PokemonCard[]> {
   try {
-    const response = await searchCards({
-      name: name,
-      pageSize: limit,
-      orderBy: 'name'
-    })
+    // Use our Next.js API route instead of direct API call
+    const url = `/api/tcg/search?name=${encodeURIComponent(name)}&pageSize=${limit}&orderBy=name`
     
-    return response.data
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status} ${response.statusText}`)
+    }
+
+    const data: TCGApiResponse = await response.json()
+    console.log(`Found ${data.totalCount} cards for query: ${name}`)
+    
+    return data.data
     
   } catch (error) {
     console.error('Error searching cards by name:', error)

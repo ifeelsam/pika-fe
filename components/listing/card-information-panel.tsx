@@ -144,7 +144,7 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
       } catch (error) {
         console.error('Error searching cards:', error)
         setSearchResults([])
-        setShowResults(false)
+        setShowResults(true) // Keep showing to display error message
       } finally {
         setIsSearching(false)
       }
@@ -421,10 +421,13 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
           )}
 
           {/* No results message */}
-          {showResults && searchQuery.length > 1 && searchResults.length === 0 && (
+          {showResults && searchQuery.length > 1 && searchResults.length === 0 && !isSearching && (
             <div className="absolute z-[9999] w-full mt-2 bg-pikavault-dark/95 border-4 border-white/30 p-4 text-center shadow-2xl backdrop-blur-sm">
               <p className="text-white/70 mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                 No cards found matching "{searchQuery}"
+              </p>
+              <p className="text-white/50 text-sm mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                Try a different search term or check your spelling
               </p>
               <button
                 className="text-pikavault-cyan text-sm sm:hover:underline"
