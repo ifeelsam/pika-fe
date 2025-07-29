@@ -209,7 +209,11 @@ export function getMarketPrice(card: PokemonCard, condition: string = 'near mint
 }
 
 // Clean up card name to extract base Pokemon name
-function cleanCardName(name: string): string {
+function cleanCardName(name: string | undefined): string {
+  if (!name || typeof name !== 'string') {
+    return 'Unknown Card'
+  }
+  
   // Remove possessive names (Ash's, Team Rocket's, etc.)
   let cleanName = name.replace(/^[A-Za-z\s]+\'s\s+/, '')
   
@@ -226,11 +230,15 @@ function cleanCardName(name: string): string {
   cleanName = cleanName.replace(/\s+\d+.*$/, '')
   
   // Trim and return
-  return cleanName.trim()
+  return cleanName.trim() || name
 }
 
 // Clean up set name to be more readable
-function cleanSetName(setName: string): string {
+function cleanSetName(setName: string | undefined): string {
+  if (!setName || typeof setName !== 'string') {
+    return 'Unknown Set'
+  }
+  
   // Remove "Pokemon " prefix if present
   let cleanSet = setName.replace(/^Pokemon\s+/i, '')
   
@@ -264,11 +272,15 @@ function cleanSetName(setName: string): string {
     cleanSet = cleanSet.substring(0, 22) + '...'
   }
   
-  return cleanSet
+  return cleanSet || setName
 }
 
 // Normalize rarity names
-function normalizeRarity(rarity: string): string {
+function normalizeRarity(rarity: string | undefined): string {
+  if (!rarity || typeof rarity !== 'string') {
+    return 'common'
+  }
+  
   const rarityMappings: { [key: string]: string } = {
     'common': 'common',
     'uncommon': 'uncommon',
@@ -306,31 +318,59 @@ function normalizeRarity(rarity: string): string {
 
 // Format card data for our application
 export function formatCardForApp(card: PokemonCard) {
+  // Safety checks for required fields
+  if (!card) {
+    console.warn('No card data provided to formatCardForApp')
+    return {
+      name: 'Unknown Card',
+      set: 'Unknown Set',
+      number: '',
+      rarity: 'common',
+      language: "English",
+      condition: "",
+      conditionNotes: "",
+      price: 0,
+      suggestedPrice: 0,
+      listingType: "fixed",
+      duration: "7d",
+      isGraded: false,
+      gradingCompany: "",
+      gradingScore: "",
+      tcgId: 'unknown',
+      artist: undefined,
+      setId: 'unknown',
+      images: undefined,
+      originalName: 'Unknown Card',
+      originalSet: 'Unknown Set',
+      originalRarity: 'common'
+    }
+  }
+
   const marketPrice = getMarketPrice(card)
   
   return {
     name: cleanCardName(card.name),
-    set: cleanSetName(card.set.name),
-    number: card.number,
+    set: cleanSetName(card.set?.name),
+    number: card.number || '',
     rarity: normalizeRarity(card.rarity),
     language: "English", // Default, could be enhanced later
     condition: "", // User will specify
     conditionNotes: "",
     price: 0, // User will set
-    suggestedPrice: Math.round(marketPrice * 100), // Convert to cents
+    suggestedPrice: Math.round(marketPrice * 100) || 0, // Convert to cents
     listingType: "fixed",
     duration: "7d",
     isGraded: false,
     gradingCompany: "",
     gradingScore: "",
     // Additional metadata
-    tcgId: card.id,
+    tcgId: card.id || 'unknown',
     artist: card.artist,
-    setId: card.set.id,
+    setId: card.set?.id || 'unknown',
     images: card.images,
-    originalName: card.name, // Keep original for reference
-    originalSet: card.set.name,
-    originalRarity: card.rarity
+    originalName: card.name || 'Unknown Card', // Keep original for reference
+    originalSet: card.set?.name || 'Unknown Set',
+    originalRarity: card.rarity || 'common'
   }
 }
 

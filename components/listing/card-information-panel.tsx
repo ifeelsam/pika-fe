@@ -39,24 +39,38 @@ interface CardInformationPanelProps {
 
 // Convert TCG API card to search result format
 const convertTCGCardToSearchResult = (card: any): CardSearchResult => {
+  // Safety checks for required fields
+  if (!card || !card.name || !card.set) {
+    console.warn('Invalid card data received:', card)
+    return {
+      id: card?.id || 'unknown',
+      name: 'Unknown Card',
+      set: 'Unknown Set',
+      number: '',
+      rarity: 'common',
+      image: '',
+      originalName: card?.name || 'Unknown Card'
+    }
+  }
+
   // Clean the card name for display but keep original in a separate field
   const cleanName = card.name
-    .replace(/^[A-Za-z\s]+\'s\s+/, '') // Remove possessive names
-    .replace(/^(Dark|Light|Shining|Crystal|Team Rocket's|Rocket's|Giovanni's|Lt\. Surge's|Misty's|Brock's|Erika's|Koga's|Sabrina's|Blaine's|)\s+/, '') // Remove prefixes
-    .replace(/\s+(ex|EX|GX|V|VMAX|VSTAR|Prime|LEGEND|BREAK|Tag Team|&.*)?$/i, '') // Remove suffixes
-    .replace(/\s+Lv\.\d+/i, '') // Remove level indicators
-    .trim()
+    ?.replace(/^[A-Za-z\s]+\'s\s+/, '') // Remove possessive names
+    ?.replace(/^(Dark|Light|Shining|Crystal|Team Rocket's|Rocket's|Giovanni's|Lt\. Surge's|Misty's|Brock's|Erika's|Koga's|Sabrina's|Blaine's|)\s+/, '') // Remove prefixes
+    ?.replace(/\s+(ex|EX|GX|V|VMAX|VSTAR|Prime|LEGEND|BREAK|Tag Team|&.*)?$/i, '') // Remove suffixes
+    ?.replace(/\s+Lv\.\d+/i, '') // Remove level indicators
+    ?.trim()
 
   return {
-    id: card.id,
-    name: cleanName || card.name, // Use cleaned name, fallback to original
-    set: card.set.name.replace(/^Pokemon\s+/i, ''), // Remove "Pokemon " prefix
-    number: card.number,
-    rarity: card.rarity,
+    id: card.id || 'unknown',
+    name: cleanName || card.name || 'Unknown Card',
+    set: card.set?.name?.replace(/^Pokemon\s+/i, '') || 'Unknown Set',
+    number: card.number || '',
+    rarity: card.rarity || 'common',
     image: card.images?.small || card.images?.large || "",
-    year: card.set.releaseDate ? new Date(card.set.releaseDate).getFullYear() : undefined,
-    artist: card.artist,
-    originalName: card.name // Keep original name for reference
+    year: card.set?.releaseDate ? new Date(card.set.releaseDate).getFullYear() : undefined,
+    artist: card.artist || undefined,
+    originalName: card.name || 'Unknown Card'
   }
 }
 
@@ -134,13 +148,21 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
       try {
         setIsSearching(true)
         
-        // Search for cards using the real TCG API
+        // Search for cards using our proxy API with better error handling
         const apiResults = await searchCardsByName(query, 10)
-        const searchResults = apiResults.map(convertTCGCardToSearchResult)
         
-        setSearchResults(searchResults)
-        setShowResults(true)
-        console.log(`Found ${searchResults.length} cards for query: ${query}`)
+        if (apiResults && Array.isArray(apiResults)) {
+          const validResults = apiResults.filter(card => card && card.name)
+          const searchResults = validResults.map(convertTCGCardToSearchResult)
+          
+          setSearchResults(searchResults)
+          setShowResults(true)
+          console.log(`Found ${searchResults.length} cards for query: ${query}`)
+        } else {
+          console.warn('Invalid API response:', apiResults)
+          setSearchResults([])
+          setShowResults(true)
+        }
       } catch (error) {
         console.error('Error searching cards:', error)
         setSearchResults([])
@@ -411,31 +433,40 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
                     )}
                   </div>
                   <div className="flex-shrink-0">
-                    {(card.rarity.toLowerCase().includes("rare holo") || card.rarity.toLowerCase().includes("rare")) && <Star className="w-5 h-5 text-pikavault-yellow" />}
-                    {card.rarity.toLowerCase().includes("uncommon") && <Star className="w-5 h-5 text-pikavault-cyan" />}
-                    {card.rarity.toLowerCase().includes("common") && <Star className="w-5 h-5 text-white/50" />}
+                    {(card.rarity?.toLowerCase()?.includes("rare holo") || card.rarity?.toLowerCase()?.includes("rare")) && <Star className="w-5 h-5 text-pikavault-yellow" />}
+                    {card.rarity?.toLowerCase()?.includes("uncommon") && <Star className="w-5 h-5 text-pikavault-cyan" />}
+                    {(card.rarity?.toLowerCase()?.includes("common") || !card.rarity) && <Star className="w-5 h-5 text-white/50" />}
                   </div>
                 </button>
               ))}
             </div>
           )}
 
-          {/* No results message */}
+          {/* No results or error message */}
           {showResults && searchQuery.length > 1 && searchResults.length === 0 && !isSearching && (
             <div className="absolute z-[9999] w-full mt-2 bg-pikavault-dark/95 border-4 border-white/30 p-4 text-center shadow-2xl backdrop-blur-sm">
               <p className="text-white/70 mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                 No cards found matching "{searchQuery}"
               </p>
-              <p className="text-white/50 text-sm mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                Try a different search term or check your spelling
+              <p className="text-white/50 text-sm mb-3" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                The Pokemon TCG API might be experiencing high traffic. Try again in a moment or enter card details manually.
               </p>
-              <button
-                className="text-pikavault-cyan text-sm sm:hover:underline"
-                onClick={clearSearch}
-                onMouseEnter={() => onSound("hover")}
-              >
-                Clear search
-              </button>
+              <div className="flex justify-center gap-3">
+                <button
+                  className="text-pikavault-cyan text-sm sm:hover:underline"
+                  onClick={() => performSearch(searchQuery)}
+                  onMouseEnter={() => onSound("hover")}
+                >
+                  Retry Search
+                </button>
+                <button
+                  className="text-pikavault-yellow text-sm sm:hover:underline"
+                  onClick={clearSearch}
+                  onMouseEnter={() => onSound("hover")}
+                >
+                  Clear Search
+                </button>
+              </div>
             </div>
           )}
         </div>

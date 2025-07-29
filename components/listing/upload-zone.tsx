@@ -233,19 +233,54 @@ export function UploadZone({ onImageUpload, uploadedImages, isProcessing, onSoun
 
   return (
     <div className="space-y-8">
-      {/* Main upload zone */}
+      {/* Mobile-only buttons (no drag and drop box) */}
+      <div className="block sm:hidden">
+        <div className="text-center space-y-4">
+          <p className="text-xl font-bold text-center mb-4" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
+            UPLOAD YOUR CARD
+          </p>
+          <p className="text-white/70 text-center mb-6" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            Upload high-quality images of your card (front, back, corners, holographic effect)
+          </p>
+          
+          <div className="flex flex-col gap-3 justify-center">
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                if (fileInputRef.current) {
+                  fileInputRef.current.click()
+                }
+                onSound("click")
+              }}
+              disabled={isUploading}
+              className={`px-6 py-4 ${
+                isUploading 
+                  ? "bg-gray-500 cursor-not-allowed" 
+                  : "bg-pikavault-cyan sm:hover:bg-pikavault-cyan/90"
+              } text-pikavault-dark font-bold flex items-center justify-center space-x-2`}
+              style={{ fontFamily: "'Monument Extended', sans-serif" }}
+              onMouseEnter={() => !isUploading && onSound("hover")}
+            >
+              <Upload className="w-5 h-5" />
+              <span>{isUploading ? "UPLOADING..." : "BROWSE FILES"}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop/Tablet drag and drop zone */}
       <div
         ref={dropZoneRef}
         className={`relative border-4 border-dashed ${
           isDragging ? "border-pikavault-yellow" : "border-white/30"
-        } bg-white/5 p-8 h-80 flex flex-col items-center justify-center transition-colors duration-300`}
+        } bg-white/5 p-8 h-80 flex-col items-center justify-center transition-colors duration-300 hidden sm:flex`}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
         onDrop={handleDrop}
         onClick={() => !cameraActive && !isUploading && fileInputRef.current?.click()}
       >
-        {/* File input for gallery/files */}
+        {/* File inputs - shared between mobile and desktop */}
         <input
           type="file"
           ref={fileInputRef}
@@ -394,6 +429,29 @@ export function UploadZone({ onImageUpload, uploadedImages, isProcessing, onSoun
           </div>
         )}
       </div>
+
+      {/* Mobile upload progress and errors */}
+      {(uploadProgress > 0 || uploadError) && (
+        <div className="block sm:hidden">
+          {uploadProgress > 0 && (
+            <div className="mb-4">
+              <div className="h-4 bg-white/10 rounded">
+                <div
+                  className="h-full bg-pikavault-pink rounded"
+                  style={{ width: `${uploadProgress}%`, transition: "width 0.2s ease-out" }}
+                ></div>
+              </div>
+            </div>
+          )}
+          
+          {uploadError && (
+            <div className="bg-pikavault-pink/20 border-l-4 border-pikavault-pink p-4 flex items-start space-x-2">
+              <AlertTriangle className="w-5 h-5 text-pikavault-pink flex-shrink-0 mt-0.5" />
+              <p style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{uploadError}</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Hidden canvas for camera capture */}
       <canvas ref={canvasRef} className="hidden"></canvas>
