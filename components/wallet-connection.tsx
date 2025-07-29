@@ -76,7 +76,7 @@ export function WalletConnection() {
   // Sound effects
   const playSound = (type: "hover" | "click" | "success") => {
     // In a real app, you would implement actual sound effects here
-    console.log(`Playing ${type} sound`)
+    // console.log(`Playing ${type} sound`)
   }
 
   // Truncate wallet address
