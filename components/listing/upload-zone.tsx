@@ -24,6 +24,7 @@ export function UploadZone({ onImageUpload, uploadedImages, isProcessing, onSoun
   const [isUploading, setIsUploading] = useState(false)
   const dropZoneRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const cameraInputRef = useRef<HTMLInputElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   
@@ -244,6 +245,7 @@ export function UploadZone({ onImageUpload, uploadedImages, isProcessing, onSoun
         onDrop={handleDrop}
         onClick={() => !cameraActive && !isUploading && fileInputRef.current?.click()}
       >
+        {/* File input for gallery/files */}
         <input
           type="file"
           ref={fileInputRef}
@@ -253,33 +255,77 @@ export function UploadZone({ onImageUpload, uploadedImages, isProcessing, onSoun
           onChange={handleFileInputChange}
           disabled={isUploading}
         />
+        
+        {/* Camera-specific input */}
+        <input
+          type="file"
+          ref={cameraInputRef}
+          className="hidden"
+          accept="image/*"
+          capture="environment"
+          onChange={handleFileInputChange}
+          disabled={isUploading}
+        />
 
         {!cameraActive ? (
           <>
             <Upload className="w-16 h-16 text-white/50 mb-4" />
             <p className="text-xl font-bold text-center mb-2" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
-              DRAG & DROP IMAGES
+              DRAG AND DROP HERE
             </p>
-            <p className="text-white/70 text-center mb-6" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            <p className="text-white/70 text-center mb-4" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               Upload high-quality images of your card (front, back, corners, holographic effect)
             </p>
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                activateCamera()
-              }}
-              disabled={isUploading}
-              className={`px-6 py-3 ${
-                isUploading 
-                  ? "bg-gray-500 cursor-not-allowed" 
-                  : "bg-pikavault-cyan sm:hover:bg-pikavault-cyan/90"
-              } text-pikavault-dark font-bold flex items-center space-x-2`}
-              style={{ fontFamily: "'Monument Extended', sans-serif" }}
-              onMouseEnter={() => !isUploading && onSound("hover")}
-            >
-              <Camera className="w-5 h-5" />
-              <span>{isUploading ? "UPLOADING..." : "USE CAMERA"}</span>
-            </button>
+            <div className="flex items-center justify-center mb-4">
+              <div className="h-px bg-white/30 flex-1"></div>
+              <span className="px-4 text-white/50 text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                OR
+              </span>
+              <div className="h-px bg-white/30 flex-1"></div>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  if (fileInputRef.current) {
+                    fileInputRef.current.click()
+                  }
+                  onSound("click")
+                }}
+                disabled={isUploading}
+                className={`px-6 py-3 ${
+                  isUploading 
+                    ? "bg-gray-500 cursor-not-allowed" 
+                    : "bg-pikavault-cyan sm:hover:bg-pikavault-cyan/90"
+                } text-pikavault-dark font-bold flex items-center justify-center space-x-2`}
+                style={{ fontFamily: "'Monument Extended', sans-serif" }}
+                onMouseEnter={() => !isUploading && onSound("hover")}
+              >
+                <Upload className="w-5 h-5" />
+                <span>{isUploading ? "UPLOADING..." : "BROWSE FILES"}</span>
+              </button>
+              
+              {/* <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  if (cameraInputRef.current) {
+                    cameraInputRef.current.click()
+                  }
+                  onSound("click")
+                }}
+                disabled={isUploading}
+                className={`px-6 py-3 ${
+                  isUploading 
+                    ? "bg-gray-500 cursor-not-allowed" 
+                    : "bg-pikavault-yellow sm:hover:bg-pikavault-yellow/90"
+                } text-pikavault-dark font-bold flex items-center justify-center space-x-2`}
+                style={{ fontFamily: "'Monument Extended', sans-serif" }}
+                onMouseEnter={() => !isUploading && onSound("hover")}
+              >
+                <Camera className="w-5 h-5" />
+                <span>{isUploading ? "UPLOADING..." : "USE CAMERA"}</span>
+              </button> */}
+            </div>
           </>
         ) : (
           <div className="relative w-full h-full">
