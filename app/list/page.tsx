@@ -20,11 +20,8 @@ import {
   getUserAccount,
   findMarketplacePDA
 } from "@/lib/anchor/transactions"
-import { Keypair } from "@solana/web3.js"
-import { createMint } from "@solana/spl-token"
 import { MARKETPLACE_ADMIN } from "@/lib/anchor/config"
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js"
-import { searchCardsByName, formatCardForApp, detectCardFromText } from "@/lib/tcg-api"
 import { CacheDebug } from "@/components/debug/cache-debug"
 
 export default function ListingPage() {
@@ -611,7 +608,7 @@ export default function ListingPage() {
       />
 
       {/* Cache Debug Tool (only in development) */}
-      {process.env.NODE_ENV === 'development' && <CacheDebug />}
+      <CacheDebug />
     </div>
   )
 }
