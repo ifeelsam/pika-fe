@@ -45,10 +45,13 @@ export async function GET(
 
     const data = await response.json()
     
-    // Add cache headers for better performance
+    // Add cache headers for better performance + debug info
     return NextResponse.json(data, {
       headers: {
-        'Cache-Control': 's-maxage=900, stale-while-revalidate=1200' // Cache for 15 min
+        'Cache-Control': 's-maxage=600, stale-while-revalidate=1200', // Cache for 10 minutes
+        'X-Cache-Status': 'MISS', // This request hit the API
+        'X-Cache-Time': new Date().toISOString(),
+        'X-API-Source': 'Pokemon-TCG-API'
       }
     })
 

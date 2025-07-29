@@ -25,6 +25,7 @@ import { createMint } from "@solana/spl-token"
 import { MARKETPLACE_ADMIN } from "@/lib/anchor/config"
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js"
 import { searchCardsByName, formatCardForApp, detectCardFromText } from "@/lib/tcg-api"
+import { CacheDebug } from "@/components/debug/cache-debug"
 
 export default function ListingPage() {
   const [activeStep, setActiveStep] = useState(0)
@@ -608,6 +609,9 @@ export default function ListingPage() {
         message="WALLET NOT CONNECTED"
         secondaryMessage="Connect your wallet to list cards"
       />
+
+      {/* Cache Debug Tool (only in development) */}
+      {process.env.NODE_ENV === 'development' && <CacheDebug />}
     </div>
   )
 }
