@@ -31,7 +31,7 @@ export default function MarketplaceLoading() {
           </div>
 
           {/* Search Bar Skeleton */}
-          <div className="flex justify-end -mt-20 md:-mt-24 lg:-mt-32 mb-12 relative z-10">
+          <div className="hidden xl:flex justify-end -mt-20 md:-mt-24 lg:-mt-32 mb-12 relative z-10">
             <div className="w-full max-w-md relative">
               <Skeleton
                 className="absolute inset-0 bg-zinc-800/40 transform translate-x-2 translate-y-2 animate-pulse"

@@ -49,7 +49,7 @@ export function MarketplaceHeader() {
         MARKET<span className="text-pikavault-yellow">PLACE</span>
       </h1>
 
-      <div className="flex justify-end -mt-20 md:-mt-24 lg:-mt-32 mb-12 relative z-10">
+      <div className="hidden xl:flex justify-end -mt-20 md:-mt-24 lg:-mt-32 mb-12 relative z-10">
         <div ref={searchRef} className="w-full max-w-md relative group">
           <div className="absolute inset-0 bg-pikavault-yellow/10 transform translate-x-2 translate-y-2 group-focus-within:translate-x-3 group-focus-within:translate-y-3 transition-transform duration-300"></div>
           <div className="relative flex items-center border-4 border-white/30 group-focus-within:border-pikavault-yellow bg-pikavault-dark transition-colors duration-300">
