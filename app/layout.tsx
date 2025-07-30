@@ -3,6 +3,7 @@ import './globals.css'
 import { WalletContextProvider } from '@/components/providers/wallet-provider'
 import { MarketplaceProvider } from '@/components/marketplace/marketplace-context'
 import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export const metadata: Metadata = {
   title: 'PikaVault - Digital Card Collection',
@@ -25,6 +26,7 @@ export default function RootLayout({
           </MarketplaceProvider>
         </WalletContextProvider>
         <Analytics/>
+        <SpeedInsights/>
       </body>
     </html>
   )
