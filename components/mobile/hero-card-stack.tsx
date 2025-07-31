@@ -46,7 +46,7 @@ export function HeroCardStack() {
     {
       id: 1,
       color: "pikavault-pink",
-      borderColor: "border-pikavault-pink",
+      borderColor: "border-pikavault-yellow",
       image: "/electric-pokemon-card.png",
       rotation: -12,
       zIndex: 30,
@@ -56,7 +56,7 @@ export function HeroCardStack() {
     {
       id: 2,
       color: "pikavault-teal",
-      borderColor: "border-pikavault-teal",
+      borderColor: "border-pikavault-pink",
       image: "/cyber-pokemon-card.png",
       rotation: 0,
       zIndex: 20,
@@ -66,7 +66,7 @@ export function HeroCardStack() {
     {
       id: 3,
       color: "pikavault-yellow",
-      borderColor: "border-pikavault-yellow",
+      borderColor: "border-pikavault-cyan",
       image: "/digital-wave-pokemon-card.png",
       rotation: 15,
       zIndex: 10,
@@ -201,7 +201,7 @@ export function HeroCardStack() {
 
       {/* Headline with Electric Effects */}
       <motion.h1
-        className="text-[40px] font-black mb-6 text-center leading-none font-monument"
+        className={`text-[40px] font-black mb-6 text-center leading-none font-monument ${electricActive ? 'z-20' : ''}`}
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.8 }}

@@ -43,7 +43,7 @@ export function FilterBar() {
   return (
     <div ref={filterBarRef} className="mb-12" style={{ opacity: isAnimated ? 1 : 0 }}>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold font-monument">
+        <h2 className="text-lg md:text-2xl font-bold font-monument">
           FILTERS
         </h2>
 
@@ -51,14 +51,14 @@ export function FilterBar() {
           {hasActiveFilters && (
             <button
               onClick={resetFilters}
-              className="flex items-center space-x-2 text-white/70 sm:hover:text-pikavault-yellow transition-colors group"
+              className="flex items-center space-x-2 text-sm md:text-md text-white/70 sm:hover:text-pikavault-yellow transition-colors group"
             >
-              <X className="w-5 h-5 sm:group-hover:scale-125 transition-transform" />
+              <X className="w-3 h-3 md:w-5 md:h-5 sm:group-hover:scale-125 transition-transform" />
               <span className="font-space-grotesk">RESET</span>
             </button>
           )}
 
-          <p className="text-white/70 font-space-grotesk">
+          <p className="text-sm md:text-md text-white/70 font-space-grotesk">
             {filteredCards.length} CARDS
           </p>
         </div>
@@ -78,7 +78,7 @@ export function FilterBar() {
                     key={option.id}
                     onClick={() => toggleFilter(filter.id, option.id)}
                     className={`
-                      px-4 py-3 border-4 transition-all duration-300 font-space-grotesk
+                      text-sm md:text-[15px] px-2 py-2 md:px-4 md:py-3 border-4 transition-all duration-300 font-space-grotesk
                       ${
                         option.active
                           ? "border-pikavault-yellow bg-pikavault-yellow/10 scale-105"
