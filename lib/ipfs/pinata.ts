@@ -11,7 +11,7 @@ import axios from 'axios';
  */
 export const uploadToIrys = async (file: File, wallet?: any): Promise<string> => {
   try {
-    console.log('Uploading to Irys via Pinata gateway (simplified approach)...');
+    process.env.NODE_ENV == "development" && console.log('Uploading to Irys via Pinata gateway via simplified approach');
     
     // For now, use Pinata but return an Irys-compatible format
     // This is a temporary solution until Irys SDK issues are resolved
@@ -47,7 +47,7 @@ export const uploadToIrys = async (file: File, wallet?: any): Promise<string> =>
     console.log('File uploaded via Irys-compatible gateway:', irysUrl);
     return irysUrl;
   } catch (error) {
-    console.error('Error uploading to Irys:', error);
+    process.env.NODE_ENV == "development" && console.error('Error uploading to Irys:', error);
     if (axios.isAxiosError(error)) {
       if (error.response) {
         console.error('Response data:', error.response.data);

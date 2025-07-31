@@ -126,7 +126,7 @@ export function UploadZone({ onImageUpload, uploadedImages, isProcessing, onSoun
         setIsUploading(false)
       }, 500)
     } catch (error) {
-      console.error("Error uploading to Irys:", error)
+      process.env.NODE_ENV == "development" && console.error("Error uploading to Irys:", error)
       setUploadError("Failed to upload to Irys. Please try again.")
       setIsUploading(false)
       setUploadProgress(0)
@@ -270,10 +270,10 @@ export function UploadZone({ onImageUpload, uploadedImages, isProcessing, onSoun
         {!cameraActive ? (
           <>
             <Upload className="w-16 h-16 text-white/50 mb-4" />
-            <p className="text-xl font-bold text-center mb-2" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
+            <p className="text-md md:text-xl font-bold text-center mb-2" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
               DRAG AND DROP HERE
             </p>
-            <p className="text-white/70 text-center mb-4" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            <p className="text-white/70 text-xs md:text-sm text-center mb-4" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               Upload high-quality images of your card (front, back, corners, holographic effect)
             </p>
             <div className="flex items-center justify-center mb-4">
@@ -297,34 +297,13 @@ export function UploadZone({ onImageUpload, uploadedImages, isProcessing, onSoun
                   isUploading 
                     ? "bg-gray-500 cursor-not-allowed" 
                     : "bg-pikavault-cyan sm:hover:bg-pikavault-cyan/90"
-                } text-pikavault-dark font-bold flex items-center justify-center space-x-2`}
+                } text-pikavault-dark text-sm md:text-md font-bold flex items-center justify-center space-x-2`}
                 style={{ fontFamily: "'Monument Extended', sans-serif" }}
                 onMouseEnter={() => !isUploading && onSound("hover")}
               >
                 <Upload className="w-5 h-5" />
                 <span>{isUploading ? "UPLOADING..." : "BROWSE FILES"}</span>
-              </button>
-              
-              {/* <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  if (cameraInputRef.current) {
-                    cameraInputRef.current.click()
-                  }
-                  onSound("click")
-                }}
-                disabled={isUploading}
-                className={`px-6 py-3 ${
-                  isUploading 
-                    ? "bg-gray-500 cursor-not-allowed" 
-                    : "bg-pikavault-yellow sm:hover:bg-pikavault-yellow/90"
-                } text-pikavault-dark font-bold flex items-center justify-center space-x-2`}
-                style={{ fontFamily: "'Monument Extended', sans-serif" }}
-                onMouseEnter={() => !isUploading && onSound("hover")}
-              >
-                <Camera className="w-5 h-5" />
-                <span>{isUploading ? "UPLOADING..." : "USE CAMERA"}</span>
-              </button> */}
+              </button>  
             </div>
           </>
         ) : (
