@@ -104,7 +104,7 @@ export default function ListingPage() {
   useEffect(() => {
     const interval = setInterval(() => {
       if (cardData.name && connected) {
-        console.log("Auto-saving listing...")
+        process.env.NODE_ENV == "development" && console.log("Auto-saving listing...")
         // In a real app, this would save to localStorage or backend
       }
     }, 30000)
