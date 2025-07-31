@@ -143,9 +143,9 @@ export const createUmiInstance = (
 
   if (wallet) {
     umi.use(walletAdapterIdentity(wallet));
-    console.log("umi:", umi)
+    process.env.NODE_ENV == "development" && console.log("umi", umi)
   }
-  console.log("umi", umi)
+  process.env.NODE_ENV == "development" && console.log("umi", umi)
 
   return umi;
 };
