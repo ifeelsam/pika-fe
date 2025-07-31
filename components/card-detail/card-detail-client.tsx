@@ -51,7 +51,6 @@ export function CardDetailClient({ params }: CardDetailClientProps) {
 
   // Sound effects handler
   const playSound = (soundType: "hover" | "click" | "success") => {
-    console.log(`Playing ${soundType} sound`)
   }
 
   if (!card) {

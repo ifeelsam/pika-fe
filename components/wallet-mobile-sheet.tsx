@@ -47,7 +47,6 @@ export function WalletMobileSheet({
   // Sound effects
   const playSound = (type: "hover" | "click" | "success") => {
     // In a real app, you would implement actual sound effects here
-    console.log(`Playing ${type} sound`)
   }
 
   if (!isOpen) return null

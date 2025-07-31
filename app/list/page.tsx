@@ -329,7 +329,6 @@ export default function ListingPage() {
   // Sound effects
   const playSound = (soundType: "hover" | "click" | "success" | "error") => {
     // In a real app, you would implement actual sound effects here
-    console.log(`Playing ${soundType} sound`)
   }
 
   // Show wallet connection requirement if not connected
