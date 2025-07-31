@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
     // cache headers for performance + debug info
     return NextResponse.json(data, {
       headers: {
-        'Cache-Control': 's-maxage=86400, stale-while-revalidate=600', 
+        'Cache-Control': 's-maxage=86400, stale-while-revalidate=86400', 
         'X-Cache-Status': 'MISS', // This request hit the API
         'X-Cache-Time': new Date().toISOString(),
         'X-API-Source': 'Pokemon-TCG-API'
