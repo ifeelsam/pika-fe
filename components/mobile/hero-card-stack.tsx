@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 
 export function HeroCardStack() {
   const [electricActive, setElectricActive] = useState(false)
-  const [cardHover, setCardHover] = useState<number | null>(null)
+  const [cardShineActive, setCardShineActive] = useState<number | null>(null)
   const router = useRouter()
 
   // Trigger electric current animation periodically
@@ -17,6 +17,29 @@ export function HeroCardStack() {
     }, 6000)
 
     return () => clearInterval(interval)
+  }, [])
+
+  useEffect(() => {
+    let currentCardIndex = 0
+    
+    const shineCards = () => {
+      const cardId = currentCardIndex + 1
+      setCardShineActive(cardId)
+      setTimeout(() => setCardShineActive(null), 1500)
+      
+      currentCardIndex = (currentCardIndex + 1) % 3
+    }
+
+    const initialTimeout = setTimeout(shineCards, 2000)
+    
+    const interval = setInterval(() => {
+      shineCards()
+    }, 3500)
+
+    return () => {
+      clearTimeout(initialTimeout)
+      clearInterval(interval)
+    }
   }, [])
 
   const cards = [
@@ -115,7 +138,7 @@ export function HeroCardStack() {
               y: 0, 
               rotateX: 0,
               rotateZ: card.rotation,
-              rotateY: cardHover === card.id ? 15 : 0,
+              scale: cardShineActive === card.id ? 1.02 : 1,
             }}
             transition={{ 
               duration: 1, 
@@ -123,13 +146,6 @@ export function HeroCardStack() {
               type: "spring",
               stiffness: 100 
             }}
-            whileHover={{ 
-              scale: 1.05,
-              rotateY: 15,
-              transition: { duration: 0.3 }
-            }}
-            onHoverStart={() => setCardHover(card.id)}
-            onHoverEnd={() => setCardHover(null)}
           >
             {/* Card Container */}
             <div className={`relative w-full h-full ${card.borderColor} border-4 bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden group`}>
@@ -144,11 +160,32 @@ export function HeroCardStack() {
               
               {/* Holographic Shine Effect */}
               <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 sm:group-hover:opacity-100"
-                initial={{ x: "-100%" }}
-                animate={{ x: cardHover === card.id ? "100%" : "-100%" }}
-                transition={{ duration: 0.8, ease: "easeInOut" }}
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                initial={{ x: "-100%", opacity: 0 }}
+                animate={{ 
+                  x: cardShineActive === card.id ? "100%" : "-100%",
+                  opacity: cardShineActive === card.id ? 1 : 0
+                }}
+                transition={{ 
+                  duration: 1.2, 
+                  ease: "easeInOut",
+                  opacity: { duration: 0.3 }
+                }}
               />
+              
+              {/* sparkle effect */}
+              {cardShineActive === card.id && (
+                <motion.div
+                  className="absolute inset-0"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: [0, 1, 0] }}
+                  transition={{ duration: 1.2, ease: "easeInOut" }}
+                >
+                  <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-white rounded-full opacity-80" />
+                  <div className="absolute top-3/4 right-1/4 w-1 h-1 bg-white rounded-full opacity-60" />
+                  <div className="absolute top-1/2 right-1/3 w-1.5 h-1.5 bg-white rounded-full opacity-70" />
+                </motion.div>
+              )}
               
               {/* Deep Black Shadow */}
               <div 

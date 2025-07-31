@@ -44,7 +44,7 @@ export function MarketplaceHeader() {
   return (
     <div ref={headerRef} className="mb-12">
       <h1
-        className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black mb-8 tracking-tight font-monument"
+        className="text-[34px] sm:text-5xl md:text-7xl lg:text-8xl font-black mb-8 tracking-tight font-monument"
       >
         MARKET<span className="text-pikavault-yellow">PLACE</span>
       </h1>
