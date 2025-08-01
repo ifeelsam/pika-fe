@@ -446,10 +446,10 @@ export function UploadZone({ onImageUpload, uploadedImages, isProcessing, onSoun
 
       {/* Upload tips */}
       <div className="bg-white/5 p-6 border-l-4 border-white/30">
-        <h3 className="text-lg font-bold mb-4" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
-          PHOTO TIPS
+          <h3 className="text-lg font-bold mb-4 font-monument">
+            PHOTO TIPS
         </h3>
-        <ul className="space-y-2 text-white/70" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+        <ul className="space-y-2 text-sm sm:text-md text-white/70 font-space-grotesk">
           <li className="flex items-start space-x-2">
             <span className="text-pikavault-yellow font-bold">•</span>
             <span>Use good lighting without glare or shadows</span>
