@@ -117,7 +117,7 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
   ]
 
   // Mock languages
-  const languages = ["English", "Japanese", "French", "German", "Italian", "Spanish", "Chinese", "Korean"]
+  const languages = ["English", "Japanese", "Korean", "Chinese", "French", "German", "Italian", "Spanish", "Portuguese"]
 
   // Debounce the search query
   useEffect(() => {
@@ -283,7 +283,7 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
     <div ref={panelRef} className="space-y-8 relative">
       {/* Card search */}
       <div className="space-y-4 relative z-10">
-        <h3 className="text-xl font-bold" style={{ fontFamily: "'Monument Extended', sans-serif" }}>
+        <h3 className="text-xl font-bold font-monument">
           SEARCH CARD
         </h3>
 
@@ -338,7 +338,7 @@ export function CardInformationPanel({ cardData, updateCardData, onSound }: Card
                   onMouseEnter={() => onSound("hover")}
                 >
                   <Clock className="w-3 h-3" />
-                  <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{term}</span>
+                  <span className="font-space-grotesk">{term}</span>
                 </button>
               ))}
             </div>

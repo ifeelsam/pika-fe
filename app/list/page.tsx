@@ -363,16 +363,15 @@ export default function ListingPage() {
       <BackgroundEffects />
       <Navigation />
 
-      <main ref={pageRef} className="pt-24 pb-32 px-4 md:px-8 lg:px-12 relative z-10">
+      <main ref={pageRef} className="pt-24 pb-32 px-2 md:px-8 lg:px-12 relative z-10">
         <div className="container mx-auto">
           <h1
-            className="text-5xl md:text-7xl font-black mb-8 tracking-tight"
-            style={{ fontFamily: "'Monument Extended', sans-serif" }}
+            className="text-[34px] sm:text-5xl md:text-7xl font-black mb-8 tracking-tight font-monument"
           >
             TOKENIZE <span className="text-pikavault-yellow">YOUR CARD</span>
           </h1>
 
-          <p className="text-xl text-white/70 max-w-3xl mb-16" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+          <p className="text-md md:text-xl text-white/70 max-w-lg md:max-w-3xl mb-16" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
             Transform your physical Pokémon cards into digital assets on the blockchain. Our secure process ensures
             authenticity and provides a permanent record of ownership.
           </p>
