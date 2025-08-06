@@ -21,7 +21,7 @@ export function Footer() {
     },
     { 
       name: "discord", 
-      href: "https://discord.gg/pikavault",
+      href: "https://discord.gg/Zsv8mC8NHH",
       icon: "⚔️"
     },
     { 
