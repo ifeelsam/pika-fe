@@ -275,12 +275,6 @@ export function CardDisplay({ card, currentView, onViewChange, onInspectionOpen,
             </button>
           )}
         </div>
-
-        {/* Inspection hint */}
-        <div className="absolute top-8 right-8 flex items-center space-x-2 text-white/50">
-          <Eye className="w-5 h-5" />
-          <span style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Click to inspect</span>
-        </div>
       </div>
     </div>
   )
