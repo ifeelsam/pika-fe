@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Order {
+  id            String      @id @default(uuid())
+  listingPubkey String      @unique
+  nftMint       String
+  cardId        String?
+  price         Float
+  buyerWallet   String
+  sellerWallet  String
+  buyerEmail    String?
+  buyerTwitter  String?
+  status        OrderStatus @default(PENDING_SHIPMENT)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+enum OrderStatus {
+  PENDING_SHIPMENT
+  SHIPPED
+  ESCROW_RELEASED
+}

@@ -3,6 +3,7 @@
 import { useRef, useEffect } from "react"
 import { Search, X } from "lucide-react"
 import { useMarketplace } from "./marketplace-context"
+import { SellerNotificationBanner } from "./seller-notification-banner"
 import { gsap } from "gsap"
 
 export function MarketplaceHeader() {
@@ -48,6 +49,8 @@ export function MarketplaceHeader() {
       >
         MARKET<span className="text-pikavault-yellow">PLACE</span>
       </h1>
+
+      <SellerNotificationBanner />
 
       <div className="hidden xl:flex justify-end -mt-20 md:-mt-24 lg:-mt-32 mb-12 relative z-10">
         <div ref={searchRef} className="w-full max-w-md relative group">

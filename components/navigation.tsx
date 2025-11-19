@@ -20,6 +20,7 @@ export function Navigation() {
   const navItems = [
     { name: "COLLECTION", href: "/collection" },
     { name: "MARKETPLACE", href: "/marketplace" },
+    { name: "ORDERS", href: "/orders" },
     { name: "ABOUT", href: "/about" },
     { name: "LIST", href: "/list" },
   ]

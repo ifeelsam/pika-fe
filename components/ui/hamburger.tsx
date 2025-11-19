@@ -128,6 +128,9 @@ export const HamburgerNav = () => {
               <MenuLink href="/collection" onClick={() => setMenuOpen(false)}>
                 COLLECTION
               </MenuLink>
+              <MenuLink href="/orders" onClick={() => setMenuOpen(false)}>
+                ORDERS
+              </MenuLink>
               <MenuLink href="/list" onClick={() => setMenuOpen(false)}>
                 LIST CARDS
               </MenuLink>
