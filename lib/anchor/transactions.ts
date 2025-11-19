@@ -1,4 +1,4 @@
-import { PublicKey, SystemProgram, Keypair} from "@solana/web3.js";
+import { PublicKey, SystemProgram, Keypair, Transaction} from "@solana/web3.js";
 import { Program, BN } from "@coral-xyz/anchor";
 import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddress, createAssociatedTokenAccountInstruction, getAccount } from "@solana/spl-token";
 import { METADATA_PROGRAM_ID } from "./config";
@@ -236,7 +236,232 @@ export const listNFT = async (
   }
 };
 
-// Combined function: Mint NFT with UMI and list on marketplace
+// Batch list multiple NFTs in a single transaction
+// This is more efficient than calling listNFT multiple times
+export const batchListNFTs = async (
+  program: Program<PikaVault>,
+  maker: PublicKey,
+  marketplace: PublicKey,
+  listings: Array<{ nftMint: PublicKey; listingPrice: number }>
+) => {
+  try {
+    if (listings.length === 0) {
+      throw new Error("No NFTs to list");
+    }
+
+    // Solana transaction size limit is ~1232 bytes
+    // Each listing instruction is roughly ~200-300 bytes
+    // We can safely batch ~3-4 listings per transaction
+    // For larger batches, we'll split into multiple transactions
+    const MAX_LISTINGS_PER_TX = 4;
+    const results: Array<{ tx: string; listings: Array<{ listing: PublicKey; nftMint: PublicKey }> }> = [];
+
+    // Process listings in batches
+    for (let i = 0; i < listings.length; i += MAX_LISTINGS_PER_TX) {
+      const batch = listings.slice(i, i + MAX_LISTINGS_PER_TX);
+      
+      // Build instructions for this batch
+      const instructions = await Promise.all(
+        batch.map(async ({ nftMint, listingPrice }) => {
+          const [userAccount] = findUserAccountPDA(maker, program.programId);
+          const [listing] = findListingPDA(marketplace, nftMint, program.programId);
+          
+          const makerAta = await getAssociatedTokenAddress(nftMint, maker);
+          const vault = await getAssociatedTokenAddress(nftMint, listing, true);
+
+          // Get the instruction without sending it
+          return {
+            instruction: await program.methods
+              .listNft(new BN(listingPrice))
+              .accountsStrict({
+                maker: maker,
+                userAccount: userAccount,
+                marketplace: marketplace,
+                nftMint: nftMint,
+                makerAta: makerAta,
+                vault: vault,
+                listing: listing,
+                tokenProgram: TOKEN_PROGRAM_ID,
+                associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+                systemProgram: SystemProgram.programId,
+              })
+              .instruction(),
+            listing,
+            nftMint,
+          };
+        })
+      );
+
+      // Create a new transaction and add all instructions
+      const transaction = new Transaction();
+      instructions.forEach(({ instruction }) => {
+        transaction.add(instruction);
+      });
+
+      // Get recent blockhash
+      const { blockhash } = await program.provider.connection.getLatestBlockhash();
+      transaction.recentBlockhash = blockhash;
+      transaction.feePayer = maker;
+
+      // Sign and send the transaction
+      if (!program.provider.wallet) {
+        throw new Error("Wallet not available");
+      }
+      const signedTx = await program.provider.wallet.signTransaction(transaction);
+      const signature = await program.provider.connection.sendRawTransaction(signedTx.serialize());
+      
+      // Wait for confirmation
+      await program.provider.connection.confirmTransaction(signature, "confirmed");
+
+      console.log(`Batch listed ${batch.length} NFT(s) successfully! Transaction signature:`, signature);
+      
+      results.push({
+        tx: signature,
+        listings: instructions.map(({ listing, nftMint }) => ({ listing, nftMint })),
+      });
+    }
+
+    return results;
+  } catch (error) {
+    console.error("Error batch listing NFTs:", error);
+    throw error;
+  }
+};
+
+// Batch mint and list NFT in a single transaction
+// This combines the UMI mint instruction with the Anchor list instruction
+export const mintAndListNFTBatched = async (
+  program: Program<PikaVault>,
+  umi: Umi,
+  maker: PublicKey,
+  marketplace: PublicKey,
+  metadata: {
+    name: string;
+    symbol: string;
+    description: string;
+    image: string;
+    attributes?: Array<{ trait_type: string; value: string }>;
+  },
+  listingPrice: number,
+  wallet: any
+): Promise<{ nftMint: PublicKey; tx: string; metadataUri: string; listing: PublicKey }> => {
+  try {
+    // Step 1: Upload metadata and prepare mint
+    console.log("Uploading metadata to Irys...");
+    const metadataUri = await uploadMetadataToIrys(metadata, wallet);
+    console.log("Metadata uploaded to Irys:", metadataUri);
+
+    // Generate a new NFT mint signer
+    const nftMint = generateSigner(umi);
+    const nftMintPublicKey = new PublicKey(nftMint.publicKey);
+
+    // Step 2: Build the mint instruction using UMI
+    const createNftBuilder = createNft(umi, {
+      mint: nftMint,
+      name: metadata.name,
+      symbol: metadata.symbol,
+      uri: metadataUri,
+      sellerFeeBasisPoints: percentAmount(0), // 0% royalty
+    });
+
+    // Step 3: Build the list instruction using Anchor
+    const [userAccount] = findUserAccountPDA(maker, program.programId);
+    const [listing] = findListingPDA(marketplace, nftMintPublicKey, program.programId);
+    
+    const makerAta = await getAssociatedTokenAddress(nftMintPublicKey, maker);
+    const vault = await getAssociatedTokenAddress(nftMintPublicKey, listing, true);
+
+    const listInstruction = await program.methods
+      .listNft(new BN(listingPrice))
+      .accountsStrict({
+        maker: maker,
+        userAccount: userAccount,
+        marketplace: marketplace,
+        nftMint: nftMintPublicKey,
+        makerAta: makerAta,
+        vault: vault,
+        listing: listing,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        systemProgram: SystemProgram.programId,
+      })
+      .instruction();
+
+    // Step 4: Get blockhash and build combined transaction
+    const { blockhash, lastValidBlockHeight } = await program.provider.connection.getLatestBlockhash();
+    
+    // Get instructions from UMI builder before building
+    // UMI transaction builder has a getInstructions method
+    const mintInstructions = createNftBuilder.getInstructions();
+    
+    // Create a new web3.js Transaction
+    const combinedTransaction = new Transaction();
+    
+    // Add all mint instructions from UMI
+    mintInstructions.forEach((ix: any) => {
+      // Convert UMI instruction to web3.js instruction format
+      combinedTransaction.add({
+        keys: ix.keys.map((key: any) => ({
+          pubkey: new PublicKey(key.pubkey),
+          isSigner: key.isSigner,
+          isWritable: key.isWritable,
+        })),
+        programId: new PublicKey(ix.programId),
+        data: Buffer.from(ix.data),
+      });
+    });
+    
+    // Add the list instruction
+    combinedTransaction.add(listInstruction);
+    
+    // Set transaction properties
+    combinedTransaction.recentBlockhash = blockhash;
+    combinedTransaction.feePayer = maker;
+    
+    // Sign the transaction with both the wallet and the mint keypair
+    if (!program.provider.wallet) {
+      throw new Error("Wallet not available");
+    }
+    
+    // First, sign with wallet (this signs for the maker/fee payer)
+    const signedTx = await program.provider.wallet.signTransaction(combinedTransaction);
+    
+    // Get the mint keypair from UMI signer and sign the transaction
+    // UMI signers have a secretKey property we can use
+    const mintKeypair = Keypair.fromSecretKey(
+      Buffer.from(nftMint.secretKey)
+    );
+    
+    // Sign with the mint keypair
+    signedTx.partialSign(mintKeypair);
+    
+    // Send the fully signed transaction
+    const signature = await program.provider.connection.sendRawTransaction(
+      signedTx.serialize(),
+      { skipPreflight: false }
+    );
+    
+    // Wait for confirmation
+    await program.provider.connection.confirmTransaction(
+      { signature, blockhash, lastValidBlockHeight },
+      "confirmed"
+    );
+
+    console.log("NFT minted and listed in single transaction! Signature:", signature);
+
+    return {
+      nftMint: nftMintPublicKey,
+      tx: signature,
+      metadataUri,
+      listing,
+    };
+  } catch (error) {
+    console.error("Error in batch mint and list:", error);
+    throw error;
+  }
+};
+
+// Combined function: Mint NFT with UMI and list on marketplace (legacy - kept for compatibility)
 export const mintAndListNFT = async (
   program: Program<PikaVault>,
   maker: PublicKey,

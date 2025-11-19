@@ -16,6 +16,7 @@ import {
   registerUser, 
   createUmiInstance,
   mintNFTWithUmi,
+  mintAndListNFTBatched,
   listNFT,
   getUserAccount,
   findMarketplacePDA
@@ -326,54 +327,51 @@ export default function ListingPage() {
         : "PIKAVAULT";
       console.log("Using symbol:", symbol)
 
-      console.log("Minting and listing NFT...")
+      console.log("Minting and listing NFT (batched)...")
       
-      // Step 1: Create UMI instance and mint NFT with metadata
+      // Create UMI instance
       const umi = createUmiInstance(connection.rpcEndpoint, wallet)
       
-      const nftResult = await mintNFTWithUmi(umi, {
-        name: cardData.name || "Unnamed Card",
-        symbol: symbol,
-        description: `${cardData.set} - ${cardData.number} | ${cardData.condition} | ${cardData.rarity}`,
-        image: imageUrl,
-        attributes: [
-          { trait_type: "Set", value: cardData.set || "Unknown Set" },
-          { trait_type: "Number", value: cardData.number || "" },
-          { trait_type: "Rarity", value: cardData.rarity || "common" },
-          { trait_type: "Condition", value: cardData.condition || "Near Mint" },
-          { trait_type: "Language", value: cardData.language || "English" },
-          { trait_type: "Graded", value: cardData.isGraded ? "Yes" : "No" },
-          ...(cardData.isGraded && cardData.gradingCompany ? [{ trait_type: "Grading Company", value: cardData.gradingCompany }] : []),
-          ...(cardData.isGraded && cardData.gradingScore ? [{ trait_type: "Grade", value: cardData.gradingScore }] : []),
-        ]
-      }, wallet)
-
-      // Convert UMI public key to Solana public key
-      const nftMintPublicKey = new PublicKey(nftResult.nftMint.publicKey)
-      
-      console.log("NFT minted with metadata! Mint:", nftMintPublicKey.toString())
-      console.log("Metadata URI:", nftResult.metadataUri)
-
-      // Step 2: List the NFT on the marketplace
-      const listResult = await listNFT(
+      // Batch mint and list in optimized flow
+      // Note: True single-transaction batching of UMI + Anchor is complex due to different transaction formats
+      // This function optimizes the flow and sends transactions in sequence for better UX
+      const result = await mintAndListNFTBatched(
         program,
+        umi,
         wallet.publicKey,
         marketplacePDA,
-        nftMintPublicKey,
-        priceInLamports
+        {
+          name: cardData.name || "Unnamed Card",
+          symbol: symbol,
+          description: `${cardData.set} - ${cardData.number} | ${cardData.condition} | ${cardData.rarity}`,
+          image: imageUrl,
+          attributes: [
+            { trait_type: "Set", value: cardData.set || "Unknown Set" },
+            { trait_type: "Number", value: cardData.number || "" },
+            { trait_type: "Rarity", value: cardData.rarity || "common" },
+            { trait_type: "Condition", value: cardData.condition || "Near Mint" },
+            { trait_type: "Language", value: cardData.language || "English" },
+            { trait_type: "Graded", value: cardData.isGraded ? "Yes" : "No" },
+            ...(cardData.isGraded && cardData.gradingCompany ? [{ trait_type: "Grading Company", value: cardData.gradingCompany }] : []),
+            ...(cardData.isGraded && cardData.gradingScore ? [{ trait_type: "Grade", value: cardData.gradingScore }] : []),
+          ]
+        },
+        priceInLamports,
+        wallet
       )
 
-      setTransactionSignature(listResult.tx)
-      setNftMintAddress(nftMintPublicKey.toString())
+      setTransactionSignature(result.tx)
+      setNftMintAddress(result.nftMint.toString())
       
       console.log("NFT minted and listed successfully!")
-      console.log("Transaction:", listResult.tx)
-      console.log("NFT Mint:", nftMintPublicKey.toString())
+      console.log("Transaction:", result.tx)
+      console.log("NFT Mint:", result.nftMint.toString())
+      console.log("Metadata URI:", result.metadataUri)
       
       setIsProcessing(false)
       setIsPublished(true)
       
-      return listResult
+      return result
     } catch (mintError) {
       console.error("Error in minting process:", mintError)
       throw new Error(`Minting failed: ${mintError instanceof Error ? mintError.message : "Unknown error"}`)
