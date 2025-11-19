@@ -9,8 +9,6 @@ type SellerOrder = {
   listingPubkey: string
   status: string
   cardId?: string | null
-  buyerEmail?: string | null
-  buyerTwitter?: string | null
 }
 
 export function SellerNotificationBanner() {

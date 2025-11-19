@@ -10,8 +10,6 @@ const createOrderSchema = z.object({
   price: z.number().nonnegative(),
   buyerWallet: z.string().min(1, "Buyer wallet is required"),
   sellerWallet: z.string().min(1, "Seller wallet is required"),
-  buyerEmail: z.string().email().optional().or(z.literal("")),
-  buyerTwitter: z.string().optional(),
 })
 
 const updateOrderSchema = z.object({
@@ -24,17 +22,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const parsed = createOrderSchema.parse(body)
 
-    const hasContact =
-      (parsed.buyerEmail && parsed.buyerEmail.trim() !== "") ||
-      (parsed.buyerTwitter && parsed.buyerTwitter.trim() !== "")
-
-    if (!hasContact) {
-      return NextResponse.json(
-        { error: "Please provide at least one contact method" },
-        { status: 400 }
-      )
-    }
-
     const order = await prisma.order.upsert({
       where: { listingPubkey: parsed.listingPubkey },
       create: {
@@ -44,15 +31,11 @@ export async function POST(request: NextRequest) {
         price: parsed.price,
         buyerWallet: parsed.buyerWallet,
         sellerWallet: parsed.sellerWallet,
-        buyerEmail: parsed.buyerEmail?.trim() || null,
-        buyerTwitter: parsed.buyerTwitter?.trim() || null,
         status: OrderStatus.PENDING_SHIPMENT,
       },
       update: {
         buyerWallet: parsed.buyerWallet,
         sellerWallet: parsed.sellerWallet,
-        buyerEmail: parsed.buyerEmail?.trim() || null,
-        buyerTwitter: parsed.buyerTwitter?.trim() || null,
         price: parsed.price,
         nftMint: parsed.nftMint,
         cardId: parsed.cardId,
@@ -91,6 +74,10 @@ export async function GET(request: NextRequest) {
     if (listingPubkey) {
       const order = await prisma.order.findUnique({
         where: { listingPubkey },
+        include: { 
+          buyerProfile: true,
+          sellerProfile: true 
+        },
       })
       return NextResponse.json({ order })
     }
@@ -105,6 +92,10 @@ export async function GET(request: NextRequest) {
 
     const orders = await prisma.order.findMany({
       where: whereClause,
+      include: { 
+        buyerProfile: true,
+        sellerProfile: true 
+      },
       orderBy: { createdAt: "desc" },
     })
 

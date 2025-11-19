@@ -20,10 +20,12 @@ interface TransactionPanelProps {
 
 interface SellerOrder {
   listingPubkey: string
-  buyerEmail?: string | null
-  buyerTwitter?: string | null
   status: string
   createdAt: string
+  buyerProfile?: {
+    email?: string | null
+    twitter?: string | null
+  } | null
 }
 
 export function TransactionPanel({ isOpen, selectedCards, onClose }: TransactionPanelProps) {
@@ -155,7 +157,24 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
     const normalizedTwitter =
       buyerTwitter.trim() === "" ? "" : buyerTwitter.trim().replace(/^@/, "")
 
-    const response = await fetch("/api/orders", {
+    // First, save buyer profile
+    const buyerProfileResponse = await fetch("/api/buyers", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        walletAddress: buyerWallet,
+        email: buyerEmail.trim(),
+        twitter: normalizedTwitter,
+      }),
+    })
+
+    if (!buyerProfileResponse.ok) {
+      const data = await buyerProfileResponse.json().catch(() => null)
+      throw new Error(data?.error || "Failed to save buyer contact details.")
+    }
+
+    // Then, create the order (which will link to the buyer profile via relation)
+    const orderResponse = await fetch("/api/orders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -165,14 +184,12 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
         price: card.price,
         buyerWallet,
         sellerWallet: card.ownerAddress,
-        buyerEmail: buyerEmail.trim(),
-        buyerTwitter: normalizedTwitter,
       }),
     })
 
-    if (!response.ok) {
-      const data = await response.json().catch(() => null)
-      throw new Error(data?.error || "Failed to save buyer contact details.")
+    if (!orderResponse.ok) {
+      const data = await orderResponse.json().catch(() => null)
+      throw new Error(data?.error || "Failed to save order details.")
     }
   }
 
@@ -451,18 +468,18 @@ export function TransactionPanel({ isOpen, selectedCards, onClose }: Transaction
                           <p className="uppercase tracking-wide text-white/60">Buyer contact</p>
                           {isFetchingOrders ? (
                             <p className="text-white/50">Loading details...</p>
-                          ) : sellerOrders[card.listingPubkey] ? (
+                          ) : sellerOrders[card.listingPubkey]?.buyerProfile ? (
                             <>
-                              {sellerOrders[card.listingPubkey].buyerEmail && (
-                                <p className="text-white">Email: {sellerOrders[card.listingPubkey].buyerEmail}</p>
+                              {sellerOrders[card.listingPubkey].buyerProfile?.email && (
+                                <p className="text-white">Email: {sellerOrders[card.listingPubkey].buyerProfile?.email}</p>
                               )}
-                              {sellerOrders[card.listingPubkey].buyerTwitter && (
+                              {sellerOrders[card.listingPubkey].buyerProfile?.twitter && (
                                 <p className="text-white">
-                                  Twitter: @{sellerOrders[card.listingPubkey].buyerTwitter?.replace(/^@/, "")}
+                                  Twitter: @{sellerOrders[card.listingPubkey].buyerProfile?.twitter?.replace(/^@/, "")}
                                 </p>
                               )}
-                              {!sellerOrders[card.listingPubkey].buyerEmail &&
-                                !sellerOrders[card.listingPubkey].buyerTwitter && (
+                              {!sellerOrders[card.listingPubkey].buyerProfile?.email &&
+                                !sellerOrders[card.listingPubkey].buyerProfile?.twitter && (
                                   <p className="text-white/50">Buyer did not share contact</p>
                                 )}
                             </>

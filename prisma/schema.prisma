@@ -8,18 +8,41 @@ datasource db {
 }
 
 model Order {
-  id            String      @id @default(uuid())
-  listingPubkey String      @unique
+  id            String         @id @default(uuid())
+  listingPubkey String         @unique
   nftMint       String
   cardId        String?
   price         Float
   buyerWallet   String
   sellerWallet  String
-  buyerEmail    String?
-  buyerTwitter  String?
-  status        OrderStatus @default(PENDING_SHIPMENT)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  status        OrderStatus    @default(PENDING_SHIPMENT)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  
+  buyerProfile  BuyerProfile?  @relation(fields: [buyerWallet], references: [walletAddress])
+  sellerProfile SellerProfile? @relation(fields: [sellerWallet], references: [walletAddress])
+}
+
+model BuyerProfile {
+  id           String   @id @default(uuid())
+  walletAddress String  @unique
+  email        String?
+  twitter      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  orders       Order[]
+}
+
+model SellerProfile {
+  id           String   @id @default(uuid())
+  walletAddress String  @unique
+  email        String?
+  twitter      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  orders       Order[]
 }
 
 enum OrderStatus {

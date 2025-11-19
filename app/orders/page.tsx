@@ -22,12 +22,18 @@ type Order = {
   price: number
   buyerWallet: string
   sellerWallet: string
-  buyerEmail?: string | null
-  buyerTwitter?: string | null
   status: string
   createdAt: string
   cardName?: string
   cardImage?: string
+  buyerProfile?: {
+    email?: string | null
+    twitter?: string | null
+  } | null
+  sellerProfile?: {
+    email?: string | null
+    twitter?: string | null
+  } | null
 }
 
 export default function OrdersPage() {
@@ -337,23 +343,23 @@ export default function OrdersPage() {
                                 Buyer Contact Information
                               </p>
                               <div className="space-y-2">
-                                {order.buyerEmail ? (
+                                {order.buyerProfile?.email ? (
                                   <div className="flex items-center gap-2 text-white">
                                     <Mail className="w-4 h-4 text-pikavault-cyan" />
-                                    <span className="text-sm font-space-grotesk">{order.buyerEmail}</span>
+                                    <span className="text-sm font-space-grotesk">{order.buyerProfile.email}</span>
                                   </div>
                                 ) : (
                                   <p className="text-white/40 text-xs font-space-grotesk">No email provided</p>
                                 )}
-                                {order.buyerTwitter ? (
+                                {order.buyerProfile?.twitter ? (
                                   <div className="flex items-center gap-2 text-white">
                                     <Twitter className="w-4 h-4 text-pikavault-cyan" />
-                                    <span className="text-sm font-space-grotesk">@{order.buyerTwitter.replace(/^@/, "")}</span>
+                                    <span className="text-sm font-space-grotesk">@{order.buyerProfile.twitter.replace(/^@/, "")}</span>
                                   </div>
                                 ) : (
                                   <p className="text-white/40 text-xs font-space-grotesk">No Twitter provided</p>
                                 )}
-                                {!order.buyerEmail && !order.buyerTwitter && (
+                                {!order.buyerProfile?.email && !order.buyerProfile?.twitter && (
                                   <p className="text-pikavault-pink text-xs font-space-grotesk">
                                     ⚠️ Buyer did not provide contact information
                                   </p>
@@ -423,8 +429,31 @@ export default function OrdersPage() {
 
                             <div className="border-t border-white/10 pt-4">
                               <p className="text-white/70 text-xs uppercase tracking-wide mb-3 font-space-grotesk">
-                                Seller Information
+                                Seller Contact Information
                               </p>
+                              <div className="space-y-2 mb-3">
+                                {order.sellerProfile?.email ? (
+                                  <div className="flex items-center gap-2 text-white">
+                                    <Mail className="w-4 h-4 text-pikavault-yellow" />
+                                    <span className="text-sm font-space-grotesk">{order.sellerProfile.email}</span>
+                                  </div>
+                                ) : (
+                                  <p className="text-white/40 text-xs font-space-grotesk">No email provided</p>
+                                )}
+                                {order.sellerProfile?.twitter ? (
+                                  <div className="flex items-center gap-2 text-white">
+                                    <Twitter className="w-4 h-4 text-pikavault-yellow" />
+                                    <span className="text-sm font-space-grotesk">@{order.sellerProfile.twitter.replace(/^@/, "")}</span>
+                                  </div>
+                                ) : (
+                                  <p className="text-white/40 text-xs font-space-grotesk">No Twitter provided</p>
+                                )}
+                                {!order.sellerProfile?.email && !order.sellerProfile?.twitter && (
+                                  <p className="text-pikavault-pink text-xs font-space-grotesk">
+                                    ⚠️ Seller did not provide contact information
+                                  </p>
+                                )}
+                              </div>
                               <p className="text-white/50 text-xs font-space-grotesk">
                                 Seller Wallet: {order.sellerWallet.slice(0, 8)}...{order.sellerWallet.slice(-6)}
                               </p>

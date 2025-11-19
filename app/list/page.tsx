@@ -46,6 +46,9 @@ export default function ListingPage() {
     gradingCompany: "",
     gradingScore: "",
   })
+  const [sellerEmail, setSellerEmail] = useState("")
+  const [sellerTwitter, setSellerTwitter] = useState("")
+  const [contactError, setContactError] = useState<string | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [isPublished, setIsPublished] = useState(false)
   const [showToast, setShowToast] = useState(false)
@@ -64,8 +67,28 @@ export default function ListingPage() {
       setShowToast(true)
     } else if (program && wallet.publicKey) {
       checkUserRegistration()
+      loadSellerProfile()
     }
   }, [connected, program, wallet.publicKey])
+
+  // Load existing seller profile if available
+  const loadSellerProfile = async () => {
+    if (!wallet.publicKey) return
+    
+    try {
+      const params = new URLSearchParams({ wallet: wallet.publicKey.toString() })
+      const response = await fetch(`/api/sellers?${params.toString()}`)
+      if (response.ok) {
+        const data = await response.json()
+        if (data.profile) {
+          setSellerEmail(data.profile.email || "")
+          setSellerTwitter(data.profile.twitter || "")
+        }
+      }
+    } catch (error) {
+      console.log("No existing seller profile found")
+    }
+  }
 
   // Check if user is registered
   const checkUserRegistration = async () => {
@@ -200,6 +223,53 @@ export default function ListingPage() {
     setCardData({ ...cardData, ...data })
   }
 
+  // Validate seller contact info
+  const validateSellerContact = () => {
+    if (!sellerEmail.trim() && !sellerTwitter.trim()) {
+      setContactError("Please provide at least one contact method so buyers can reach you.")
+      return false
+    }
+
+    if (sellerEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sellerEmail.trim())) {
+      setContactError("Please enter a valid email address.")
+      return false
+    }
+
+    if (sellerTwitter && !/^@?[A-Za-z0-9_]{1,15}$/.test(sellerTwitter.trim())) {
+      setContactError("Twitter handles can only contain letters, numbers, or underscores.")
+      return false
+    }
+
+    setContactError(null)
+    return true
+  }
+
+  // Save seller contact info to database
+  const saveSellerProfile = async () => {
+    if (!wallet.publicKey) return
+
+    const normalizedTwitter = sellerTwitter.trim() === "" ? "" : sellerTwitter.trim().replace(/^@/, "")
+
+    try {
+      const response = await fetch("/api/sellers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          walletAddress: wallet.publicKey.toString(),
+          email: sellerEmail.trim(),
+          twitter: normalizedTwitter,
+        }),
+      })
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => null)
+        throw new Error(data?.error || "Failed to save contact details.")
+      }
+    } catch (error: any) {
+      throw new Error(error.message || "Failed to save seller contact details.")
+    }
+  }
+
   // Publish listing to blockchain
   const publishListing = async () => {
     if (!program || !wallet.publicKey || !connected) {
@@ -208,12 +278,21 @@ export default function ListingPage() {
 
     try {
       setPublishingError(null)
+      setContactError(null)
       setIsProcessing(true)
       
       // Validate required data
       if (!uploadedImages.length) {
         throw new Error("Please upload at least one image of your card")
       }
+
+      // Validate and save seller contact info
+      if (!validateSellerContact()) {
+        setIsProcessing(false)
+        return
+      }
+
+      await saveSellerProfile()
       
       console.log("Starting listing process with data:", {
         name: cardData.name,
@@ -451,6 +530,65 @@ export default function ListingPage() {
                   )}
                   {activeStep === 3 && (
                     <div className="space-y-8">
+                      {/* Seller Contact Information */}
+                      <div className="bg-white/5 border-4 border-pikavault-cyan p-8">
+                        <h3
+                          className="text-2xl font-black mb-4"
+                          style={{ fontFamily: "'Monument Extended', sans-serif" }}
+                        >
+                          YOUR CONTACT INFO
+                        </h3>
+                        <p className="text-white/70 mb-6" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                          Provide at least one contact method so buyers can reach you after purchasing your card.
+                        </p>
+                        
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-white/60 text-sm uppercase mb-2 font-space-grotesk">
+                              Email (Optional)
+                            </label>
+                            <input
+                              type="email"
+                              value={sellerEmail}
+                              onChange={(e) => {
+                                setSellerEmail(e.target.value)
+                                if (contactError) setContactError(null)
+                              }}
+                              placeholder="you@domain.com"
+                              className="w-full bg-transparent border-2 border-white/20 focus:border-pikavault-cyan px-4 py-3 text-white font-space-grotesk placeholder:text-white/30 transition-colors outline-none"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-white/60 text-sm uppercase mb-2 font-space-grotesk">
+                              Twitter / X (Optional)
+                            </label>
+                            <input
+                              type="text"
+                              value={sellerTwitter}
+                              onChange={(e) => {
+                                setSellerTwitter(e.target.value)
+                                if (contactError) setContactError(null)
+                              }}
+                              placeholder="@yourusername"
+                              className="w-full bg-transparent border-2 border-white/20 focus:border-pikavault-cyan px-4 py-3 text-white font-space-grotesk placeholder:text-white/30 transition-colors outline-none"
+                            />
+                          </div>
+
+                          {contactError && (
+                            <div className="bg-pikavault-pink/20 border-2 border-pikavault-pink p-3 text-center">
+                              <p className="text-pikavault-pink text-sm font-space-grotesk">
+                                {contactError}
+                              </p>
+                            </div>
+                          )}
+
+                          <p className="text-white/50 text-xs font-space-grotesk">
+                            Your contact info will only be shared with buyers after they purchase your card and escrow is created.
+                          </p>
+                        </div>
+                      </div>
+
                       <div className="bg-white/5 border-4 border-pikavault-yellow p-8">
                         <h3
                           className="text-2xl font-black mb-6"
@@ -552,13 +690,15 @@ export default function ListingPage() {
                     isProcessing ||
                     (activeStep === 0 && uploadedImages.length === 0) ||
                     (activeStep === 1 && (!cardData.name || !cardData.set || !cardData.rarity)) ||
-                    (activeStep === 2 && !cardData.condition)
+                    (activeStep === 2 && !cardData.condition) ||
+                    (activeStep === 3 && !sellerEmail.trim() && !sellerTwitter.trim())
                   }
                   className={`px-8 py-4 transition-all duration-300 ${
                     isProcessing ||
                     (activeStep === 0 && uploadedImages.length === 0) ||
                     (activeStep === 1 && (!cardData.name || !cardData.set || !cardData.rarity)) ||
-                    (activeStep === 2 && !cardData.condition)
+                    (activeStep === 2 && !cardData.condition) ||
+                    (activeStep === 3 && !sellerEmail.trim() && !sellerTwitter.trim())
                       ? "bg-white/20 text-white/50 cursor-not-allowed"
                       : activeStep === 3
                         ? "bg-pikavault-yellow text-pikavault-dark sm:hover:bg-pikavault-yellow/90"
@@ -571,7 +711,8 @@ export default function ListingPage() {
                       !(
                         (activeStep === 0 && uploadedImages.length === 0) ||
                         (activeStep === 1 && (!cardData.name || !cardData.set || !cardData.rarity)) ||
-                        (activeStep === 2 && !cardData.condition)
+                        (activeStep === 2 && !cardData.condition) ||
+                        (activeStep === 3 && !sellerEmail.trim() && !sellerTwitter.trim())
                       )
                     ) {
                       playSound("hover")
