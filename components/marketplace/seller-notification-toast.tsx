@@ -163,7 +163,7 @@ export function SellerNotificationToast() {
   if (!publicKey || isLoading || !isVisible || pendingOrders.length === 0) return null
 
   return (
-    <div className="fixed top-4 right-4 z-[100]">
+    <div className="fixed top-20 right-4 z-[100]">
       <div
         ref={toastRef}
         onClick={handleClick}
