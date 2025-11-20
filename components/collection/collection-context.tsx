@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { useWallet } from "@solana/wallet-adapter-react"
 import { useAnchorProgram } from "@/lib/anchor/client"
-import { getUserOwnedNFTs, listNFT, delistNFT, findMarketplacePDA } from "@/lib/anchor/transactions"
+import { getUserOwnedNFTs, listNFT, batchListNFTs, delistNFT, findMarketplacePDA } from "@/lib/anchor/transactions"
 import { PublicKey } from "@solana/web3.js"
 import { MARKETPLACE_ADMIN } from "@/lib/anchor/config"
 
@@ -260,34 +260,39 @@ export function CollectionProvider({ children }: { children: ReactNode }) {
         throw new Error("No unlisted cards selected")
       }
 
-      // List each NFT (could be batched in the future)
-      for (const card of cardsToList) {
-        console.log(`Listing NFT ${card.nftMint} for ${price} SOL`)
+      // Prepare listings for batch transaction
+      const listings = cardsToList.map(card => ({
+        nftMint: new PublicKey(card.nftMint),
+        listingPrice: priceInLamports,
+      }))
+
+      console.log(`Batch listing ${listings.length} NFT(s) for ${price} SOL each`)
+
+      try {
+        // Use batch listing to combine multiple listings into fewer transactions
+        const results = await batchListNFTs(
+          program,
+          publicKey,
+          marketplace,
+          listings
+        )
+
+        console.log(`Successfully batch listed ${listings.length} NFT(s) in ${results.length} transaction(s)`)
         
-        try {
-          await listNFT(
-            program,
-            publicKey,
-            marketplace,
-            new PublicKey(card.nftMint),
-            priceInLamports
-          )
-        } catch (listError: any) {
-          console.error(`Failed to list NFT ${card.nftMint}:`, listError)
-          
-          // Provide specific error messages for listing failures
-          if (listError.message?.includes("insufficient funds")) {
-            throw new Error(`Insufficient SOL to pay transaction fees for listing ${card.name}`)
-          } else if (listError.message?.includes("User rejected")) {
-            throw new Error("Transaction was cancelled by user")
-          } else {
-            throw new Error(`Failed to list ${card.name}: ${listError.message || "Unknown error"}`)
-          }
+        // Refresh the NFT list
+        await refreshNFTs()
+      } catch (listError: any) {
+        console.error(`Failed to batch list NFTs:`, listError)
+        
+        // Provide specific error messages for listing failures
+        if (listError.message?.includes("insufficient funds")) {
+          throw new Error(`Insufficient SOL to pay transaction fees for listing`)
+        } else if (listError.message?.includes("User rejected")) {
+          throw new Error("Transaction was cancelled by user")
+        } else {
+          throw new Error(`Failed to list NFTs: ${listError.message || "Unknown error"}`)
         }
       }
-
-      // Refresh the NFT list
-      await refreshNFTs()
       
     } catch (error: any) {
       console.error("Error listing NFTs:", error)
