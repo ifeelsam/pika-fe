@@ -173,34 +173,6 @@ export default function ListingPage() {
             rarity: "rare",
             suggestedPrice: 350, // $350.00
           },
-          {
-            name: "Pikachu",
-            set: "Base Set", 
-            number: "025/102",
-            rarity: "common",
-            suggestedPrice: 50, // $50.00
-          },
-          {
-            name: "Blastoise",
-            set: "Base Set",
-            number: "009/102", 
-            rarity: "rare",
-            suggestedPrice: 150, // $150.00
-          },
-          {
-            name: "Venusaur",
-            set: "Base Set",
-            number: "015/102",
-            rarity: "rare", 
-            suggestedPrice: 120, // $120.00
-          },
-          {
-            name: "Mewtwo",
-            set: "Base Set",
-            number: "010/102",
-            rarity: "rare",
-            suggestedPrice: 250, // $250.00
-          }
         ]
 
         const randomCard = mockCards[Math.floor(Math.random() * mockCards.length)]
