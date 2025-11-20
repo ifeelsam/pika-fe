@@ -831,17 +831,34 @@ export const getUserOwnedNFTs = async (
         allListings = [];
       }
       
-      const listingMap = new Map(
-        allListings.map(listing => [
-          listing.account.nftAddress.toString(),
-          {
-            listingPubkey: listing.publicKey.toString(),
-            price: parseInt(listing.account.listingPrice.toString()) / 1000000000, // Convert lamports to SOL
-            status: listing.account.status.active ? "active" as const 
-                   : listing.account.status.sold ? "sold" as const 
-                   : "unlisted" as const
+      // Check escrow existence for sold listings
+      const listingMap = new Map();
+      await Promise.all(
+        allListings.map(async (listing) => {
+          let status: "active" | "sold" | "unlisted" = "unlisted";
+          
+          if (listing.account.status.active) {
+            status = "active";
+          } else if (listing.account.status.sold) {
+            // Check if escrow still exists - if not, the sale is complete and we should skip it
+            try {
+              const [escrow] = findEscrowPDA(listing.publicKey, program.programId);
+              await program.account.escrow.fetch(escrow);
+              // Escrow exists, so it's still in "sold" state
+              status = "sold";
+            } catch (error) {
+              // Escrow doesn't exist, meaning it was released - skip this listing
+              console.log(`Escrow for listing ${listing.publicKey.toString()} was released, skipping`);
+              return;
+            }
           }
-        ])
+          
+          listingMap.set(listing.account.nftAddress.toString(), {
+            listingPubkey: listing.publicKey.toString(),
+            price: parseInt(listing.account.listingPrice.toString()) / 1000000000,
+            status
+          });
+        })
       );
 
       // Fetch metadata for each NFT in parallel with error handling

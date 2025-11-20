@@ -6,6 +6,7 @@ import { useRef, useEffect, useState } from "react"
 import { useCollection } from "./collection-context"
 import { gsap } from "gsap"
 import { Check, Eye, Share2, Tag } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 interface CollectionGridProps {
   selectedCards: string[]
@@ -19,7 +20,7 @@ export function CollectionGrid({ selectedCards, setSelectedCards }: CollectionGr
   const [contextMenuCard, setContextMenuCard] = useState<string | null>(null)
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 })
   const [isAnimated, setIsAnimated] = useState(false)
-
+  const router = useRouter()
   // Grid animation
   useEffect(() => {
     if (gridRef.current) {
@@ -393,7 +394,7 @@ export function CollectionGrid({ selectedCards, setSelectedCards }: CollectionGr
             }}
           >
             <div className="p-2">
-              <button className="w-full text-left px-3 py-2 text-white sm:hover:bg-white/10 flex items-center space-x-2">
+              <button onClick={() => router.push(`/card/${contextMenuCard}`)} className="w-full text-left px-3 py-2 text-white sm:hover:bg-white/10 flex items-center space-x-2">
                 <Eye className="w-4 h-4" />
                 <span className="font-space-grotesk">View Details</span>
               </button>

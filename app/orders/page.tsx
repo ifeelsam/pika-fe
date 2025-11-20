@@ -111,6 +111,14 @@ export default function OrdersPage() {
         const sellerOrdersList = Array.isArray(sellerData.orders) ? sellerData.orders : []
         const buyerOrdersList = Array.isArray(buyerData.orders) ? buyerData.orders : []
         
+        // Mark notification as viewed when orders page is visited
+        const pendingSellerOrders = sellerOrdersList.filter((order: Order) => order.status === "PENDING_SHIPMENT")
+        const viewedKey = `seller_notification_viewed_${publicKey.toString()}`
+        const viewedPendingCountKey = `seller_notification_viewed_count_${publicKey.toString()}`
+        localStorage.setItem(viewedKey, "true")
+        localStorage.setItem(viewedPendingCountKey, pendingSellerOrders.length.toString())
+        window.dispatchEvent(new CustomEvent("sellerNotificationViewed"))
+        
         // Fetch card metadata for seller orders
         const sellerOrdersWithMetadata = await Promise.all(
           sellerOrdersList.map(async (order: Order) => {

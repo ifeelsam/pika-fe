@@ -160,14 +160,38 @@ export function MarketplaceProvider({ children }: { children: ReactNode }) {
 
       const listings = await getAllListings(readOnlyProgram)
       
+      // Filter out listings where escrow has been released
+      const activeListingsPromises = listings.map(async (listing) => {
+        // If listing is sold, check if escrow still exists
+        if (listing.account.status.sold) {
+          try {
+            const [escrow] = PublicKey.findProgramAddressSync(
+              [Buffer.from("escrow"), listing.publicKey.toBuffer()],
+              readOnlyProgram.programId
+            );
+            await readOnlyProgram.account.escrow.fetch(escrow);
+            // Escrow exists, keep the listing
+            return listing;
+          } catch (error) {
+            // Escrow doesn't exist, filter out this listing
+            console.log(`Filtering out listing ${listing.publicKey.toString()} - escrow released`);
+            return null;
+          }
+        }
+        return listing;
+      });
+      
+      const activeListingsResults = await Promise.all(activeListingsPromises);
+      const activeListings = activeListingsResults.filter((listing): listing is NonNullable<typeof listing> => listing !== null);
+      
       // Fetch metadata for all NFTs in parallel
-      const metadataPromises = listings.map(listing => 
+      const metadataPromises = activeListings.map(listing => 
         fetchNFTMetadata(listing.account.nftAddress.toString())
       )
       
       const metadataResults = await Promise.allSettled(metadataPromises)
       
-      const formattedCards: BaseCardData[] = listings.map((listing, index) => {
+      const formattedCards: BaseCardData[] = activeListings.map((listing, index) => {
         const priceInSol = parseInt(listing.account.listingPrice.toString()) / LAMPORTS_PER_SOL
         
         // Get metadata or fallback
