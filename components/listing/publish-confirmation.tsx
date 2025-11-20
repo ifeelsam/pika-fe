@@ -4,6 +4,7 @@ import { useRef, useEffect } from "react"
 import { gsap } from "gsap"
 import { Check, ExternalLink } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 interface PublishConfirmationProps {
   cardData: any
@@ -19,7 +20,7 @@ export function PublishConfirmation({
   nftMintAddress 
 }: PublishConfirmationProps) {
   const confirmationRef = useRef<HTMLDivElement>(null)
-
+  const router = useRouter()
   // Animation for confirmation
   useEffect(() => {
     if (confirmationRef.current) {
@@ -120,7 +121,7 @@ export function PublishConfirmation({
                   className="flex items-center space-x-1 text-white/70 sm:hover:text-pikavault-yellow transition-colors mt-1 break-all"
                 >
                   <span className="font-mono text-xs" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                    {transactionSignature}
+                    {transactionSignature?.toString().slice(0, 10)}...{transactionSignature?.toString().slice(-10)}
                   </span>
                   <ExternalLink className="w-4 h-4 flex-shrink-0 ml-1" />
                 </a>
@@ -139,7 +140,7 @@ export function PublishConfirmation({
                   className="flex items-center space-x-1 text-white/70 sm:hover:text-pikavault-yellow transition-colors mt-1 break-all"
                 >
                   <span className="font-mono text-xs" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                    {nftMintAddress}
+                    {nftMintAddress?.slice(0, 10)}...{nftMintAddress?.slice(-10)}
                   </span>
                   <ExternalLink className="w-4 h-4 flex-shrink-0 ml-1" />
                 </a>
@@ -161,13 +162,13 @@ export function PublishConfirmation({
       </div>
 
       <div className="space-y-4">
-        <Link
-          href={`/card/${nftMintAddress}`}
-          className="inline-block px-8 py-4 bg-pikavault-yellow text-pikavault-dark font-bold text-lg"
+        <button
+          onClick={() => router.push(`/card/${nftMintAddress}`)}
+          className="inline-block px-8 py-4 bg-pikavault-yellow text-pikavault-dark font-bold text-lg cursor-pointer"
           style={{ fontFamily: "'Monument Extended', sans-serif" }}
         >
           VIEW LISTING
-        </Link>
+        </button>
 
         <div className="flex justify-center space-x-6 mt-4">
           <Link
